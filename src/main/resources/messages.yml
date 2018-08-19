@@ -1,0 +1,9 @@
+sender:
+  teleport-request-incoming: "&7Teleportation request to &b%receiver%"
+  teleport-request-denied: "&b%receiver% &7denied your teleportation request."
+  teleport-request-accepted: "&b%receiver% &7accepted your teleportation request."
+  teleport-request-pending: "&b%receiver% &7has already pending teleportation request."
+receiver:
+  teleport-request-incoming: "&b%sender% &7wants teleport to you!"
+  teleport-request-denied: "&7You denied &b%sender%'s &7teleportation request."
+  teleport-request-accepted: "&7You accepted &b%sender% &7teleportation request."
