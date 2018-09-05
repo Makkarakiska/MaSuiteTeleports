@@ -1,12 +1,15 @@
-invalid-coords: "&cInvalid coordinates given!"
+invalid-coords-given: "&cInvalid coordinates given!"
+teleported: "&7You have been teleported to &b%player%&7!"
 sender:
-  teleport-request-incoming: "&7Teleportation request sent to &b%receiver%"
+  teleport-to-request-incoming: "&7Teleportation request sent to &b%receiver%&7!"
+  teleport-here-request-incoming: "Teleportation request sent to &b%receiver%!"
   teleport-request-denied: "&b%receiver% &7denied your teleportation request."
   teleport-request-accepted: "&b%receiver% &7accepted your teleportation request."
   teleport-request-expired: "&7Teleportation request for &b%receiver% &7expired."
   teleport-request-pending: "&b%receiver% &7has already pending teleportation request."
 receiver:
-  teleport-request-incoming: "&b%sender% &7wants teleport to you!"
+  teleport-to-request-incoming: "&b%sender% &7wants teleport to you!"
+  teleport-here-request-incoming: "&b%sender% &7wants you to teleport to her!"
   teleport-request-denied: "&7You denied &b%sender%'s &7teleportation request."
   teleport-request-accepted: "&7You accepted &b%sender% &7teleportation request."
   teleport-request-expired: "&7Teleportation request from &b%sender% &7expired."

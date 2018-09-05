@@ -20,62 +20,131 @@ public class Request implements Listener {
     private Configuration config = new Configuration();
     private MaSuiteTeleports plugin;
 
-    public Request(MaSuiteTeleports p){
+    public Request(MaSuiteTeleports p) {
         plugin = p;
     }
-    public void createRequest(ProxiedPlayer sender, ProxiedPlayer receiver){
 
-        if(!Teleport.receivers.containsKey(receiver.getUniqueId())){
+    public void createRequest(ProxiedPlayer sender, ProxiedPlayer receiver) {
+
+        if (!Teleport.receivers.containsKey(receiver.getUniqueId())) {
             Teleport.senders.put(sender.getUniqueId(), receiver.getUniqueId());
             Teleport.receivers.put(receiver.getUniqueId(), sender.getUniqueId());
-            sender.sendMessage(new TextComponent(formator.colorize(config.load("teleports","messages.yml").getString("sender.teleport-request-incoming"))));
-            receiver.sendMessage(new TextComponent(formator.colorize(config.load("teleports","messages.yml").getString("receiver.teleport-request-incoming"))));
+            Teleport.method.put(sender.getUniqueId(), "to");
+            sender.sendMessage(new TextComponent(formator.colorize(config.load("teleports", "messages.yml")
+                    .getString("sender.teleport-to-request-incoming")
+                    .replace("%sender%", sender.getName())
+                    .replace("%receiver%", receiver.getName()))));
+            receiver.sendMessage(new TextComponent(formator.colorize(config.load("teleports", "messages.yml")
+                    .getString("receiver.teleport-to-request-incoming")
+                    .replace("%sender%", sender.getName())
+                    .replace("%receiver%", receiver.getName()))));
 
             ProxyServer.getInstance().getScheduler().schedule(plugin, new Runnable() {
                 public void run() {
                     cancelRequest(receiver, "timer");
                 }
-            }, config.load("teleports","settings.yml").getInt("keep-request-alive"), TimeUnit.SECONDS);
-        }else{
-            sender.sendMessage(new TextComponent(formator.colorize(config.load("teleports","messages.yml").getString("sender.teleport-request-pending"))));
+            }, config.load("teleports", "settings.yml").getInt("keep-request-alive"), TimeUnit.SECONDS);
+        } else {
+            sender.sendMessage(new TextComponent(formator.colorize(config.load("teleports", "messages.yml")
+                    .getString("sender.teleport-request-pending")
+                    .replace("%sender%", sender.getName())
+                    .replace("%receiver%", receiver.getName())
+            )));
         }
 
     }
 
+    public void createHereRequest(ProxiedPlayer sender, ProxiedPlayer receiver) {
+
+        if (!Teleport.receivers.containsKey(receiver.getUniqueId())) {
+            Teleport.senders.put(sender.getUniqueId(), receiver.getUniqueId());
+            Teleport.receivers.put(receiver.getUniqueId(), sender.getUniqueId());
+            Teleport.method.put(sender.getUniqueId(), "here");
+            formator.sendMessage(sender, config.load("teleports", "messages.yml")
+                    .getString("sender.teleport-here-request-incoming")
+                    .replace("%sender%", sender.getName())
+                    .replace("%receiver%", receiver.getName())
+            );
+            formator.sendMessage(receiver, config.load("teleports", "messages.yml")
+                    .getString("receiver.teleport-here-request-incoming")
+                    .replace("%sender%", sender.getName())
+                    .replace("%receiver%", receiver.getName())
+            );
+
+            ProxyServer.getInstance().getScheduler().schedule(plugin, new Runnable() {
+                public void run() {
+                    cancelRequest(receiver, "timer");
+                }
+            }, config.load("teleports", "settings.yml").getInt("keep-request-alive"), TimeUnit.SECONDS);
+        } else {
+            formator.sendMessage(sender, config.load("teleports", "messages.yml")
+                    .getString("sender.teleport-request-pending")
+                    .replace("%sender%", sender.getName())
+                    .replace("%receiver%", receiver.getName())
+            );
+        }
+
+    }
+
+
     public void cancelRequest(ProxiedPlayer receiver, String type) {
-        if(Teleport.receivers.containsKey(receiver.getUniqueId())) {
+        if (Teleport.receivers.containsKey(receiver.getUniqueId())) {
             ProxiedPlayer sender = ProxyServer.getInstance().getPlayer(Teleport.receivers.get(receiver.getUniqueId()));
-            if(sender != null){
+            if (sender != null) {
                 if (Teleport.senders.containsKey(sender.getUniqueId())) {
+                    if (type.equals("timer")) {
+                        formator.sendMessage(sender, config.load("teleports", "messages.yml")
+                                .getString("sender.teleport-request-expired")
+                                .replace("%receiver%", receiver.getName())
+                        );
+                        formator.sendMessage(receiver, config.load("teleports", "messages.yml")
+                                .getString("receiver.teleport-request-expired")
+                                .replace("%sender%", sender.getName())
+
+                        );
+                    } else if (type.equals("player")) {
+                        formator.sendMessage(receiver, config.load("teleports", "messages.yml")
+                                .getString("sender.teleport-request-denied")
+                                .replace("%sender%", sender.getName())
+                                .replace("%receiver%", receiver.getName())
+                        );
+                        formator.sendMessage(receiver, config.load("teleports", "messages.yml")
+                                .getString("receiver.teleport-request-denied")
+                                .replace("%sender%", sender.getName())
+                                .replace("%receiver%", receiver.getName())
+                        );
+                    }
                     Teleport.senders.remove(sender.getUniqueId(), receiver.getUniqueId());
                     Teleport.receivers.remove(receiver.getUniqueId(), sender.getUniqueId());
-                    if(type.equals("timer")){
-                        sender.sendMessage(new TextComponent(formator.colorize(config.load("teleports", "messages.yml").getString("sender.teleport-request-expired"))));
-                        receiver.sendMessage(new TextComponent(formator.colorize(config.load("teleports", "messages.yml").getString("receiver.teleport-request-expired"))));
-                    }else if(type.equals("player")){
-                        sender.sendMessage(new TextComponent(formator.colorize(config.load("teleports", "messages.yml").getString("sender.teleport-request-denied"))));
-                        receiver.sendMessage(new TextComponent(formator.colorize(config.load("teleports", "messages.yml").getString("receiver.teleport-request-denied"))));
-                    }
-
+                    Teleport.method.remove(sender.getUniqueId());
                 }
             }
         }
     }
 
-    public void acceptRequest(ProxiedPlayer receiver){
-        if(Teleport.receivers.containsKey(receiver.getUniqueId())){
+    public void acceptRequest(ProxiedPlayer receiver) {
+        if (Teleport.receivers.containsKey(receiver.getUniqueId())) {
             ProxiedPlayer sender = ProxyServer.getInstance().getPlayer(Teleport.receivers.get(receiver.getUniqueId()));
-            if(sender != null){
-                sender.sendMessage(new TextComponent(formator.colorize(config.load("teleports","messages.yml").getString("sender.teleport-request-accepted"))));
-                receiver.sendMessage(new TextComponent(formator.colorize(config.load("teleports","messages.yml").getString("receiver.teleport-request-accepted"))));
+            if (sender != null) {
+                formator.sendMessage(sender, config.load("teleports", "messages.yml")
+                        .getString("sender.teleport-request-accepted")
+                        .replace("%sender%", sender.getName())
+                        .replace("%receiver%", receiver.getName())
+                );
+                formator.sendMessage(receiver, config.load("teleports", "messages.yml")
+                        .getString("receiver.teleport-request-accepted")
+                        .replace("%sender%", sender.getName())
+                        .replace("%receiver%", receiver.getName())
+                );
                 PlayerToPlayer(sender, receiver);
                 Teleport.senders.remove(sender.getUniqueId());
                 Teleport.receivers.remove(receiver.getUniqueId());
-            }else{
-                receiver.sendMessage(new TextComponent(formator.colorize(config.load("messages.yml").getString("player-not-online"))));
+                Teleport.method.remove(sender.getUniqueId());
+            } else {
+                formator.sendMessage(receiver,config.load("messages.yml").getString("player-not-online"));
             }
-        }else{
-            receiver.sendMessage(new TextComponent(formator.colorize(config.load("teleports","messages.yml").getString("receiver.no-pending-teleport-requests"))));
+        } else {
+            formator.sendMessage(receiver,config.load("teleports", "messages.yml").getString("receiver.no-pending-teleport-requests"));
         }
 
     }

@@ -5,6 +5,7 @@ import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
 import fi.matiaspaavilainen.masuiteteleports.managers.requests.Request;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
@@ -17,10 +18,14 @@ public class Deny extends Command {
 
     @Override
     public void execute(CommandSender cs, String[] args) {
+        Formator formator = new Formator();
+        Configuration config = new Configuration();
         if (args.length == 0) {
             ProxiedPlayer sender = (ProxiedPlayer) cs;
             fi.matiaspaavilainen.masuiteteleports.managers.requests.Request tp = new Request(plugin);
             tp.cancelRequest(sender, "player");
+        }else{
+            formator.sendMessage((ProxiedPlayer) cs, config.load("teleports", "syntax.yml").getString("tpdeny"));
         }
     }
 }

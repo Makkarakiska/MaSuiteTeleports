@@ -5,14 +5,16 @@ import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
 import fi.matiaspaavilainen.masuiteteleports.managers.requests.Request;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.Listener;
 
-public class Accept extends Command {
+public class To extends Command implements Listener {
     private MaSuiteTeleports plugin;
-    public Accept(MaSuiteTeleports p) {
-        super("tpaccept", "masuiteteleports.teleport.accept", "tpyes");
+    public To(MaSuiteTeleports p) {
+        super("tpa", "masuiteteleports.teleport.request");
         plugin = p;
     }
 
@@ -20,15 +22,18 @@ public class Accept extends Command {
     public void execute(CommandSender cs, String[] args) {
         Configuration config = new Configuration();
         Formator formator = new Formator();
-
-
         // Teleport sender to player
-        if (args.length == 0) {
+        if (args.length == 1) {
             ProxiedPlayer sender = (ProxiedPlayer) cs;
+            ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
+            if (target == null) {
+                formator.sendMessage(sender, config.load(null,"messages.yml").getString("player-not-online"));
+            } else {
                 Request tp = new Request(plugin);
-                tp.acceptRequest(sender);
+                tp.createRequest(sender, target);
+            }
         }else{
-            formator.sendMessage((ProxiedPlayer) cs, config.load("teleports", "syntax.yml").getString("tpaccept"));
+            formator.sendMessage((ProxiedPlayer) cs, config.load("teleports", "syntax.yml").getString("tpa"));
         }
     }
 }

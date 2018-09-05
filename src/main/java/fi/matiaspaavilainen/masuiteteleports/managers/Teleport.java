@@ -15,11 +15,13 @@ import java.util.UUID;
 public class Teleport {
     public static HashMap<UUID, UUID> senders = new HashMap<>();
     public static HashMap<UUID, UUID> receivers = new HashMap<>();
+    public static HashMap<UUID, String> method = new HashMap<>();
+
     public static void PlayerToPlayer(ProxiedPlayer sender, ProxiedPlayer receiver) {
         Formator formator = new Formator();
         Configuration config = new Configuration();
-        if (receiver == null || sender == null) {
-            sender.sendMessage(new TextComponent(formator.colorize(config.load("messages.yml").getString("player-not-online"))));
+        if (receiver == null) {
+            formator.sendMessage(sender, config.load(null,"messages.yml").getString("player-not-online"));
         } else {
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(b);
@@ -29,8 +31,18 @@ public class Teleport {
                 }
                 out.writeUTF("Teleport");
                 out.writeUTF("PlayerToPlayer");
-                out.writeUTF(sender.getName());
-                out.writeUTF(receiver.getName());
+                if(method.containsKey(sender.getUniqueId())){
+                    if(method.get(sender.getUniqueId()).equals("here")){
+                        out.writeUTF(receiver.getName());
+                        out.writeUTF(sender.getName());
+                    }else{
+                        out.writeUTF(sender.getName());
+                        out.writeUTF(receiver.getName());
+                    }
+                }else{
+                    out.writeUTF(sender.getName());
+                    out.writeUTF(receiver.getName());
+                }
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }

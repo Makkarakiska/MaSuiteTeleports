@@ -1,13 +1,14 @@
-package fi.matiaspaavilainen.masuiteteleports.commands;
+package fi.matiaspaavilainen.masuiteteleports.commands.force;
 
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
-import fi.matiaspaavilainen.masuiteteleports.managers.requests.Request;
+import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.Listener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -15,8 +16,8 @@ import java.io.IOException;
 
 import static fi.matiaspaavilainen.masuiteteleports.managers.Teleport.PlayerToPlayer;
 
-public class Teleport extends Command {
-    public Teleport() {
+public class Teleport extends Command implements Listener {
+    public Teleport(MaSuiteTeleports p) {
         super("tp", "masuiteteleports.teleport.force", "teleport");
     }
 
@@ -25,23 +26,42 @@ public class Teleport extends Command {
         Configuration config = new Configuration();
         Formator formator = new Formator();
 
+        if(!(cs instanceof ProxiedPlayer)){
+            return;
+        }
 
         // Teleport sender to player
         if (args.length == 1) {
             ProxiedPlayer sender = (ProxiedPlayer) cs;
             ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
-            PlayerToPlayer(target, sender);
+            if(target == null){
+                formator.sendMessage((ProxiedPlayer) cs,config.load(null,"messages.yml").getString("player-not-online"));
+                return;
+            }
+            PlayerToPlayer(sender, target);
+            formator.sendMessage(sender, config.load("teleports","messages.yml")
+                    .getString("teleported")
+                    .replace("%player%", target.getName())
+            );
         }
 
         // Teleport player to other player
-        if (args.length == 2) {
+         else if (args.length == 2) {
             ProxiedPlayer sender = ProxyServer.getInstance().getPlayer(args[0]);
             ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[1]);
-            PlayerToPlayer(target, sender);
+            if(sender == null || target == null){
+                formator.sendMessage((ProxiedPlayer) cs,config.load(null,"messages.yml").getString("player-not-online"));
+                return;
+            }
+            PlayerToPlayer(sender, target);
+            formator.sendMessage(sender,config.load("teleports","messages.yml")
+                    .getString("teleported")
+                    .replace("%player%", target.getName())
+            );
         }
 
         // Teleport sender to coords
-        if (args.length == 3) {
+        else if (args.length == 3) {
             ProxiedPlayer sender = (ProxiedPlayer) cs;
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(b);
@@ -58,19 +78,20 @@ public class Teleport extends Command {
                 }
                 sender.getServer().sendData("BungeeCord", b.toByteArray());
             }else{
-                sender.sendMessage(new TextComponent(formator.colorize(config.load("teleports","messages.yml").getString("invalid-coords-given"))));
+                formator.sendMessage(sender, config.load("teleports","messages.yml").getString("invalid-coords-given"));
             }
 
         }
 
 
         // Teleport player to coords
-        if (args.length == 4) {
+        else if (args.length == 4) {
             ProxiedPlayer sender = (ProxiedPlayer) cs;
             ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
             if (target == null) {
                 sender.sendMessage(new TextComponent(formator.colorize(config.load(null,"messages.yml").getString("player-not-online"))));
-            } else {
+                return;
+            }
                 if (isDouble(args[1]) && isDouble(args[2]) && isDouble(args[3])) {
                         ByteArrayOutputStream b = new ByteArrayOutputStream();
                         DataOutputStream out = new DataOutputStream(b);
@@ -86,9 +107,14 @@ public class Teleport extends Command {
                         }
                         sender.getServer().sendData("BungeeCord", b.toByteArray());
                 }else{
-                    sender.sendMessage(new TextComponent("Invalid coords given"));
+                    formator.sendMessage(sender, config.load("teleports","messages.yml").getString("invalid-coords-given"));
                 }
 
+        }
+        else {
+            formator.sendMessage((ProxiedPlayer) cs, config.load("teleports", "syntax.yml").getString("tp.title"));
+            for(String syntax: config.load("teleports", "syntax.yml").getStringList("tp.syntaxes")){
+                formator.sendMessage((ProxiedPlayer) cs, syntax);
             }
         }
     }
