@@ -6,7 +6,7 @@
 
     <groupId>fi.matiaspaavilainen</groupId>
     <artifactId>MaSuiteTeleports</artifactId>
-    <version>1.0.1</version>
+    <version>1.1</version>
     <build>
         <plugins>
             <plugin>
@@ -41,8 +41,7 @@
         <dependency>
             <groupId>com.github.masagameplay</groupId>
             <artifactId>masuitecore</artifactId>
-            <version>18cef61e6c</version>
+            <version>2c9949cc7e</version>
         </dependency>
     </dependencies>
-
 </project>

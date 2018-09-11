@@ -1,6 +1,5 @@
 package fi.matiaspaavilainen.masuiteteleports.managers.requests;
 
-import fi.matiaspaavilainen.masuitecore.MaSuiteCore;
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
