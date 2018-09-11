@@ -14,3 +14,8 @@ receiver:
   teleport-request-accepted: "&7You accepted &b%sender% &7teleportation request."
   teleport-request-expired: "&7Teleportation request from &b%sender% &7expired."
   no-pending-teleport-requests: "&7You don't have any pending teleportation requests!"
+spawn:
+  set: "&aSpawn set"
+  deleted: "&aSpawn deleted"
+  teleported: "&aTeleported to spawn"
+  not-found: "&cThere is no spawn set on this server"

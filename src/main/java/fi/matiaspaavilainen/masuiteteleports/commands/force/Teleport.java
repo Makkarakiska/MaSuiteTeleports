@@ -70,9 +70,9 @@ public class Teleport extends Command implements Listener {
                     out.writeUTF("Teleport");
                     out.writeUTF("SenderToCoords");
                     out.writeUTF(sender.getName());
-                    out.writeUTF(args[0]);
-                    out.writeUTF(args[1]);
-                    out.writeUTF(args[2]);
+                    out.writeDouble(Double.parseDouble(args[0]));
+                    out.writeDouble(Double.parseDouble(args[1]));
+                    out.writeDouble(Double.parseDouble(args[2]));
                 } catch (IOException e) {
                     System.out.println(e.getMessage());
                 }
@@ -99,9 +99,9 @@ public class Teleport extends Command implements Listener {
                             out.writeUTF("Teleport");
                             out.writeUTF("PlayerToCoords");
                             out.writeUTF(target.getName());
-                            out.writeUTF(args[1]);
-                            out.writeUTF(args[2]);
-                            out.writeUTF(args[3]);
+                            out.writeDouble(Double.parseDouble(args[0]));
+                            out.writeDouble(Double.parseDouble(args[1]));
+                            out.writeDouble(Double.parseDouble(args[2]));
                         } catch (IOException e) {
                             System.out.println(e.getMessage());
                         }
