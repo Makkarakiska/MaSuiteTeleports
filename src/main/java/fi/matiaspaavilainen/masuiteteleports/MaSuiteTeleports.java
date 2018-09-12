@@ -1,6 +1,7 @@
 package fi.matiaspaavilainen.masuiteteleports;
 
 import fi.matiaspaavilainen.masuitecore.MaSuiteCore;
+import fi.matiaspaavilainen.masuitecore.Updator;
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuiteteleports.commands.force.All;
@@ -56,6 +57,8 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         config.create(this, "teleports", "messages.yml");
         config.create(this, "teleports", "settings.yml");
         config.create(this, "teleports", "syntax.yml");
+
+        new Updator().checkVersion(this.getDescription(), "60125");
     }
 
     @EventHandler
