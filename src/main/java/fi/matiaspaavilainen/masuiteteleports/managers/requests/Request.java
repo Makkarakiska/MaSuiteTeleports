@@ -2,6 +2,7 @@ package fi.matiaspaavilainen.masuiteteleports.managers.requests;
 
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
+import fi.matiaspaavilainen.masuiteteleports.Button;
 import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
 import fi.matiaspaavilainen.masuiteteleports.managers.Teleport;
 import net.md_5.bungee.api.ProxyServer;
@@ -37,7 +38,10 @@ public class Request implements Listener {
                     .getString("receiver.teleport-to-request-incoming")
                     .replace("%sender%", sender.getName())
                     .replace("%receiver%", receiver.getName()))));
-
+            TextComponent buttons = new TextComponent();
+            buttons.addExtra(new Button().create("accept", "/tpaccept"));
+            buttons.addExtra(new Button().create("deny", "/tpdeny"));
+            receiver.sendMessage(buttons);
             ProxyServer.getInstance().getScheduler().schedule(plugin, new Runnable() {
                 public void run() {
                     cancelRequest(receiver, "timer");

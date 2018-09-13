@@ -32,6 +32,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         super.onEnable();
 
         getProxy().getPluginManager().registerListener(this, this);
+
         //Teleportation
         getProxy().getPluginManager().registerCommand(this, new Teleport(this));
         getProxy().getPluginManager().registerCommand(this, new To(this));
@@ -57,6 +58,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         config.create(this, "teleports", "messages.yml");
         config.create(this, "teleports", "settings.yml");
         config.create(this, "teleports", "syntax.yml");
+        config.create(this, "teleports", "buttons.yml");
 
         new Updator().checkVersion(this.getDescription(), "60125");
     }
