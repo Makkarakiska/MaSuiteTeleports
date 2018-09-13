@@ -38,10 +38,12 @@ public class Request implements Listener {
                     .getString("receiver.teleport-to-request-incoming")
                     .replace("%sender%", sender.getName())
                     .replace("%receiver%", receiver.getName()))));
-            TextComponent buttons = new TextComponent();
-            buttons.addExtra(new Button().create("accept", "/tpaccept"));
-            buttons.addExtra(new Button().create("deny", "/tpdeny"));
-            receiver.sendMessage(buttons);
+            if (config.load("teleports", "buttons.yml").getBoolean("enabled")) {
+                TextComponent buttons = new TextComponent();
+                buttons.addExtra(new Button().create("accept", "/tpaccept"));
+                buttons.addExtra(new Button().create("deny", "/tpdeny"));
+                receiver.sendMessage(buttons);
+            }
             ProxyServer.getInstance().getScheduler().schedule(plugin, new Runnable() {
                 public void run() {
                     cancelRequest(receiver, "timer");
@@ -144,10 +146,10 @@ public class Request implements Listener {
                 Teleport.receivers.remove(receiver.getUniqueId());
                 Teleport.method.remove(sender.getUniqueId());
             } else {
-                formator.sendMessage(receiver,config.load("messages.yml").getString("player-not-online"));
+                formator.sendMessage(receiver, config.load("messages.yml").getString("player-not-online"));
             }
         } else {
-            formator.sendMessage(receiver,config.load("teleports", "messages.yml").getString("receiver.no-pending-teleport-requests"));
+            formator.sendMessage(receiver, config.load("teleports", "messages.yml").getString("receiver.no-pending-teleport-requests"));
         }
 
     }

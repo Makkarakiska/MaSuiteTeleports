@@ -33,6 +33,16 @@ public class MaSuiteTeleports extends Plugin implements Listener {
 
         getProxy().getPluginManager().registerListener(this, this);
 
+        // Table creation
+        MaSuiteCore.db.createTable("spawns",
+                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) UNIQUE NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        // Generate configs
+        config.create(this, "teleports", "messages.yml");
+        config.create(this, "teleports", "settings.yml");
+        config.create(this, "teleports", "syntax.yml");
+        config.create(this, "teleports", "buttons.yml");
+
         //Teleportation
         getProxy().getPluginManager().registerCommand(this, new Teleport(this));
         getProxy().getPluginManager().registerCommand(this, new To(this));
@@ -46,19 +56,11 @@ public class MaSuiteTeleports extends Plugin implements Listener {
 
 
         // Spawn
-        getProxy().getPluginManager().registerCommand(this, new Spawn());
-        getProxy().getPluginManager().registerCommand(this, new Set());
-        getProxy().getPluginManager().registerCommand(this, new Delete());
-
-        // Table creation
-        MaSuiteCore.db.createTable("spawns",
-                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) UNIQUE NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-
-        // Generate configs
-        config.create(this, "teleports", "messages.yml");
-        config.create(this, "teleports", "settings.yml");
-        config.create(this, "teleports", "syntax.yml");
-        config.create(this, "teleports", "buttons.yml");
+        if(config.load("teleports", "settings.yml").getBoolean("enable-spawns")){
+            getProxy().getPluginManager().registerCommand(this, new Spawn());
+            getProxy().getPluginManager().registerCommand(this, new Set());
+            getProxy().getPluginManager().registerCommand(this, new Delete());
+        }
 
         new Updator().checkVersion(this.getDescription(), "60125");
     }
