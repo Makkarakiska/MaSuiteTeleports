@@ -116,6 +116,8 @@ public class Request implements Listener {
                     Teleport.senders.remove(sender.getUniqueId(), receiver.getUniqueId());
                     Teleport.receivers.remove(receiver.getUniqueId(), sender.getUniqueId());
                     Teleport.method.remove(sender.getUniqueId());
+                }else{
+                    formator.sendMessage(receiver,config.load("teleports", "messages.yml").getString("receiver.no-pending-teleport-requests"));
                 }
             }
         }
