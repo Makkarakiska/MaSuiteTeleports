@@ -1,8 +1,10 @@
 package fi.matiaspaavilainen.masuiteteleports;
 
 import fi.matiaspaavilainen.masuitecore.MaSuiteCore;
+import fi.matiaspaavilainen.masuitecore.Updator;
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
+import fi.matiaspaavilainen.masuitecore.database.Database;
 import fi.matiaspaavilainen.masuiteteleports.commands.force.All;
 import fi.matiaspaavilainen.masuiteteleports.commands.force.Teleport;
 import fi.matiaspaavilainen.masuiteteleports.commands.requests.Accept;
@@ -25,12 +27,24 @@ import java.io.*;
 public class MaSuiteTeleports extends Plugin implements Listener {
 
     Configuration config = new Configuration();
-
+    public static Database db = new Database();
     @Override
     public void onEnable() {
         super.onEnable();
 
         getProxy().getPluginManager().registerListener(this, this);
+
+        // Table creation
+        db.connect();
+        db.createTable("spawns",
+                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) UNIQUE NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        // Generate configs
+        config.create(this, "teleports", "messages.yml");
+        config.create(this, "teleports", "settings.yml");
+        config.create(this, "teleports", "syntax.yml");
+        config.create(this, "teleports", "buttons.yml");
+
         //Teleportation
         getProxy().getPluginManager().registerCommand(this, new Teleport(this));
         getProxy().getPluginManager().registerCommand(this, new To(this));
@@ -44,18 +58,13 @@ public class MaSuiteTeleports extends Plugin implements Listener {
 
 
         // Spawn
-        getProxy().getPluginManager().registerCommand(this, new Spawn());
-        getProxy().getPluginManager().registerCommand(this, new Set());
-        getProxy().getPluginManager().registerCommand(this, new Delete());
+        if(config.load("teleports", "settings.yml").getBoolean("enable-spawns")){
+            getProxy().getPluginManager().registerCommand(this, new Spawn());
+            getProxy().getPluginManager().registerCommand(this, new Set());
+            getProxy().getPluginManager().registerCommand(this, new Delete());
+        }
 
-        // Table creation
-        MaSuiteCore.db.createTable("spawns",
-                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) UNIQUE NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-
-        // Generate configs
-        config.create(this, "teleports", "messages.yml");
-        config.create(this, "teleports", "settings.yml");
-        config.create(this, "teleports", "syntax.yml");
+        new Updator().checkVersion(this.getDescription(), "60125");
     }
 
     @EventHandler

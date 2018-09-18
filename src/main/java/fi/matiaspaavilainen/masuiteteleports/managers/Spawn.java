@@ -6,6 +6,7 @@ import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuitecore.database.Database;
 import fi.matiaspaavilainen.masuitecore.managers.Location;
+import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -21,14 +22,14 @@ import java.util.Set;
 
 public class Spawn {
 
-    Database db = MaSuiteCore.db;
+    private Database db = MaSuiteTeleports.db;
     private String server;
     private Location location;
     private Connection connection = null;
     private PreparedStatement statement = null;
     private Configuration config = new Configuration();
     private String tablePrefix = config.load(null, "config.yml").getString("database.table-prefix");
-    Debugger debugger = new Debugger();
+    private Debugger debugger = new Debugger();
 
     public Spawn(){}
 
@@ -59,7 +60,7 @@ public class Spawn {
         ResultSet rs = null;
 
         try {
-            connection = MaSuiteCore.db.hikari.getConnection();
+            connection = db.hikari.getConnection();
             statement = connection.prepareStatement("SELECT * FROM " +  tablePrefix +"spawns WHERE server = ?");
             statement.setString(1, server);
             rs = statement.executeQuery();
@@ -174,7 +175,7 @@ public class Spawn {
         ResultSet rs = null;
 
         try {
-            connection = MaSuiteCore.db.hikari.getConnection();
+            connection = db.hikari.getConnection();
             statement = connection.prepareStatement("SELECT * FROM " + tablePrefix + "spawns;");
             rs = statement.executeQuery();
             while (rs.next()) {
@@ -215,7 +216,7 @@ public class Spawn {
 
     public Boolean delete(ProxiedPlayer p){
         try {
-            connection = MaSuiteCore.db.hikari.getConnection();
+            connection = db.hikari.getConnection();
             statement = connection.prepareStatement("DELETE FROM " + tablePrefix + "spawns WHERE server = ?");
             statement.setString(1, p.getServer().getInfo().getName());
             statement.execute();

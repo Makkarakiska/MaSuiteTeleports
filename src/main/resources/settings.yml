@@ -1,1 +1,2 @@
 keep-request-alive: 20 #In seconds
+enable-spawns: true

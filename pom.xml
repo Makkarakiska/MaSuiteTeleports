@@ -3,10 +3,9 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>fi.matiaspaavilainen</groupId>
     <artifactId>MaSuiteTeleports</artifactId>
-    <version>1.1</version>
+    <version>1.2.2</version>
     <build>
         <plugins>
             <plugin>
@@ -41,7 +40,7 @@
         <dependency>
             <groupId>com.github.masagameplay</groupId>
             <artifactId>masuitecore</artifactId>
-            <version>2c9949cc7e</version>
+            <version>2afdf4ce37</version>
         </dependency>
     </dependencies>
 </project>

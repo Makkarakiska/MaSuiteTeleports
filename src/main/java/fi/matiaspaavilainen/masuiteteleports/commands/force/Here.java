@@ -3,8 +3,8 @@ package fi.matiaspaavilainen.masuiteteleports.commands.force;
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
+import fi.matiaspaavilainen.masuiteteleports.managers.PlayerFinder;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Listener;
@@ -22,7 +22,7 @@ public class Here extends Command implements Listener {
         Formator formator = new Formator();
         if (args.length == 1) {
             ProxiedPlayer sender = (ProxiedPlayer) cs;
-            ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
+            ProxiedPlayer target = new PlayerFinder().get(args[0]);
             if(target == null){
                 formator.sendMessage((ProxiedPlayer) cs, config.load(null,"messages.yml").getString("player-not-online"));
                 return;

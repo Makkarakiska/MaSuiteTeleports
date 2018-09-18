@@ -3,6 +3,7 @@ package fi.matiaspaavilainen.masuiteteleports.commands.requests;
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
+import fi.matiaspaavilainen.masuiteteleports.managers.PlayerFinder;
 import fi.matiaspaavilainen.masuiteteleports.managers.requests.Request;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -25,7 +26,7 @@ public class To extends Command implements Listener {
         // Teleport sender to player
         if (args.length == 1) {
             ProxiedPlayer sender = (ProxiedPlayer) cs;
-            ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
+            ProxiedPlayer target = new PlayerFinder().get(args[0]);
             if (target == null) {
                 formator.sendMessage(sender, config.load(null,"messages.yml").getString("player-not-online"));
             } else {

@@ -1,0 +1,9 @@
+enabled: true #Set false to disable buttons
+buttons:
+  accept:
+    text: " &8[&aAccept&8]"
+    hover: "&9Click to accept"
+  deny:
+    text: " &8[&cDeny&8]"
+    hover: "&9Click to deny"
+
