@@ -100,7 +100,7 @@ public class Request implements Listener {
 
                         );
                     } else if (type.equals("player")) {
-                        formator.sendMessage(receiver, config.load("teleports", "messages.yml")
+                        formator.sendMessage(sender, config.load("teleports", "messages.yml")
                                 .getString("sender.teleport-request-denied")
                                 .replace("%sender%", sender.getName())
                                 .replace("%receiver%", receiver.getName())
@@ -114,10 +114,10 @@ public class Request implements Listener {
                     Teleport.senders.remove(sender.getUniqueId(), receiver.getUniqueId());
                     Teleport.receivers.remove(receiver.getUniqueId(), sender.getUniqueId());
                     Teleport.method.remove(sender.getUniqueId());
-                }else{
-                    formator.sendMessage(receiver,config.load("teleports", "messages.yml").getString("receiver.no-pending-teleport-requests"));
                 }
             }
+        }else{
+            formator.sendMessage(receiver,config.load("teleports", "messages.yml").getString("receiver.no-pending-teleport-requests"));
         }
     }
 
