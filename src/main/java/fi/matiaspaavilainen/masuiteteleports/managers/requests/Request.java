@@ -44,11 +44,7 @@ public class Request implements Listener {
                 buttons.addExtra(new Button().create("deny", "/tpdeny"));
                 receiver.sendMessage(buttons);
             }
-            ProxyServer.getInstance().getScheduler().schedule(plugin, new Runnable() {
-                public void run() {
-                    cancelRequest(receiver, "timer");
-                }
-            }, config.load("teleports", "settings.yml").getInt("keep-request-alive"), TimeUnit.SECONDS);
+            ProxyServer.getInstance().getScheduler().schedule(plugin, () -> cancelRequest(receiver, "timer"), config.load("teleports", "settings.yml").getInt("keep-request-alive"), TimeUnit.SECONDS);
         } else {
             sender.sendMessage(new TextComponent(formator.colorize(config.load("teleports", "messages.yml")
                     .getString("sender.teleport-request-pending")
@@ -76,11 +72,7 @@ public class Request implements Listener {
                     .replace("%receiver%", receiver.getName())
             );
 
-            ProxyServer.getInstance().getScheduler().schedule(plugin, new Runnable() {
-                public void run() {
-                    cancelRequest(receiver, "timer");
-                }
-            }, config.load("teleports", "settings.yml").getInt("keep-request-alive"), TimeUnit.SECONDS);
+            ProxyServer.getInstance().getScheduler().schedule(plugin, () -> cancelRequest(receiver, "timer"), config.load("teleports", "settings.yml").getInt("keep-request-alive"), TimeUnit.SECONDS);
         } else {
             formator.sendMessage(sender, config.load("teleports", "messages.yml")
                     .getString("sender.teleport-request-pending")

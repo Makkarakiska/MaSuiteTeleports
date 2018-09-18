@@ -4,6 +4,7 @@ import fi.matiaspaavilainen.masuitecore.MaSuiteCore;
 import fi.matiaspaavilainen.masuitecore.Updator;
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
+import fi.matiaspaavilainen.masuitecore.database.Database;
 import fi.matiaspaavilainen.masuiteteleports.commands.force.All;
 import fi.matiaspaavilainen.masuiteteleports.commands.force.Teleport;
 import fi.matiaspaavilainen.masuiteteleports.commands.requests.Accept;
@@ -26,7 +27,7 @@ import java.io.*;
 public class MaSuiteTeleports extends Plugin implements Listener {
 
     Configuration config = new Configuration();
-
+    public static Database db = new Database();
     @Override
     public void onEnable() {
         super.onEnable();
@@ -34,7 +35,8 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         getProxy().getPluginManager().registerListener(this, this);
 
         // Table creation
-        MaSuiteCore.db.createTable("spawns",
+        db.connect();
+        db.createTable("spawns",
                 "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) UNIQUE NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
         // Generate configs

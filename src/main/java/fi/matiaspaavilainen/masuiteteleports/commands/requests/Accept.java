@@ -21,7 +21,6 @@ public class Accept extends Command {
         Configuration config = new Configuration();
         Formator formator = new Formator();
 
-
         // Teleport sender to player
         if (args.length == 0) {
             ProxiedPlayer sender = (ProxiedPlayer) cs;

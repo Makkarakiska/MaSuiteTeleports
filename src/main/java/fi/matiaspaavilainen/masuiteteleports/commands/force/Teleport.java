@@ -3,8 +3,8 @@ package fi.matiaspaavilainen.masuiteteleports.commands.force;
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
+import fi.matiaspaavilainen.masuiteteleports.managers.PlayerFinder;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
@@ -20,7 +20,7 @@ public class Teleport extends Command implements Listener {
     public Teleport(MaSuiteTeleports p) {
         super("tp", "masuiteteleports.teleport.force", "teleport");
     }
-
+    private PlayerFinder playerFinder = new PlayerFinder();
     @Override
     public void execute(CommandSender cs, String[] args) {
         Configuration config = new Configuration();
@@ -33,7 +33,7 @@ public class Teleport extends Command implements Listener {
         // Teleport sender to player
         if (args.length == 1) {
             ProxiedPlayer sender = (ProxiedPlayer) cs;
-            ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
+            ProxiedPlayer target = playerFinder.get(args[0]);
             if(target == null){
                 formator.sendMessage((ProxiedPlayer) cs,config.load(null,"messages.yml").getString("player-not-online"));
                 return;
@@ -47,8 +47,8 @@ public class Teleport extends Command implements Listener {
 
         // Teleport player to other player
          else if (args.length == 2) {
-            ProxiedPlayer sender = ProxyServer.getInstance().getPlayer(args[0]);
-            ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[1]);
+            ProxiedPlayer sender = playerFinder.get(args[0]);
+            ProxiedPlayer target = playerFinder.get(args[1]);
             if(sender == null || target == null){
                 formator.sendMessage((ProxiedPlayer) cs,config.load(null,"messages.yml").getString("player-not-online"));
                 return;
@@ -83,11 +83,10 @@ public class Teleport extends Command implements Listener {
 
         }
 
-
         // Teleport player to coords
         else if (args.length == 4) {
             ProxiedPlayer sender = (ProxiedPlayer) cs;
-            ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
+            ProxiedPlayer target = playerFinder.get(args[0]);
             if (target == null) {
                 sender.sendMessage(new TextComponent(formator.colorize(config.load(null,"messages.yml").getString("player-not-online"))));
                 return;
