@@ -38,12 +38,7 @@ public class Request implements Listener {
                     .getString("receiver.teleport-to-request-incoming")
                     .replace("%sender%", sender.getName())
                     .replace("%receiver%", receiver.getName()))));
-            if (config.load("teleports", "buttons.yml").getBoolean("enabled")) {
-                TextComponent buttons = new TextComponent();
-                buttons.addExtra(new Button().create("accept", "/tpaccept"));
-                buttons.addExtra(new Button().create("deny", "/tpdeny"));
-                receiver.sendMessage(buttons);
-            }
+            buttons(receiver);
             ProxyServer.getInstance().getScheduler().schedule(plugin, () -> cancelRequest(receiver, "timer"), config.load("teleports", "settings.yml").getInt("keep-request-alive"), TimeUnit.SECONDS);
         } else {
             sender.sendMessage(new TextComponent(formator.colorize(config.load("teleports", "messages.yml")
@@ -71,7 +66,7 @@ public class Request implements Listener {
                     .replace("%sender%", sender.getName())
                     .replace("%receiver%", receiver.getName())
             );
-
+            buttons(receiver);
             ProxyServer.getInstance().getScheduler().schedule(plugin, () -> cancelRequest(receiver, "timer"), config.load("teleports", "settings.yml").getInt("keep-request-alive"), TimeUnit.SECONDS);
         } else {
             formator.sendMessage(sender, config.load("teleports", "messages.yml")
@@ -81,6 +76,15 @@ public class Request implements Listener {
             );
         }
 
+    }
+
+    private void buttons(ProxiedPlayer receiver) {
+        if (config.load("teleports", "buttons.yml").getBoolean("enabled")) {
+            TextComponent buttons = new TextComponent();
+            buttons.addExtra(new Button().create("accept", "/tpaccept"));
+            buttons.addExtra(new Button().create("deny", "/tpdeny"));
+            receiver.sendMessage(buttons);
+        }
     }
 
 
