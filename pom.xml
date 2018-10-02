@@ -5,8 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fi.matiaspaavilainen</groupId>
     <artifactId>MaSuiteTeleports</artifactId>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
     <build>
+        <finalName>MaSuiteTeleports</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -98,9 +98,9 @@ public class Teleport extends Command implements Listener {
                             out.writeUTF("Teleport");
                             out.writeUTF("PlayerToCoords");
                             out.writeUTF(target.getName());
-                            out.writeDouble(Double.parseDouble(args[0]));
                             out.writeDouble(Double.parseDouble(args[1]));
                             out.writeDouble(Double.parseDouble(args[2]));
+                            out.writeDouble(Double.parseDouble(args[3]));
                         } catch (IOException e) {
                             System.out.println(e.getMessage());
                         }

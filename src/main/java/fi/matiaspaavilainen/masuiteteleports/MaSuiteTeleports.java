@@ -26,7 +26,7 @@ import java.io.*;
 
 public class MaSuiteTeleports extends Plugin implements Listener {
 
-    Configuration config = new Configuration();
+    private Configuration config = new Configuration();
     public static Database db = new Database();
     @Override
     public void onEnable() {
@@ -67,6 +67,9 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         new Updator().checkVersion(this.getDescription(), "60125");
     }
 
+    public void onDisable(){
+        db.hikari.close();
+    }
     @EventHandler
     public void onPluginMessage(PluginMessageEvent e) throws IOException {
         if(!e.getTag().equals("BungeeCord")){
