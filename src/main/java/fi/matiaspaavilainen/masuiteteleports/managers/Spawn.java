@@ -1,13 +1,11 @@
 package fi.matiaspaavilainen.masuiteteleports.managers;
 
 import fi.matiaspaavilainen.masuitecore.Debugger;
-import fi.matiaspaavilainen.masuitecore.MaSuiteCore;
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
-import fi.matiaspaavilainen.masuitecore.database.Database;
+import fi.matiaspaavilainen.masuiteteleports.database.Database;
 import fi.matiaspaavilainen.masuitecore.managers.Location;
 import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.io.ByteArrayOutputStream;

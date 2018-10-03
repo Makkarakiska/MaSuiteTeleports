@@ -1,10 +1,9 @@
 package fi.matiaspaavilainen.masuiteteleports;
 
-import fi.matiaspaavilainen.masuitecore.MaSuiteCore;
 import fi.matiaspaavilainen.masuitecore.Updator;
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
-import fi.matiaspaavilainen.masuitecore.database.Database;
+import fi.matiaspaavilainen.masuiteteleports.database.Database;
 import fi.matiaspaavilainen.masuiteteleports.commands.force.All;
 import fi.matiaspaavilainen.masuiteteleports.commands.force.Teleport;
 import fi.matiaspaavilainen.masuiteteleports.commands.requests.Accept;
