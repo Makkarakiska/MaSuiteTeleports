@@ -28,7 +28,7 @@ public class Teleport {
                 if (!sender.getServer().getInfo().getName().equals(receiver.getServer().getInfo().getName())) {
                     sender.connect(ProxyServer.getInstance().getServerInfo(receiver.getServer().getInfo().getName()));
                 }
-                out.writeUTF("Teleport");
+                out.writeUTF("MaSuiteTeleports");
                 out.writeUTF("PlayerToPlayer");
                 if(method.containsKey(sender.getUniqueId())){
                     if(method.get(sender.getUniqueId()).equals("here")){
