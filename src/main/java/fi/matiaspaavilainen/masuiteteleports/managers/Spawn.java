@@ -29,7 +29,8 @@ public class Spawn {
     private String tablePrefix = config.load(null, "config.yml").getString("database.table-prefix");
     private Debugger debugger = new Debugger();
 
-    public Spawn(){}
+    public Spawn() {
+    }
 
     public Spawn(String server, Location location) {
         this.server = server;
@@ -53,18 +54,18 @@ public class Spawn {
         this.location = location;
     }
 
-    public Spawn find(String server){
+    public Spawn find(String server) {
         Spawn spawn = new Spawn();
         ResultSet rs = null;
 
         try {
             connection = db.hikari.getConnection();
-            statement = connection.prepareStatement("SELECT * FROM " +  tablePrefix +"spawns WHERE server = ?");
+            statement = connection.prepareStatement("SELECT * FROM " + tablePrefix + "spawns WHERE server = ?");
             statement.setString(1, server);
             rs = statement.executeQuery();
 
-            if(rs == null){
-                return new Spawn();
+            if (rs == null) {
+                return null;
             }
             while (rs.next()) {
                 spawn.setServer(server);
@@ -101,33 +102,29 @@ public class Spawn {
         return spawn;
     }
 
-    public Boolean spawn(ProxiedPlayer p){
+    public Boolean spawn(ProxiedPlayer p) {
         Spawn spawn = new Spawn();
         spawn = spawn.find(p.getServer().getInfo().getName());
-        if(spawn.getServer() == null){
+        if (spawn.getServer() == null) {
             new Formator().sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.not-found"));
             return false;
         }
-        try{
+        try {
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(b);
             out.writeUTF("Teleport");
             out.writeUTF("SpawnPlayer");
-            out.writeUTF(String.valueOf(p.getUniqueId()));
-            out.writeUTF(spawn.getLocation().getWorld());
-            out.writeDouble(spawn.getLocation().getX());
-            out.writeDouble(spawn.getLocation().getY());
-            out.writeDouble(spawn.getLocation().getZ());
-            out.writeFloat(spawn.getLocation().getYaw());
-            out.writeFloat(spawn.getLocation().getPitch());
+            out.writeUTF(p.getUniqueId().toString());
+            Location loc = spawn.getLocation();
+            out.writeUTF(loc.getWorld()+ ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch());
             p.getServer().sendData("BungeeCord", b.toByteArray());
-        } catch (IOException e){
-            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            e.getStackTrace();
         }
         return true;
     }
 
-    public Spawn create(Spawn spawn) {
+    public boolean create(Spawn spawn) {
         String insert = "INSERT INTO " + tablePrefix +
                 "spawns (server, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?) " +
                 "ON DUPLICATE KEY UPDATE world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ?;";
@@ -148,8 +145,10 @@ public class Spawn {
             statement.setFloat(12, spawn.getLocation().getYaw());
             statement.setFloat(13, spawn.getLocation().getPitch());
             statement.execute();
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         } finally {
             if (connection != null) {
                 try {
@@ -166,9 +165,9 @@ public class Spawn {
                 }
             }
         }
-        return spawn;
     }
-    public Set<Spawn> all(){
+
+    public Set<Spawn> all() {
         Set<Spawn> spawns = new HashSet<>();
         ResultSet rs = null;
 
@@ -212,13 +211,13 @@ public class Spawn {
         return spawns;
     }
 
-    public Boolean delete(ProxiedPlayer p){
+    public Boolean delete(String spawn) {
         try {
             connection = db.hikari.getConnection();
             statement = connection.prepareStatement("DELETE FROM " + tablePrefix + "spawns WHERE server = ?");
-            statement.setString(1, p.getServer().getInfo().getName());
+            statement.setString(1, spawn);
             statement.execute();
-
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -237,8 +236,6 @@ public class Spawn {
                     e.printStackTrace();
                 }
             }
-            new Formator().sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.deleted"));
         }
-        return true;
     }
 }
