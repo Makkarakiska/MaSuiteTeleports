@@ -1,19 +1,12 @@
 package fi.matiaspaavilainen.masuiteteleports;
 
 import fi.matiaspaavilainen.masuitecore.Updator;
-import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
+import fi.matiaspaavilainen.masuitecore.managers.Location;
+import fi.matiaspaavilainen.masuiteteleports.commands.TeleportForceCommand;
+import fi.matiaspaavilainen.masuiteteleports.commands.TeleportRequestCommand;
+import fi.matiaspaavilainen.masuiteteleports.commands.SpawnCommand;
 import fi.matiaspaavilainen.masuiteteleports.database.Database;
-import fi.matiaspaavilainen.masuiteteleports.commands.force.All;
-import fi.matiaspaavilainen.masuiteteleports.commands.force.Teleport;
-import fi.matiaspaavilainen.masuiteteleports.commands.requests.Accept;
-import fi.matiaspaavilainen.masuiteteleports.commands.requests.Deny;
-import fi.matiaspaavilainen.masuiteteleports.commands.requests.Here;
-import fi.matiaspaavilainen.masuiteteleports.commands.requests.To;
-import fi.matiaspaavilainen.masuiteteleports.commands.spawns.Delete;
-import fi.matiaspaavilainen.masuiteteleports.commands.spawns.Set;
-import fi.matiaspaavilainen.masuiteteleports.commands.spawns.Spawn;
-import fi.matiaspaavilainen.masuiteteleports.managers.requests.Request;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
@@ -27,6 +20,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
 
     private Configuration config = new Configuration();
     public static Database db = new Database();
+
     @Override
     public void onEnable() {
         super.onEnable();
@@ -44,66 +38,92 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         config.create(this, "teleports", "syntax.yml");
         config.create(this, "teleports", "buttons.yml");
 
-        //Teleportation
-        getProxy().getPluginManager().registerCommand(this, new Teleport(this));
-        getProxy().getPluginManager().registerCommand(this, new To(this));
-        getProxy().getPluginManager().registerCommand(this, new Here(this));
-        getProxy().getPluginManager().registerCommand(this, new Accept(this));
-        getProxy().getPluginManager().registerCommand(this, new Deny(this));
-        getProxy().getPluginManager().registerListener(this, new Request(this));
-        getProxy().getPluginManager().registerCommand(this, new All(this));
-        getProxy().getPluginManager().registerCommand(this, new fi.matiaspaavilainen.masuiteteleports.commands.force.Here(this));
-        getProxy().getPluginManager().registerCommand(this, new fi.matiaspaavilainen.masuiteteleports.commands.force.Teleport(this));
-
-
-        // Spawn
-        if(config.load("teleports", "settings.yml").getBoolean("enable-spawns")){
-            getProxy().getPluginManager().registerCommand(this, new Spawn());
-            getProxy().getPluginManager().registerCommand(this, new Set());
-            getProxy().getPluginManager().registerCommand(this, new Delete());
-        }
-
         new Updator().checkVersion(this.getDescription(), "60125");
     }
 
-    public void onDisable(){
+    public void onDisable() {
         db.hikari.close();
     }
+
     @EventHandler
     public void onPluginMessage(PluginMessageEvent e) throws IOException {
-        if(!e.getTag().equals("BungeeCord")){
+        if (!e.getTag().equals("BungeeCord")) {
             return;
         }
 
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));
         String subchannel = in.readUTF();
-        if(subchannel.equals("SpawnPlayer")){
-            ProxiedPlayer p = ProxyServer.getInstance().getPlayer(in.readUTF());
-            if(p == null){
-                return;
+        if (subchannel.equals("MaSuiteTeleports")) {
+            String childchannel = in.readUTF();
+            ProxiedPlayer sender = ProxyServer.getInstance().getPlayer(in.readUTF());
+
+            // Spawn
+            if (config.load("teleports", "settings.yml").getBoolean("enable-spawns")) {
+                SpawnCommand command = new SpawnCommand();
+                switch (childchannel) {
+                    case "SpawnPlayer":
+                        command.spawn(sender);
+                        break;
+                    case "SetSpawn":
+                        String[] loc = in.readUTF().split(":");
+                        command.setSpawn(sender, new Location(loc[0], Double.parseDouble(loc[1]), Double.parseDouble(loc[2]), Double.parseDouble(loc[3]), Float.parseFloat(loc[4]), Float.parseFloat(loc[5])));
+                        break;
+                    case "DelSpawn":
+                        command.deleteSpawn(sender);
+                        break;
+                }
             }
-            fi.matiaspaavilainen.masuiteteleports.managers.Spawn spawn = new fi.matiaspaavilainen.masuiteteleports.managers.Spawn();
-            spawn = spawn.find(p.getServer().getInfo().getName());
-            if(spawn.getServer() == null){
-                new Formator().sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.not-found"));
-                return;
+
+            //Teleportation requests
+            TeleportRequestCommand tprequest = new TeleportRequestCommand(this);
+            switch (childchannel) {
+                case "TeleportRequestTo":
+                    tprequest.tpa(sender, in.readUTF());
+                    break;
+                case "TeleportRequestHere":
+                    tprequest.tpahere(sender, in.readUTF());
+                    break;
+                case "TeleportAccept":
+                    tprequest.tpaccept(sender);
+                    break;
+                case "TeleportDeny":
+                    tprequest.tpdeny(sender);
+                    break;
             }
-            try{
-                ByteArrayOutputStream b = new ByteArrayOutputStream();
-                DataOutputStream out = new DataOutputStream(b);
-                out.writeUTF("Teleport");
-                out.writeUTF("SpawnPlayer");
-                out.writeUTF(String.valueOf(p.getUniqueId()));
-                out.writeUTF(spawn.getLocation().getWorld());
-                out.writeDouble(spawn.getLocation().getX());
-                out.writeDouble(spawn.getLocation().getY());
-                out.writeDouble(spawn.getLocation().getZ());
-                out.writeFloat(spawn.getLocation().getYaw());
-                out.writeFloat(spawn.getLocation().getPitch());
-                p.getServer().sendData("BungeeCord", b.toByteArray());
-            } catch (IOException ex){
-                System.out.println(ex.getMessage());
+
+            //Teleportation forces
+            TeleportForceCommand tpforce = new TeleportForceCommand(this);
+            switch (childchannel) {
+                case ("TeleportForceTo"):
+                    String superchildchannel = in.readUTF();
+                    switch (superchildchannel) {
+                        case "TeleportSenderToTarget":
+                            tpforce.tp(sender, in.readUTF());
+                            break;
+                        case "TeleportTargetToTarget":
+                            tpforce.tp(sender, in.readUTF(), in.readUTF());
+                            break;
+                        case "TeleportToXYZ":
+                            tpforce.tp(sender, in.readUTF(), in.readDouble(), in.readDouble(), in.readDouble());
+                            break;
+                        case "TeleportToCoordinates":
+                            tpforce.tp(sender, in.readUTF(), new Location(in.readUTF(), in.readDouble(), in.readDouble(), in.readDouble()));
+                            break;
+                        case "TeleportToServerCoordinates":
+                            tpforce.tp(sender, in.readUTF(), in.readUTF(), new Location(in.readUTF(), in.readDouble(), in.readDouble(), in.readDouble()));
+                            break;
+                    }
+                    break;
+                case "TeleportForceHere":
+                    tpforce.tphere(sender, in.readUTF());
+                    break;
+                case "TeleportForceAll":
+                    tpforce.tpall(sender);
+                    break;
             }
+
+
         }
+
     }
 }
