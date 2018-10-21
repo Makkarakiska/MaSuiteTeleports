@@ -95,7 +95,6 @@ public class MaSuiteTeleports extends Plugin implements Listener {
             switch (childchannel) {
                 case ("TeleportForceTo"):
                     String superchildchannel = in.readUTF();
-                    System.out.println(superchildchannel);
                     switch (superchildchannel) {
                         case "TeleportSenderToTarget":
                             tpforce.tp(sender, in.readUTF());
