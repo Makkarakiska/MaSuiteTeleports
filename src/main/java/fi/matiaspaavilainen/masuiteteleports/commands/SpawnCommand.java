@@ -6,7 +6,6 @@ import fi.matiaspaavilainen.masuitecore.managers.Location;
 import fi.matiaspaavilainen.masuiteteleports.managers.Spawn;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-
 public class SpawnCommand {
 
     private Formator formator = new Formator();

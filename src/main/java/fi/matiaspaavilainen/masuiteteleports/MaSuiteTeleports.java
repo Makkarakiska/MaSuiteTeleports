@@ -56,7 +56,6 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         if (subchannel.equals("MaSuiteTeleports")) {
             String childchannel = in.readUTF();
             ProxiedPlayer sender = ProxyServer.getInstance().getPlayer(in.readUTF());
-
             // Spawn
             if (config.load("teleports", "settings.yml").getBoolean("enable-spawns")) {
                 SpawnCommand command = new SpawnCommand();
@@ -96,6 +95,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
             switch (childchannel) {
                 case ("TeleportForceTo"):
                     String superchildchannel = in.readUTF();
+                    System.out.println(superchildchannel);
                     switch (superchildchannel) {
                         case "TeleportSenderToTarget":
                             tpforce.tp(sender, in.readUTF());

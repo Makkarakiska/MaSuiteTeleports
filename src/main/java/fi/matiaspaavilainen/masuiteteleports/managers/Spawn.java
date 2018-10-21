@@ -64,15 +64,16 @@ public class Spawn {
             statement.setString(1, server);
             rs = statement.executeQuery();
 
-            if (rs == null) {
-                return null;
-            }
+            boolean empty = true;
             while (rs.next()) {
                 spawn.setServer(server);
                 spawn.setLocation(new Location(rs.getString("world"), rs.getDouble("x"), rs.getDouble("y"), rs.getDouble("z"), rs.getFloat("yaw"), rs.getFloat("pitch")));
-                debugger.sendMessage("[MaSuiteTeleports] [Spawn] spawn loaded.");
+                debugger.sendMessage("[MaSuite] [Teleports] [Spawn] spawn loaded.");
+                empty = false;
             }
-
+            if (empty) {
+                return null;
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,21 +104,21 @@ public class Spawn {
     }
 
     public Boolean spawn(ProxiedPlayer p) {
-        Spawn spawn = new Spawn();
-        spawn = spawn.find(p.getServer().getInfo().getName());
-        if (spawn.getServer() == null) {
+        Spawn spawn = new Spawn().find(p.getServer().getInfo().getName());
+        if (spawn == null) {
             new Formator().sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.not-found"));
             return false;
         }
         try {
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(b);
-            out.writeUTF("Teleport");
+            out.writeUTF("MaSuiteTeleports");
             out.writeUTF("SpawnPlayer");
-            out.writeUTF(p.getUniqueId().toString());
+            out.writeUTF(p.getName());
             Location loc = spawn.getLocation();
-            out.writeUTF(loc.getWorld()+ ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch());
+            out.writeUTF(loc.getWorld() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch());
             p.getServer().sendData("BungeeCord", b.toByteArray());
+            debugger.sendMessage("[MaSuite] [Teleports] [Spawn] spawned player.");
         } catch (IOException e) {
             e.getStackTrace();
         }
