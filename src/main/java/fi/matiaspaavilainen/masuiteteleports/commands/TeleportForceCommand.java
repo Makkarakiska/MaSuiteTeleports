@@ -95,39 +95,6 @@ public class TeleportForceCommand {
         }
     }
 
-    // Teleport player to specific server in specific location
-    public void tp(ProxiedPlayer sender, String t, String server, Location loc){
-        // Get the server
-        ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(server);
-        if(serverInfo == null){
-            return;
-        }
-        ProxiedPlayer target = new PlayerFinder().get(t);
-        if(utils.isOnline(target, sender)){
-            ByteArrayOutputStream b = new ByteArrayOutputStream();
-            DataOutputStream out = new DataOutputStream(b);
-            try {
-
-                out.writeUTF("MaSuiteTeleports");
-                out.writeUTF("PlayerToLocation");
-                out.writeUTF(target.getName());
-                out.writeUTF(loc.getWorld());
-                out.writeDouble(loc.getX());
-                out.writeDouble(loc.getY());
-                out.writeDouble(loc.getZ());
-                if(!target.getServer().getInfo().getName().equals(server)){
-                    target.connect(serverInfo);
-                    ProxyServer.getInstance().getScheduler().schedule(plugin, () -> serverInfo.sendData("BungeeCord", b.toByteArray()), 500, TimeUnit.MILLISECONDS);
-                }else{
-                    target.getServer().sendData("BungeeCord", b.toByteArray());
-                }
-
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-    }
-
     public void tphere(ProxiedPlayer sender, String t){
         ProxiedPlayer target = new PlayerFinder().get(t);
         if(utils.isOnline(target, sender)){

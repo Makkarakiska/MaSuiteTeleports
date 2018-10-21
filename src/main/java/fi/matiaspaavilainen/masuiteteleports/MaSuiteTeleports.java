@@ -109,9 +109,6 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                         case "TeleportToCoordinates":
                             tpforce.tp(sender, in.readUTF(), new Location(in.readUTF(), in.readDouble(), in.readDouble(), in.readDouble()));
                             break;
-                        case "TeleportToServerCoordinates":
-                            tpforce.tp(sender, in.readUTF(), in.readUTF(), new Location(in.readUTF(), in.readDouble(), in.readDouble(), in.readDouble()));
-                            break;
                     }
                     break;
                 case "TeleportForceHere":
