@@ -109,14 +109,4 @@ public class TeleportForceCommand {
             }
         }
     }
-
-    // Check if string is parsable to Double
-    private boolean isDouble(String string) {
-        try {
-            Double.parseDouble(string);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-        return true;
-    }
 }
