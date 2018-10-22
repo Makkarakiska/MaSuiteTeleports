@@ -15,11 +15,13 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 
 import java.io.*;
+import java.util.HashMap;
 
 public class MaSuiteTeleports extends Plugin implements Listener {
 
     private Configuration config = new Configuration();
     public static Database db = new Database();
+    private HashMap<String, Location> lastLocations = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -57,8 +59,9 @@ public class MaSuiteTeleports extends Plugin implements Listener {
             String childchannel = in.readUTF();
             ProxiedPlayer sender = ProxyServer.getInstance().getPlayer(in.readUTF());
             // Spawn
-            if (config.load("teleports", "settings.yml").getBoolean("enable-spawns")) {
-                SpawnCommand command = new SpawnCommand();
+            String spawnType = config.load("teleports", "settings.yml").getString("spawn-type");
+            if (spawnType.equalsIgnoreCase("server") || spawnType.equalsIgnoreCase("global")){
+                SpawnCommand command = new SpawnCommand(this);
                 switch (childchannel) {
                     case "SpawnPlayer":
                         command.spawn(sender);
@@ -103,10 +106,21 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                             tpforce.tp(sender, in.readUTF(), in.readUTF());
                             break;
                         case "TeleportToXYZ":
-                            tpforce.tp(sender, in.readUTF(), in.readDouble(), in.readDouble(), in.readDouble());
+                            String tname = in.readUTF();
+                            Double tx = in.readDouble();
+                            Double ty = in.readDouble();
+                            Double tz = in.readDouble();
+                            tpforce.tp(sender, tname, tx, ty, tz);
+                            lastLocations.put(in.readUTF(), new Location("world", tx, ty, tz));
                             break;
                         case "TeleportToCoordinates":
-                            tpforce.tp(sender, in.readUTF(), new Location(in.readUTF(), in.readDouble(), in.readDouble(), in.readDouble()));
+                            String tcname = in.readUTF();
+                            String world = in.readUTF();
+                            Double tcx = in.readDouble();
+                            Double tcy = in.readDouble();
+                            Double tcz = in.readDouble();
+                            tpforce.tp(sender, tcname, new Location(world, tcx, tcy, tcz));
+                            lastLocations.put(in.readUTF(), new Location(world, tcx, tcy, tcz));
                             break;
                     }
                     break;
@@ -116,6 +130,11 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                 case "TeleportForceAll":
                     tpforce.tpall(sender);
                     break;
+            }
+
+            // Back
+            if(childchannel.equals("Back")){
+
             }
 
 

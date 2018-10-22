@@ -1,2 +1,2 @@
 keep-request-alive: 20 #In seconds
-enable-spawns: true
+spawn-type: server #You can use server, global and none
