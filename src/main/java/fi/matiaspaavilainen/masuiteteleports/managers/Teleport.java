@@ -1,7 +1,7 @@
 package fi.matiaspaavilainen.masuiteteleports.managers;
 
-import fi.matiaspaavilainen.masuitecore.chat.Formator;
-import fi.matiaspaavilainen.masuitecore.config.Configuration;
+import fi.matiaspaavilainen.masuitecore.Utils;
+import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -17,28 +17,25 @@ public class Teleport {
     public static HashMap<UUID, String> method = new HashMap<>();
 
     public static void PlayerToPlayer(ProxiedPlayer sender, ProxiedPlayer receiver) {
-        Formator formator = new Formator();
-        Configuration config = new Configuration();
-        if (receiver == null) {
-            formator.sendMessage(sender, config.load(null,"messages.yml").getString("player-not-online"));
-        } else {
+        if (new Utils().isOnline(receiver, sender)) {
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(b);
+
             try {
                 if (!sender.getServer().getInfo().getName().equals(receiver.getServer().getInfo().getName())) {
                     sender.connect(ProxyServer.getInstance().getServerInfo(receiver.getServer().getInfo().getName()));
                 }
                 out.writeUTF("MaSuiteTeleports");
                 out.writeUTF("PlayerToPlayer");
-                if(method.containsKey(sender.getUniqueId())){
-                    if(method.get(sender.getUniqueId()).equals("here")){
+                if (method.containsKey(sender.getUniqueId())) {
+                    if (method.get(sender.getUniqueId()).equals("here")) {
                         out.writeUTF(receiver.getName());
                         out.writeUTF(sender.getName());
-                    }else{
+                    } else {
                         out.writeUTF(sender.getName());
                         out.writeUTF(receiver.getName());
                     }
-                }else{
+                } else {
                     out.writeUTF(sender.getName());
                     out.writeUTF(receiver.getName());
                 }

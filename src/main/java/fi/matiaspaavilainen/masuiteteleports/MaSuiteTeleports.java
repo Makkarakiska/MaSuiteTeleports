@@ -7,7 +7,9 @@ import fi.matiaspaavilainen.masuiteteleports.commands.TeleportForceCommand;
 import fi.matiaspaavilainen.masuiteteleports.commands.TeleportRequestCommand;
 import fi.matiaspaavilainen.masuiteteleports.commands.SpawnCommand;
 import fi.matiaspaavilainen.masuiteteleports.database.Database;
+import fi.matiaspaavilainen.masuiteteleports.managers.PositionListener;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -23,6 +25,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
     public static Database db = new Database();
     private HashMap<String, Location> lastLocations = new HashMap<>();
 
+    public PositionListener positions = new PositionListener(this);
     @Override
     public void onEnable() {
         super.onEnable();
@@ -58,6 +61,22 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         if (subchannel.equals("MaSuiteTeleports")) {
             String childchannel = in.readUTF();
             ProxiedPlayer sender = ProxyServer.getInstance().getPlayer(in.readUTF());
+
+            if(childchannel.equals("GetLocation")){
+                if (sender != null) {
+                    ServerInfo server = getProxy().getServerInfo(in.readUTF());
+                    String world = in.readUTF();
+                    double x = Double.parseDouble(in.readUTF());
+                    double y = Double.parseDouble(in.readUTF());
+                    double z = Double.parseDouble(in.readUTF());
+                    float pitch = Float.parseFloat(in.readUTF());
+                    float yaw = Float.parseFloat(in.readUTF());
+
+                    Location loc = new Location(world, x, y, z, pitch, yaw);
+                    positions.locationReceived(sender, loc, server);
+                    return;
+                }
+            }
             // Spawn
             String spawnType = config.load("teleports", "settings.yml").getString("spawn-type");
             if (spawnType.equalsIgnoreCase("server") || spawnType.equalsIgnoreCase("global")){
@@ -75,6 +94,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                         break;
                 }
             }
+
 
             //Teleportation requests
             TeleportRequestCommand tprequest = new TeleportRequestCommand(this);
@@ -106,21 +126,10 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                             tpforce.tp(sender, in.readUTF(), in.readUTF());
                             break;
                         case "TeleportToXYZ":
-                            String tname = in.readUTF();
-                            Double tx = in.readDouble();
-                            Double ty = in.readDouble();
-                            Double tz = in.readDouble();
-                            tpforce.tp(sender, tname, tx, ty, tz);
-                            lastLocations.put(in.readUTF(), new Location("world", tx, ty, tz));
+                            tpforce.tp(sender, in.readUTF(), in.readDouble(), in.readDouble(), in.readDouble());
                             break;
                         case "TeleportToCoordinates":
-                            String tcname = in.readUTF();
-                            String world = in.readUTF();
-                            Double tcx = in.readDouble();
-                            Double tcy = in.readDouble();
-                            Double tcz = in.readDouble();
-                            tpforce.tp(sender, tcname, new Location(world, tcx, tcy, tcz));
-                            lastLocations.put(in.readUTF(), new Location(world, tcx, tcy, tcz));
+                            tpforce.tp(sender, in.readUTF(), new Location(in.readUTF(), in.readDouble(), in.readDouble(), in.readDouble()));
                             break;
                     }
                     break;
@@ -134,7 +143,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
 
             // Back
             if(childchannel.equals("Back")){
-
+                tpforce.tp(sender, sender.getName(), positions.positions.get(sender.getUniqueId()));
             }
 
 

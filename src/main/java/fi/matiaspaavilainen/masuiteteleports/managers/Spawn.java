@@ -117,13 +117,14 @@ public class Spawn {
         return spawn;
     }
 
-    public Boolean spawn(ProxiedPlayer p, Plugin plugin) {
+    public Boolean spawn(ProxiedPlayer p, MaSuiteTeleports plugin) {
         Spawn spawn = new Spawn().find(p.getServer().getInfo().getName());
         if (spawn == null) {
             new Formator().sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.not-found"));
             return false;
         }
         try {
+            plugin.positions.requestPosition(p);
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(b);
             out.writeUTF("MaSuiteTeleports");
@@ -221,8 +222,6 @@ public class Spawn {
                 spawn.setLocation(new Location(rs.getString("world"), rs.getDouble("x"), rs.getDouble("y"), rs.getDouble("z"), rs.getFloat("yaw"), rs.getFloat("pitch")));
                 spawns.add(spawn);
             }
-
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

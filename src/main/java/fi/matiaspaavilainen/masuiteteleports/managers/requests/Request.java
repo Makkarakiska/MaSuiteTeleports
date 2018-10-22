@@ -1,5 +1,6 @@
 package fi.matiaspaavilainen.masuiteteleports.managers.requests;
 
+import fi.matiaspaavilainen.masuitecore.Utils;
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuiteteleports.Button;
@@ -19,6 +20,7 @@ public class Request implements Listener {
     private Formator formator = new Formator();
     private Configuration config = new Configuration();
     private MaSuiteTeleports plugin;
+    private Utils utils = new Utils();
 
     public Request(MaSuiteTeleports p) {
         plugin = p;
@@ -95,7 +97,7 @@ public class Request implements Listener {
     public void cancelRequest(ProxiedPlayer receiver, String type) {
         if (Teleport.receivers.containsKey(receiver.getUniqueId())) {
             ProxiedPlayer sender = ProxyServer.getInstance().getPlayer(Teleport.receivers.get(receiver.getUniqueId()));
-            if (sender != null) {
+            if (utils.isOnline(sender)) {
                 if (Teleport.senders.containsKey(sender.getUniqueId())) {
                     if (type.equals("timer")) {
                         formator.sendMessage(sender, config.load("teleports", "messages.yml")
@@ -126,7 +128,7 @@ public class Request implements Listener {
                 }
             }
         } else {
-            if(type.equals("player")){
+            if (type.equals("player")) {
                 formator.sendMessage(receiver, config.load("teleports", "messages.yml").getString("receiver.no-pending-teleport-requests"));
             }
         }
@@ -135,7 +137,7 @@ public class Request implements Listener {
     public void acceptRequest(ProxiedPlayer receiver) {
         if (Teleport.receivers.containsKey(receiver.getUniqueId())) {
             ProxiedPlayer sender = ProxyServer.getInstance().getPlayer(Teleport.receivers.get(receiver.getUniqueId()));
-            if (sender != null) {
+            if (utils.isOnline(sender, receiver)) {
                 formator.sendMessage(sender, config.load("teleports", "messages.yml")
                         .getString("sender.teleport-request-accepted")
                         .replace("%sender%", sender.getName())
@@ -146,13 +148,12 @@ public class Request implements Listener {
                         .replace("%sender%", sender.getName())
                         .replace("%receiver%", receiver.getName())
                 );
+                plugin.positions.requestPosition(sender);
                 PlayerToPlayer(sender, receiver);
                 Teleport.senders.remove(sender.getUniqueId());
                 Teleport.receivers.remove(receiver.getUniqueId());
                 Teleport.method.remove(sender.getUniqueId());
                 Teleport.method.remove(receiver.getUniqueId());
-            } else {
-                formator.sendMessage(receiver, config.load(null,"messages.yml").getString("player-not-online"));
             }
         } else {
             formator.sendMessage(receiver, config.load("teleports", "messages.yml").getString("receiver.no-pending-teleport-requests"));

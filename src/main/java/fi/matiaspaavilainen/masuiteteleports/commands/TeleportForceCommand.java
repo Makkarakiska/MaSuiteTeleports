@@ -7,14 +7,11 @@ import fi.matiaspaavilainen.masuitecore.managers.Location;
 import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
 import fi.matiaspaavilainen.masuiteteleports.managers.PlayerFinder;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import static fi.matiaspaavilainen.masuiteteleports.managers.Teleport.PlayerToPlayer;
 
