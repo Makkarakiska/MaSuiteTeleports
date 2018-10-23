@@ -29,6 +29,7 @@ public class TeleportForceCommand {
     public void tp(ProxiedPlayer sender, String t){
         ProxiedPlayer target = new PlayerFinder().get(t);
         if(utils.isOnline(target, sender)){
+            plugin.positions.requestPosition(sender);
             PlayerToPlayer(sender, target);
             formator.sendMessage(sender, config.load("teleports","messages.yml")
                     .getString("teleported")
@@ -42,6 +43,7 @@ public class TeleportForceCommand {
         ProxiedPlayer target1 = new PlayerFinder().get(t1);
         ProxiedPlayer target2 = new PlayerFinder().get(t2);
         if(utils.isOnline(target1, sender) &&  utils.isOnline(target2, sender)){
+            plugin.positions.requestPosition(target1);
             PlayerToPlayer(target1, target2);
             formator.sendMessage(target1, config.load("teleports","messages.yml")
                     .getString("teleported")
@@ -54,6 +56,7 @@ public class TeleportForceCommand {
     public void tp(ProxiedPlayer sender, String t, Double x, Double y, Double z){
         ProxiedPlayer target = new PlayerFinder().get(t);
         if(utils.isOnline(target, sender)){
+            plugin.positions.requestPosition(target);
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(b);
             try {
@@ -75,6 +78,7 @@ public class TeleportForceCommand {
     public void tp(ProxiedPlayer sender, String t, Location loc){
         ProxiedPlayer target = new PlayerFinder().get(t);
         if(utils.isOnline(target, sender)){
+            plugin.positions.requestPosition(target);
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(b);
             try {
@@ -95,6 +99,7 @@ public class TeleportForceCommand {
     public void tphere(ProxiedPlayer sender, String t){
         ProxiedPlayer target = new PlayerFinder().get(t);
         if(utils.isOnline(target, sender)){
+            plugin.positions.requestPosition(target);
             PlayerToPlayer(target, sender);
         }
     }
@@ -102,6 +107,7 @@ public class TeleportForceCommand {
     public void tpall(ProxiedPlayer target){
         if(utils.isOnline(target)){
             for(ProxiedPlayer p : ProxyServer.getInstance().getPlayers()){
+                plugin.positions.requestPosition(p);
                 PlayerToPlayer(p, target);
             }
         }

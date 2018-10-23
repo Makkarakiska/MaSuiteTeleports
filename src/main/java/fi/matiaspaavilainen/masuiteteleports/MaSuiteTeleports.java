@@ -1,31 +1,36 @@
 package fi.matiaspaavilainen.masuiteteleports;
 
 import fi.matiaspaavilainen.masuitecore.Updator;
+import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuitecore.managers.Location;
+import fi.matiaspaavilainen.masuiteteleports.commands.SpawnCommand;
 import fi.matiaspaavilainen.masuiteteleports.commands.TeleportForceCommand;
 import fi.matiaspaavilainen.masuiteteleports.commands.TeleportRequestCommand;
-import fi.matiaspaavilainen.masuiteteleports.commands.SpawnCommand;
 import fi.matiaspaavilainen.masuiteteleports.database.Database;
 import fi.matiaspaavilainen.masuiteteleports.managers.PositionListener;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 
-import java.io.*;
-import java.util.HashMap;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class MaSuiteTeleports extends Plugin implements Listener {
 
     private Configuration config = new Configuration();
+    private Formator formator = new Formator();
     public static Database db = new Database();
-    private HashMap<String, Location> lastLocations = new HashMap<>();
 
     public PositionListener positions = new PositionListener(this);
+
     @Override
     public void onEnable() {
         super.onEnable();
@@ -61,25 +66,25 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         if (subchannel.equals("MaSuiteTeleports")) {
             String childchannel = in.readUTF();
             ProxiedPlayer sender = ProxyServer.getInstance().getPlayer(in.readUTF());
-
-            if(childchannel.equals("GetLocation")){
+            if (childchannel.equals("GetLocation")) {
                 if (sender != null) {
-                    ServerInfo server = getProxy().getServerInfo(in.readUTF());
-                    String world = in.readUTF();
-                    double x = Double.parseDouble(in.readUTF());
-                    double y = Double.parseDouble(in.readUTF());
-                    double z = Double.parseDouble(in.readUTF());
-                    float pitch = Float.parseFloat(in.readUTF());
-                    float yaw = Float.parseFloat(in.readUTF());
+                    String[] ploc = in.readUTF().split(":");
+                    Location loc = new Location(ploc[0], Double.parseDouble(ploc[1]), Double.parseDouble(ploc[2]), Double.parseDouble(ploc[3]), Float.parseFloat(ploc[4]), Float.parseFloat(ploc[5]));
+                    String s = in.readUTF();
+                    ServerInfo server = null;
+                    if(s.equals("DETECTSERVER")){
+                        server = sender.getServer().getInfo();
+                    } else{
+                        server = getProxy().getServerInfo(s);
+                    }
 
-                    Location loc = new Location(world, x, y, z, pitch, yaw);
                     positions.locationReceived(sender, loc, server);
                     return;
                 }
             }
             // Spawn
             String spawnType = config.load("teleports", "settings.yml").getString("spawn-type");
-            if (spawnType.equalsIgnoreCase("server") || spawnType.equalsIgnoreCase("global")){
+            if (spawnType.equalsIgnoreCase("server") || spawnType.equalsIgnoreCase("global")) {
                 SpawnCommand command = new SpawnCommand(this);
                 switch (childchannel) {
                     case "SpawnPlayer":
@@ -142,12 +147,19 @@ public class MaSuiteTeleports extends Plugin implements Listener {
             }
 
             // Back
-            if(childchannel.equals("Back")){
-                tpforce.tp(sender, sender.getName(), positions.positions.get(sender.getUniqueId()));
+            if (childchannel.equals("Back")) {
+                if(positions.serverPositions.containsKey(sender.getUniqueId())){
+                    if(!positions.serverPositions.get(sender.getUniqueId()).equals(sender.getServer().getInfo())){
+                        sender.connect(positions.serverPositions.get(sender.getUniqueId()));
+                        ProxyServer.getInstance().getScheduler().schedule(this, () -> tpforce.tp(sender, sender.getName(), positions.positions.get(sender.getUniqueId())), 500, TimeUnit.MILLISECONDS);
+                    }else{
+                        tpforce.tp(sender, sender.getName(), positions.positions.get(sender.getUniqueId()));
+                    }
+                    formator.sendMessage(sender, config.load("teleports", "messages.yml").getString("back.last-loc"));
+                }else {
+                    formator.sendMessage(sender, config.load("teleports", "messages.yml").getString("back.no-loc"));
+                }
             }
-
-
         }
-
     }
 }

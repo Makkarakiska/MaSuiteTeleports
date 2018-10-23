@@ -18,11 +18,14 @@ import java.util.UUID;
 public class PositionListener {
     private MaSuiteTeleports plugin;
     private HashMap<UUID, Runnable> positionRunnables = new HashMap<>();
-    public HashMap<UUID, Location> positions, localPositions = new HashMap<>();
-    private HashMap<UUID, ServerInfo> serverPositions = new HashMap<>();
+    public HashMap<UUID, Location> positions;
+    private HashMap<UUID, Location> localPositions;
+    public HashMap<UUID, ServerInfo> serverPositions = new HashMap<>();
 
     public PositionListener(MaSuiteTeleports p) {
         plugin = p;
+        localPositions = new HashMap<>();
+        positions = new HashMap<>();
     }
 
     public void requestPosition(ProxiedPlayer p) {
@@ -33,10 +36,11 @@ public class PositionListener {
             out.writeUTF("GetLocation");
             out.writeUTF(p.getName());
             out.writeUTF(p.getServer().getInfo().getName());
+            p.getServer().sendData("BungeeCord", b.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        p.getServer().sendData("ProxySuite", b.toByteArray());
+
     }
 
     public void locationReceived(ProxiedPlayer p, Location loc, ServerInfo serverInfo) {
