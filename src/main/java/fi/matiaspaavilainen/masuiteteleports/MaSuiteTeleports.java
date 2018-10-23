@@ -12,7 +12,6 @@ import fi.matiaspaavilainen.masuiteteleports.managers.PositionListener;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -21,6 +20,8 @@ import net.md_5.bungee.event.EventHandler;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class MaSuiteTeleports extends Plugin implements Listener {
@@ -28,7 +29,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
     private Configuration config = new Configuration();
     private Formator formator = new Formator();
     public static Database db = new Database();
-
+    public static HashMap<UUID, Long> cooldowns = new HashMap<>();
     public PositionListener positions = new PositionListener(this);
 
     @Override
@@ -72,9 +73,9 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                     Location loc = new Location(ploc[0], Double.parseDouble(ploc[1]), Double.parseDouble(ploc[2]), Double.parseDouble(ploc[3]), Float.parseFloat(ploc[4]), Float.parseFloat(ploc[5]));
                     String s = in.readUTF();
                     ServerInfo server = null;
-                    if(s.equals("DETECTSERVER")){
+                    if (s.equals("DETECTSERVER")) {
                         server = sender.getServer().getInfo();
-                    } else{
+                    } else {
                         server = getProxy().getServerInfo(s);
                     }
 
@@ -148,15 +149,27 @@ public class MaSuiteTeleports extends Plugin implements Listener {
 
             // Back
             if (childchannel.equals("Back")) {
-                if(positions.serverPositions.containsKey(sender.getUniqueId())){
-                    if(!positions.serverPositions.get(sender.getUniqueId()).equals(sender.getServer().getInfo())){
+                if (cooldowns.containsKey(sender.getUniqueId())) {
+                    if (System.currentTimeMillis() - cooldowns.get(sender.getUniqueId()) <
+                            config.load("teleports", "settings.yml").getInt("cooldown") * 1000) {
+                        formator.sendMessage(sender, config.load("teleports", "messages.yml")
+                                .getString("in-cooldown")
+                                .replace("%time%", config.load("teleports", "settings.yml").getString("cooldown")
+                                ));
+                        cooldowns.remove(sender.getUniqueId());
+                        return;
+                    }
+                }
+                if (positions.serverPositions.containsKey(sender.getUniqueId())) {
+                    if (!positions.serverPositions.get(sender.getUniqueId()).equals(sender.getServer().getInfo())) {
                         sender.connect(positions.serverPositions.get(sender.getUniqueId()));
                         ProxyServer.getInstance().getScheduler().schedule(this, () -> tpforce.tp(sender, sender.getName(), positions.positions.get(sender.getUniqueId())), 500, TimeUnit.MILLISECONDS);
-                    }else{
+                    } else {
                         tpforce.tp(sender, sender.getName(), positions.positions.get(sender.getUniqueId()));
                     }
                     formator.sendMessage(sender, config.load("teleports", "messages.yml").getString("back.last-loc"));
-                }else {
+                    cooldowns.put(sender.getUniqueId(), System.currentTimeMillis());
+                } else {
                     formator.sendMessage(sender, config.load("teleports", "messages.yml").getString("back.no-loc"));
                 }
             }

@@ -1,2 +1,3 @@
 keep-request-alive: 20 #In seconds
 spawn-type: server #You can use server, global and none
+cooldown: 3 #In seconds, change to 0 to disable
