@@ -154,7 +154,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                             config.load("teleports", "settings.yml").getInt("cooldown") * 1000) {
                         formator.sendMessage(sender, config.load("teleports", "messages.yml")
                                 .getString("in-cooldown")
-                                .replace("%time%", config.load("teleports", "settings.yml").getString("cooldown")
+                                .replace("%time%", String.valueOf(config.load("teleports", "settings.yml").getInt("cooldown"))
                                 ));
                         cooldowns.remove(sender.getUniqueId());
                         return;
@@ -163,7 +163,9 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                 if (positions.serverPositions.containsKey(sender.getUniqueId())) {
                     if (!positions.serverPositions.get(sender.getUniqueId()).equals(sender.getServer().getInfo())) {
                         sender.connect(positions.serverPositions.get(sender.getUniqueId()));
-                        ProxyServer.getInstance().getScheduler().schedule(this, () -> tpforce.tp(sender, sender.getName(), positions.positions.get(sender.getUniqueId())), 500, TimeUnit.MILLISECONDS);
+                        ProxyServer.getInstance().getScheduler().schedule(this, () ->
+                                tpforce.tp(sender, sender.getName(), positions.positions.get(sender.getUniqueId())
+                                ), 500, TimeUnit.MILLISECONDS);
                     } else {
                         tpforce.tp(sender, sender.getName(), positions.positions.get(sender.getUniqueId()));
                     }

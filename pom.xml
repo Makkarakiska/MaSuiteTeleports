@@ -88,7 +88,7 @@
         <dependency>
             <groupId>com.github.masagameplay</groupId>
             <artifactId>masuitecore</artifactId>
-            <version>5f8cdc98b0</version>
+            <version>9b7c56dbd7</version>
         </dependency>
     </dependencies>
 </project>
