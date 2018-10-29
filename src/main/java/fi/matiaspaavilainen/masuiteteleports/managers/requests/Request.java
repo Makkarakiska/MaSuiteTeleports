@@ -13,8 +13,6 @@ import net.md_5.bungee.api.plugin.Listener;
 
 import java.util.concurrent.TimeUnit;
 
-import static fi.matiaspaavilainen.masuiteteleports.managers.Teleport.PlayerToPlayer;
-
 public class Request implements Listener {
 
     private Formator formator = new Formator();
@@ -149,7 +147,7 @@ public class Request implements Listener {
                         .replace("%receiver%", receiver.getName())
                 );
                 plugin.positions.requestPosition(sender);
-                PlayerToPlayer(sender, receiver);
+                new Teleport(plugin).playerToPlayer(sender, receiver);
                 Teleport.senders.remove(sender.getUniqueId());
                 Teleport.receivers.remove(receiver.getUniqueId());
                 Teleport.method.remove(sender.getUniqueId());
