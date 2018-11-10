@@ -53,7 +53,6 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         config.create(this, "teleports", "buttons.yml");
 
 
-
         new Updator().checkVersion(this.getDescription(), "60125");
     }
 
@@ -98,7 +97,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                         break;
                     case "SetSpawn":
                         String[] loc = in.readUTF().split(":");
-                        command.setSpawn(sender, new Location(loc[0], Double.parseDouble(loc[1]), Double.parseDouble(loc[2]), Double.parseDouble(loc[3]), Float.parseFloat(loc[4]), Float.parseFloat(loc[5])));
+                        command.setSpawn(sender, new Location(loc[0], Double.parseDouble(loc[1]), Double.parseDouble(loc[2]), Double.parseDouble(loc[3]), Float.parseFloat(loc[4]), Float.parseFloat(loc[5])), in.readUTF());
                         break;
                     case "DelSpawn":
                         command.deleteSpawn(sender);

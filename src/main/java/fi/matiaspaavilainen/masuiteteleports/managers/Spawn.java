@@ -3,12 +3,11 @@ package fi.matiaspaavilainen.masuiteteleports.managers;
 import fi.matiaspaavilainen.masuitecore.Debugger;
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
-import fi.matiaspaavilainen.masuiteteleports.database.Database;
 import fi.matiaspaavilainen.masuitecore.managers.Location;
 import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
+import fi.matiaspaavilainen.masuiteteleports.database.Database;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Plugin;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -26,6 +25,8 @@ public class Spawn {
     private Database db = MaSuiteTeleports.db;
     private String server;
     private Location location;
+    private int type;
+
     private Connection connection = null;
     private PreparedStatement statement = null;
     private Configuration config = new Configuration();
@@ -35,9 +36,10 @@ public class Spawn {
     public Spawn() {
     }
 
-    public Spawn(String server, Location location) {
+    public Spawn(String server, Location location, int type) {
         this.server = server;
         this.location = location;
+        this.type = type;
     }
 
 
@@ -147,21 +149,20 @@ public class Spawn {
     }
 
     public boolean create(Spawn spawn) {
-        String type = config.load("teleports", "settings.yml").getString("spawn-type");
+        String spawnType = config.load("teleports", "settings.yml").getString("spawn-type");
         String insert = null;
-        if (type.equalsIgnoreCase("server")) {
+        if (spawnType.equalsIgnoreCase("server")) {
             insert = "INSERT INTO " + tablePrefix +
-                    "spawns (server, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?) " +
-                    "ON DUPLICATE KEY UPDATE world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ?;";
+                    "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
+                    "ON DUPLICATE KEY UPDATE world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ?, type = ?;";
         }
 
-        if (type.equalsIgnoreCase("global")) {
+        if (spawnType.equalsIgnoreCase("global")) {
             if (spawn.all().size() > 0) {
                 insert = "UPDATE " + tablePrefix + "spawns " +
-                        "server = ?, world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ?;";
+                        "server = ?, world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ?, type = ?;";
             } else {
-                insert = "INSERT INTO " + tablePrefix +
-                        "spawns (server, world, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?);";
+                insert = "INSERT INTO " + tablePrefix + "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
             }
 
         }
@@ -176,13 +177,15 @@ public class Spawn {
             statement.setDouble(5, spawn.getLocation().getZ());
             statement.setFloat(6, spawn.getLocation().getYaw());
             statement.setFloat(7, spawn.getLocation().getPitch());
-            if (type.equalsIgnoreCase("server")) {
-                statement.setString(8, spawn.getLocation().getWorld());
-                statement.setDouble(9, spawn.getLocation().getX());
-                statement.setDouble(10, spawn.getLocation().getY());
-                statement.setDouble(11, spawn.getLocation().getZ());
-                statement.setFloat(12, spawn.getLocation().getYaw());
-                statement.setFloat(13, spawn.getLocation().getPitch());
+            statement.setFloat(8, spawn.getType());
+            if (spawnType.equalsIgnoreCase("server")) {
+                statement.setString(9, spawn.getLocation().getWorld());
+                statement.setDouble(10, spawn.getLocation().getX());
+                statement.setDouble(11, spawn.getLocation().getY());
+                statement.setDouble(12, spawn.getLocation().getZ());
+                statement.setFloat(13, spawn.getLocation().getYaw());
+                statement.setFloat(14, spawn.getLocation().getPitch());
+                statement.setFloat(15, spawn.getType());
             }
 
             statement.execute();
@@ -307,5 +310,13 @@ public class Spawn {
                 }
             }
         }
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 }

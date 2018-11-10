@@ -24,13 +24,11 @@ public class SpawnCommand {
         if(spawn.spawn(p, plugin)){formator.sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.teleported"));}
     }
 
-    public void setSpawn(ProxiedPlayer p, Location loc){
+    public void setSpawn(ProxiedPlayer p, Location loc, String type){
         if(p == null){
             return;
         }
-        Spawn spawn = new Spawn();
-        spawn.setServer(p.getServer().getInfo().getName());
-        spawn.setLocation(loc);
+        Spawn spawn = new Spawn(p.getServer().getInfo().getName(), loc, type.equals("default") ? 1 : 0);
         if(spawn.create(spawn)){
             formator.sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.set"));
         } else {
