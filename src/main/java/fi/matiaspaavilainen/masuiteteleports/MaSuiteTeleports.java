@@ -9,6 +9,7 @@ import fi.matiaspaavilainen.masuiteteleports.commands.TeleportForceCommand;
 import fi.matiaspaavilainen.masuiteteleports.commands.TeleportRequestCommand;
 import fi.matiaspaavilainen.masuiteteleports.database.Database;
 import fi.matiaspaavilainen.masuiteteleports.managers.PositionListener;
+import fi.matiaspaavilainen.masuiteteleports.managers.Spawn;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -39,15 +40,19 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         getProxy().getPluginManager().registerListener(this, this);
 
         // Table creation
+        String tablePrefix = config.load("", "config.yml").getString("database.table-prefix");
         db.connect();
         db.createTable("spawns",
-                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) UNIQUE NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-
+                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) UNIQUE NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT) " +
+                        "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+        new Spawn().checkTable();
         // Generate configs
         config.create(this, "teleports", "messages.yml");
         config.create(this, "teleports", "settings.yml");
         config.create(this, "teleports", "syntax.yml");
         config.create(this, "teleports", "buttons.yml");
+
+
 
         new Updator().checkVersion(this.getDescription(), "60125");
     }

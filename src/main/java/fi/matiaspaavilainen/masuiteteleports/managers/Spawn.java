@@ -132,10 +132,10 @@ public class Spawn {
             out.writeUTF(p.getName());
             Location loc = spawn.getLocation();
             out.writeUTF(loc.getWorld() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch());
-            if(!spawn.getServer().equals(p.getServer().getInfo().getName())){
+            if (!spawn.getServer().equals(p.getServer().getInfo().getName())) {
                 p.connect(ProxyServer.getInstance().getServerInfo(spawn.getServer()));
                 ProxyServer.getInstance().getScheduler().schedule(plugin, () -> p.getServer().sendData("BungeeCord", b.toByteArray()), 500, TimeUnit.MILLISECONDS);
-            } else{
+            } else {
                 p.getServer().sendData("BungeeCord", b.toByteArray());
             }
 
@@ -260,6 +260,37 @@ public class Spawn {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void checkTable() {
+        try {
+            connection = db.hikari.getConnection();
+            statement = connection.prepareStatement("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + tablePrefix + "spawns' AND COLUMN_NAME = 'type';");
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                if (rs.getInt(1) == 0) {
+                    statement = connection.prepareStatement("ALTER TABLE " + tablePrefix + "spawns ADD COLUMN type TINYINT(1) NULL DEFAULT 0;");
+                    statement.executeUpdate();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             if (statement != null) {
                 try {
