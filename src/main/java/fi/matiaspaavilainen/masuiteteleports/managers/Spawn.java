@@ -3,9 +3,9 @@ package fi.matiaspaavilainen.masuiteteleports.managers;
 import fi.matiaspaavilainen.masuitecore.Debugger;
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
+import fi.matiaspaavilainen.masuiteteleports.database.Database;
 import fi.matiaspaavilainen.masuitecore.managers.Location;
 import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
-import fi.matiaspaavilainen.masuiteteleports.database.Database;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -59,24 +59,25 @@ public class Spawn {
         this.location = location;
     }
 
-    public Spawn find(String server) {
+    public Spawn find(String server, int type) {
         Spawn spawn = new Spawn();
         ResultSet rs = null;
-        String type = config.load("teleports", "settings.yml").getString("spawn-type");
+        String spawnType = config.load("teleports", "settings.yml").getString("spawn-type");
         String select = null;
-        if (type.equalsIgnoreCase("server")) {
-            select = "SELECT * FROM " + tablePrefix + "spawns WHERE server = ?;";
+        if (spawnType.equalsIgnoreCase("server")) {
+            select = "SELECT * FROM " + tablePrefix + "spawns WHERE type = ? AND server = ?;";
         }
 
-        if (type.equalsIgnoreCase("global")) {
-            select = "SELECT * FROM " + tablePrefix + "spawns;";
+        if (spawnType.equalsIgnoreCase("global")) {
+            select = "SELECT * FROM " + tablePrefix + "spawns WHERE type = ?;";
 
         }
         try {
             connection = db.hikari.getConnection();
             statement = connection.prepareStatement(select);
-            if (type.equalsIgnoreCase("server")) {
-                statement.setString(1, server);
+            statement.setInt(1, type);
+            if (spawnType.equalsIgnoreCase("server")) {
+                statement.setString(2, server);
             }
             rs = statement.executeQuery();
 
@@ -120,7 +121,7 @@ public class Spawn {
     }
 
     public Boolean spawn(ProxiedPlayer p, MaSuiteTeleports plugin) {
-        Spawn spawn = new Spawn().find(p.getServer().getInfo().getName());
+        Spawn spawn = new Spawn().find(p.getServer().getInfo().getName(), 0);
         if (spawn == null) {
             new Formator().sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.not-found"));
             return false;

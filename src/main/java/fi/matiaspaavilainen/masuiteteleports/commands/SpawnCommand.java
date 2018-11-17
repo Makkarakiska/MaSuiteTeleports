@@ -24,11 +24,11 @@ public class SpawnCommand {
         if(spawn.spawn(p, plugin)){formator.sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.teleported"));}
     }
 
-    public void setSpawn(ProxiedPlayer p, Location loc, String type){
+    public void setSpawn(ProxiedPlayer p, Location loc, int type){
         if(p == null){
             return;
         }
-        Spawn spawn = new Spawn(p.getServer().getInfo().getName(), loc, type.equals("default") ? 1 : 0);
+        Spawn spawn = new Spawn(p.getServer().getInfo().getName(), loc, type);
         if(spawn.create(spawn)){
             formator.sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.set"));
         } else {
@@ -36,12 +36,12 @@ public class SpawnCommand {
         }
 
     }
-    public void deleteSpawn(ProxiedPlayer p){
+    public void deleteSpawn(ProxiedPlayer p, int type){
         if(p == null){
             return;
         }
         Spawn spawn = new Spawn();
-        if(spawn.find(p.getServer().getInfo().getName()) != null){
+        if(spawn.find(p.getServer().getInfo().getName(), type) != null){
             if(spawn.delete(p.getServer().getInfo().getName())){
                 formator.sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.deleted"));
             }else {

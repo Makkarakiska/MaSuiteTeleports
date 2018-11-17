@@ -1,5 +1,6 @@
 package fi.matiaspaavilainen.masuiteteleports;
 
+import fi.matiaspaavilainen.masuitecore.MaSuiteCore;
 import fi.matiaspaavilainen.masuitecore.Updator;
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
@@ -40,7 +41,6 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         getProxy().getPluginManager().registerListener(this, this);
 
         // Table creation
-        String tablePrefix = config.load("", "config.yml").getString("database.table-prefix");
         db.connect();
         db.createTable("spawns",
                 "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) UNIQUE NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT) " +
@@ -97,10 +97,10 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                         break;
                     case "SetSpawn":
                         String[] loc = in.readUTF().split(":");
-                        command.setSpawn(sender, new Location(loc[0], Double.parseDouble(loc[1]), Double.parseDouble(loc[2]), Double.parseDouble(loc[3]), Float.parseFloat(loc[4]), Float.parseFloat(loc[5])), in.readUTF());
+                        command.setSpawn(sender, new Location(loc[0], Double.parseDouble(loc[1]), Double.parseDouble(loc[2]), Double.parseDouble(loc[3]), Float.parseFloat(loc[4]), Float.parseFloat(loc[5])), in.readUTF().equals("default") ? 0 : 1);
                         break;
                     case "DelSpawn":
-                        command.deleteSpawn(sender);
+                        command.deleteSpawn(sender, in.readUTF().equals("default") ? 0 : 1);
                         break;
                 }
             }
