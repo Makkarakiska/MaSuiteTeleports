@@ -31,7 +31,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
     private Configuration config = new Configuration();
     private Formator formator = new Formator();
     public static Database db = new Database();
-    private static HashMap<UUID, Long> cooldowns = new HashMap<>();
+    public static HashMap<UUID, Long> cooldowns = new HashMap<>();
     public PositionListener positions = new PositionListener(this);
 
     @Override

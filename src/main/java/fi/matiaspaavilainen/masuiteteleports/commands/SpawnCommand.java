@@ -10,44 +10,59 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 public class SpawnCommand {
 
     private MaSuiteTeleports plugin;
-    public SpawnCommand(MaSuiteTeleports p){
+
+    public SpawnCommand(MaSuiteTeleports p) {
         plugin = p;
     }
+
     private Formator formator = new Formator();
     private Configuration config = new Configuration();
 
-    public void spawn(ProxiedPlayer p){
-        if(p == null){
+    public void spawn(ProxiedPlayer p) {
+        if (p == null) {
             return;
         }
         Spawn spawn = new Spawn();
-        if(spawn.spawn(p, plugin)){formator.sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.teleported"));}
+        if (MaSuiteTeleports.cooldowns.containsKey(p.getUniqueId())) {
+            if (System.currentTimeMillis() - MaSuiteTeleports.cooldowns.get(p.getUniqueId()) < config.load("teleports", "settings.yml").getInt("cooldown") * 1000) {
+                formator.sendMessage(p, config.load("teleports", "messages.yml")
+                        .getString("in-cooldown")
+                        .replace("%time%", String.valueOf(config.load("teleports", "settings.yml").getInt("cooldown"))
+                        ));
+                MaSuiteTeleports.cooldowns.remove(p.getUniqueId());
+                return;
+            }
+        }
+        if (spawn.spawn(p, plugin)) {
+            formator.sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.teleported"));
+        }
     }
 
-    public void setSpawn(ProxiedPlayer p, Location loc, int type){
-        if(p == null){
+    public void setSpawn(ProxiedPlayer p, Location loc, int type) {
+        if (p == null) {
             return;
         }
         Spawn spawn = new Spawn(p.getServer().getInfo().getName(), loc, type);
-        if(spawn.create(spawn)){
+        if (spawn.create(spawn)) {
             formator.sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.set"));
         } else {
             System.out.println("[MaSuite] [Teleports] [Spawn] Error while creating spawn.");
         }
 
     }
-    public void deleteSpawn(ProxiedPlayer p, int type){
-        if(p == null){
+
+    public void deleteSpawn(ProxiedPlayer p, int type) {
+        if (p == null) {
             return;
         }
         Spawn spawn = new Spawn();
-        if(spawn.find(p.getServer().getInfo().getName(), type) != null){
-            if(spawn.delete(p.getServer().getInfo().getName())){
+        if (spawn.find(p.getServer().getInfo().getName(), type) != null) {
+            if (spawn.delete(p.getServer().getInfo().getName())) {
                 formator.sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.deleted"));
-            }else {
+            } else {
                 System.out.println("[MaSuite] [Teleports] [Spawn] Error while deleting spawn.");
             }
-        }else{
+        } else {
             formator.sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.not-found"));
         }
     }
