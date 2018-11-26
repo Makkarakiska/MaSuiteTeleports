@@ -1,6 +1,6 @@
 invalid-coords-given: "&cInvalid coordinates given!"
 teleported: "&7You have been teleported to &b%player%&7!"
-in-cooldown: "&cYou can go back to your last known location after %time% seconds"
+in-cooldown: "&cYou can go use that after %time% seconds"
 back:
   last-loc: "&7You have been teleported to your last location!"
   no-loc: "&cCouldn't find your last location!"

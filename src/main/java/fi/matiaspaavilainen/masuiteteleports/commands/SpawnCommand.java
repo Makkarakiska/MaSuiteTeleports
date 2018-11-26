@@ -18,7 +18,7 @@ public class SpawnCommand {
     private Formator formator = new Formator();
     private Configuration config = new Configuration();
 
-    public void spawn(ProxiedPlayer p) {
+    public void spawn(ProxiedPlayer p, int type) {
         if (p == null) {
             return;
         }
@@ -33,7 +33,7 @@ public class SpawnCommand {
                 return;
             }
         }
-        if (spawn.spawn(p, plugin)) {
+        if (spawn.spawn(p, plugin, type)) {
             formator.sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.teleported"));
         }
     }

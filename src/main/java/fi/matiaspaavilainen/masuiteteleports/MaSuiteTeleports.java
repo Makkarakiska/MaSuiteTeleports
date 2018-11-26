@@ -9,6 +9,7 @@ import fi.matiaspaavilainen.masuiteteleports.commands.SpawnCommand;
 import fi.matiaspaavilainen.masuiteteleports.commands.TeleportForceCommand;
 import fi.matiaspaavilainen.masuiteteleports.commands.TeleportRequestCommand;
 import fi.matiaspaavilainen.masuiteteleports.database.Database;
+import fi.matiaspaavilainen.masuiteteleports.managers.PlayerJoinEvent;
 import fi.matiaspaavilainen.masuiteteleports.managers.PositionListener;
 import fi.matiaspaavilainen.masuiteteleports.managers.Spawn;
 import net.md_5.bungee.api.ProxyServer;
@@ -39,11 +40,12 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         super.onEnable();
 
         getProxy().getPluginManager().registerListener(this, this);
+        getProxy().getPluginManager().registerListener(this, new PlayerJoinEvent(this));
 
         // Table creation
         db.connect();
         db.createTable("spawns",
-                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) UNIQUE NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT) " +
+                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT) " +
                         "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
         new Spawn().checkTable();
         // Generate configs
@@ -52,6 +54,10 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         config.create(this, "teleports", "syntax.yml");
         config.create(this, "teleports", "buttons.yml");
 
+        // First spawn
+        if(config.load("teleports", "settings.yml").get("enable-first-spawn") == null){
+            config.load("teleports", "settings.yml").set("enable-first-spawn", true);
+        }
 
         new Updator().checkVersion(this.getDescription(), "60125");
     }
@@ -93,7 +99,10 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                 SpawnCommand command = new SpawnCommand(this);
                 switch (childchannel) {
                     case "SpawnPlayer":
-                        command.spawn(sender);
+                        command.spawn(sender, 0);
+                        break;
+                    case "FirstSpawnPlayer":
+                        command.spawn(sender, 1);
                         break;
                     case "SetSpawn":
                         String[] loc = in.readUTF().split(":");
@@ -104,7 +113,6 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                         break;
                 }
             }
-
 
             //Teleportation requests
             TeleportRequestCommand tprequest = new TeleportRequestCommand(this);

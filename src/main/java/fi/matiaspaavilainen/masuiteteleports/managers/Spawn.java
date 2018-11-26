@@ -120,14 +120,16 @@ public class Spawn {
         return spawn;
     }
 
-    public Boolean spawn(ProxiedPlayer p, MaSuiteTeleports plugin) {
-        Spawn spawn = new Spawn().find(p.getServer().getInfo().getName(), 0);
+    public Boolean spawn(ProxiedPlayer p, MaSuiteTeleports plugin, int type) {
+        Spawn spawn = new Spawn().find(p.getServer().getInfo().getName(), type);
         if (spawn == null) {
             new Formator().sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.not-found"));
             return false;
         }
         try {
-            plugin.positions.requestPosition(p);
+            if (type == 0) {
+                plugin.positions.requestPosition(p);
+            }
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(b);
             out.writeUTF("MaSuiteTeleports");
@@ -151,26 +153,76 @@ public class Spawn {
 
     public boolean create(Spawn spawn) {
         String spawnType = config.load("teleports", "settings.yml").getString("spawn-type");
-        String insert = null;
-        if (spawnType.equalsIgnoreCase("server")) {
-            insert = "INSERT INTO " + tablePrefix +
-                    "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
-                    "ON DUPLICATE KEY UPDATE world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ?, type = ?;";
+        String query = null;
+        Set<Spawn> spawns = spawn.all();
+        if (spawn.getType() == 1) {
+            if (spawnType.equalsIgnoreCase("server")) {
+                if (spawns.stream().anyMatch(s -> s.getType() == 1 && s.getServer().equalsIgnoreCase(spawn.getServer()))) {
+                    query = "UPDATE " + tablePrefix + "spawns SET server = ?, world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ? WHERE type = ?;";
+                } else {
+                    query = "INSERT INTO " + tablePrefix + "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+                }
+            } else if (spawnType.equalsIgnoreCase("global")) {
+                if (spawns.stream().anyMatch(s -> s.getType() == 1)) {
+                    query = "UPDATE " + tablePrefix + "spawns SET server = ?, world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ? WHERE type = ?;";
+                } else {
+                    query = "INSERT INTO " + tablePrefix + "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+                }
+            }
+        } else {
+            if (spawnType.equalsIgnoreCase("server")) {
+                if (spawns.stream().anyMatch(s -> s.getType() == 0 && s.getServer().equalsIgnoreCase(spawn.getServer()))) {
+                    query = "UPDATE " + tablePrefix + "spawns SET server = ?, world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ? WHERE type = ?;";
+                } else {
+                    query = "INSERT INTO " + tablePrefix + "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+                }
+            } else if (spawnType.equalsIgnoreCase("global")) {
+                if (spawns.stream().anyMatch(s -> s.getType() == 0)) {
+                    query = "UPDATE " + tablePrefix + "spawns SET server = ?, world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ? WHERE type = ?;";
+                } else {
+                    query = "INSERT INTO " + tablePrefix + "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+
+                }
+            }
+        }
+        /*if (spawnType.equalsIgnoreCase("server")) {
+            Set<Spawn> spawns = spawn.all();
+            if (spawns.size() > 0) {
+
+
+                insert = "INSERT INTO " + tablePrefix +
+                        "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
+                        "ON DUPLICATE KEY UPDATE world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ?, type = ?;";
+            }
         }
 
         if (spawnType.equalsIgnoreCase("global")) {
-            if (spawn.all().size() > 0) {
-                insert = "UPDATE " + tablePrefix + "spawns " +
-                        "server = ?, world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ?, type = ?;";
+            Set<Spawn> spawns = spawn.all();
+            if (spawns.size() > 0) {
+                if (spawn.getType() == 1) {
+                    if (spawns.stream().anyMatch(s -> s.getType() == 1)) {
+                        insert = "UPDATE " + tablePrefix + "spawns " +
+                                "server = ?, world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ?, type = 1;";
+                    } else {
+                        insert = "INSERT INTO " + tablePrefix + "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+                    }
+                } else {
+                    if (spawns.stream().anyMatch(s -> s.getType() == 0)) {
+                        insert = "UPDATE " + tablePrefix + "spawns " +
+                                "server = ?, world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ?, type = 0;";
+                    } else {
+                        insert = "INSERT INTO " + tablePrefix + "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+                    }
+                }
             } else {
                 insert = "INSERT INTO " + tablePrefix + "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
             }
 
-        }
+        }*/
 
         try {
             connection = db.hikari.getConnection();
-            statement = connection.prepareStatement(insert);
+            statement = connection.prepareStatement(query);
             statement.setString(1, spawn.getServer());
             statement.setString(2, spawn.getLocation().getWorld());
             statement.setDouble(3, spawn.getLocation().getX());
@@ -178,16 +230,7 @@ public class Spawn {
             statement.setDouble(5, spawn.getLocation().getZ());
             statement.setFloat(6, spawn.getLocation().getYaw());
             statement.setFloat(7, spawn.getLocation().getPitch());
-            statement.setFloat(8, spawn.getType());
-            if (spawnType.equalsIgnoreCase("server")) {
-                statement.setString(9, spawn.getLocation().getWorld());
-                statement.setDouble(10, spawn.getLocation().getX());
-                statement.setDouble(11, spawn.getLocation().getY());
-                statement.setDouble(12, spawn.getLocation().getZ());
-                statement.setFloat(13, spawn.getLocation().getYaw());
-                statement.setFloat(14, spawn.getLocation().getPitch());
-                statement.setFloat(15, spawn.getType());
-            }
+            statement.setInt(8, spawn.getType());
 
             statement.execute();
             return true;
@@ -224,6 +267,7 @@ public class Spawn {
                 Spawn spawn = new Spawn();
                 spawn.setServer(rs.getString("server"));
                 spawn.setLocation(new Location(rs.getString("world"), rs.getDouble("x"), rs.getDouble("y"), rs.getDouble("z"), rs.getFloat("yaw"), rs.getFloat("pitch")));
+                spawn.setType(rs.getInt("type"));
                 spawns.add(spawn);
             }
         } catch (Exception e) {
