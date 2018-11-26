@@ -18,6 +18,11 @@ public class SpawnCommand {
     private Formator formator = new Formator();
     private Configuration config = new Configuration();
 
+    /**
+     * Spawn player
+     * @param p player to spawn
+     * @param type default (0) or first (1)
+     */
     public void spawn(ProxiedPlayer p, int type) {
         if (p == null) {
             return;
@@ -38,6 +43,12 @@ public class SpawnCommand {
         }
     }
 
+    /**
+     * Set spawn
+     * @param p executor
+     * @param loc spawn location
+     * @param type default (0) or first (1)
+     */
     public void setSpawn(ProxiedPlayer p, Location loc, int type) {
         if (p == null) {
             return;
@@ -51,13 +62,18 @@ public class SpawnCommand {
 
     }
 
+    /**
+     * Deletes specific spawn
+     * @param p executor
+     * @param type default (0) or first (1)
+     */
     public void deleteSpawn(ProxiedPlayer p, int type) {
         if (p == null) {
             return;
         }
-        Spawn spawn = new Spawn();
-        if (spawn.find(p.getServer().getInfo().getName(), type) != null) {
-            if (spawn.delete(p.getServer().getInfo().getName())) {
+        Spawn spawn = new Spawn().find(p.getServer().getInfo().getName(), type);
+        if (spawn != null) {
+            if (spawn.delete()) {
                 formator.sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.deleted"));
             } else {
                 System.out.println("[MaSuite] [Teleports] [Spawn] Error while deleting spawn.");

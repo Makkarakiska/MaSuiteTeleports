@@ -45,9 +45,9 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         // Table creation
         db.connect();
         db.createTable("spawns",
-                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT) " +
+                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, type TINYINT(1) NULL DEFAULT 0) " +
                         "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-        new Spawn().checkTable();
+
         // Generate configs
         config.create(this, "teleports", "messages.yml");
         config.create(this, "teleports", "settings.yml");

@@ -36,29 +36,24 @@ public class Spawn {
     public Spawn() {
     }
 
+    /**
+     * Constructor for spawn
+     * @param server server's name
+     * @param location spawn location
+     * @param type default (0) or first (1)
+     */
     public Spawn(String server, Location location, int type) {
         this.server = server;
         this.location = location;
         this.type = type;
     }
 
-
-    public String getServer() {
-        return server;
-    }
-
-    public void setServer(String server) {
-        this.server = server;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
+    /**
+     * Find spawn by server and type
+     * @param server server's name
+     * @param type default (0) or first (1)
+     * @return spawn
+     */
     public Spawn find(String server, int type) {
         Spawn spawn = new Spawn();
         ResultSet rs = null;
@@ -120,7 +115,14 @@ public class Spawn {
         return spawn;
     }
 
-    public Boolean spawn(ProxiedPlayer p, MaSuiteTeleports plugin, int type) {
+    /**
+     * Spawns player
+     * @param p player to spawn
+     * @param plugin plugin to use when sending plugin message
+     * @param type default (0) or first (1)
+     * @return if player has been spawned or not
+     */
+    public boolean spawn(ProxiedPlayer p, MaSuiteTeleports plugin, int type) {
         Spawn spawn = new Spawn().find(p.getServer().getInfo().getName(), type);
         if (spawn == null) {
             new Formator().sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.not-found"));
@@ -151,6 +153,11 @@ public class Spawn {
         return true;
     }
 
+    /**
+     * Creates and saves the spawn
+     * @param spawn to save
+     * @return if saving was success
+     */
     public boolean create(Spawn spawn) {
         String spawnType = config.load("teleports", "settings.yml").getString("spawn-type");
         String query = null;
@@ -185,40 +192,6 @@ public class Spawn {
                 }
             }
         }
-        /*if (spawnType.equalsIgnoreCase("server")) {
-            Set<Spawn> spawns = spawn.all();
-            if (spawns.size() > 0) {
-
-
-                insert = "INSERT INTO " + tablePrefix +
-                        "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
-                        "ON DUPLICATE KEY UPDATE world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ?, type = ?;";
-            }
-        }
-
-        if (spawnType.equalsIgnoreCase("global")) {
-            Set<Spawn> spawns = spawn.all();
-            if (spawns.size() > 0) {
-                if (spawn.getType() == 1) {
-                    if (spawns.stream().anyMatch(s -> s.getType() == 1)) {
-                        insert = "UPDATE " + tablePrefix + "spawns " +
-                                "server = ?, world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ?, type = 1;";
-                    } else {
-                        insert = "INSERT INTO " + tablePrefix + "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
-                    }
-                } else {
-                    if (spawns.stream().anyMatch(s -> s.getType() == 0)) {
-                        insert = "UPDATE " + tablePrefix + "spawns " +
-                                "server = ?, world = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ?, type = 0;";
-                    } else {
-                        insert = "INSERT INTO " + tablePrefix + "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
-                    }
-                }
-            } else {
-                insert = "INSERT INTO " + tablePrefix + "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
-            }
-
-        }*/
 
         try {
             connection = db.hikari.getConnection();
@@ -255,6 +228,10 @@ public class Spawn {
         }
     }
 
+    /**
+     * List all spawns
+     * @return list all spawns
+     */
     public Set<Spawn> all() {
         Set<Spawn> spawns = new HashSet<>();
         ResultSet rs = null;
@@ -298,11 +275,16 @@ public class Spawn {
         return spawns;
     }
 
-    public Boolean delete(String spawn) {
+    /**
+     * Deletes spawn
+     * @return if deleting was successful
+     */
+    public boolean delete() {
         try {
             connection = db.hikari.getConnection();
-            statement = connection.prepareStatement("DELETE FROM " + tablePrefix + "spawns WHERE server = ?");
-            statement.setString(1, spawn);
+            statement = connection.prepareStatement("DELETE FROM " + tablePrefix + "spawns WHERE server = ? AND type = ?");
+            statement.setString(1, getServer());
+            statement.setInt(2, getType());
             statement.execute();
             return true;
         } catch (Exception e) {
@@ -326,35 +308,20 @@ public class Spawn {
         }
     }
 
-    public void checkTable() {
-        try {
-            connection = db.hikari.getConnection();
-            statement = connection.prepareStatement("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + tablePrefix + "spawns' AND COLUMN_NAME = 'type';");
-            ResultSet rs = statement.executeQuery();
-            while (rs.next()) {
-                if (rs.getInt(1) == 0) {
-                    statement = connection.prepareStatement("ALTER TABLE " + tablePrefix + "spawns ADD COLUMN type TINYINT(1) NULL DEFAULT 0;");
-                    statement.executeUpdate();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    public String getServer() {
+        return server;
+    }
+
+    public void setServer(String server) {
+        this.server = server;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     public int getType() {
