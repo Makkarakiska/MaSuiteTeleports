@@ -29,9 +29,8 @@ public class PositionListener {
     }
 
     public void requestPosition(ProxiedPlayer p) {
-        ByteArrayOutputStream b = new ByteArrayOutputStream();
-        DataOutputStream out = new DataOutputStream(b);
-        try {
+        try (ByteArrayOutputStream b = new ByteArrayOutputStream();
+             DataOutputStream out = new DataOutputStream(b)) {
             out.writeUTF("MaSuiteTeleports");
             out.writeUTF("GetLocation");
             out.writeUTF(p.getName());

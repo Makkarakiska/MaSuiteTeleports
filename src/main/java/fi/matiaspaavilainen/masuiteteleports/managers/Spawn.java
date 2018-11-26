@@ -38,9 +38,10 @@ public class Spawn {
 
     /**
      * Constructor for spawn
-     * @param server server's name
+     *
+     * @param server   server's name
      * @param location spawn location
-     * @param type default (0) or first (1)
+     * @param type     default (0) or first (1)
      */
     public Spawn(String server, Location location, int type) {
         this.server = server;
@@ -50,8 +51,9 @@ public class Spawn {
 
     /**
      * Find spawn by server and type
+     *
      * @param server server's name
-     * @param type default (0) or first (1)
+     * @param type   default (0) or first (1)
      * @return spawn
      */
     public Spawn find(String server, int type) {
@@ -80,6 +82,7 @@ public class Spawn {
             while (rs.next()) {
                 spawn.setServer(rs.getString("server"));
                 spawn.setLocation(new Location(rs.getString("world"), rs.getDouble("x"), rs.getDouble("y"), rs.getDouble("z"), rs.getFloat("yaw"), rs.getFloat("pitch")));
+                spawn.setType(type);
                 debugger.sendMessage("[MaSuite] [Teleports] [Spawn] spawn loaded.");
                 empty = false;
             }
@@ -117,9 +120,10 @@ public class Spawn {
 
     /**
      * Spawns player
-     * @param p player to spawn
+     *
+     * @param p      player to spawn
      * @param plugin plugin to use when sending plugin message
-     * @param type default (0) or first (1)
+     * @param type   default (0) or first (1)
      * @return if player has been spawned or not
      */
     public boolean spawn(ProxiedPlayer p, MaSuiteTeleports plugin, int type) {
@@ -155,6 +159,7 @@ public class Spawn {
 
     /**
      * Creates and saves the spawn
+     *
      * @param spawn to save
      * @return if saving was success
      */
@@ -175,6 +180,8 @@ public class Spawn {
                 } else {
                     query = "INSERT INTO " + tablePrefix + "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
                 }
+            } else {
+                return false;
             }
         } else {
             if (spawnType.equalsIgnoreCase("server")) {
@@ -190,6 +197,8 @@ public class Spawn {
                     query = "INSERT INTO " + tablePrefix + "spawns (server, world, x, y, z, yaw, pitch, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 
                 }
+            } else {
+                return false;
             }
         }
 
@@ -230,6 +239,7 @@ public class Spawn {
 
     /**
      * List all spawns
+     *
      * @return list all spawns
      */
     public Set<Spawn> all() {
@@ -277,14 +287,28 @@ public class Spawn {
 
     /**
      * Deletes spawn
+     *
      * @return if deleting was successful
      */
     public boolean delete() {
+        String spawnType = config.load("teleports", "settings.yml").getString("spawn-type");
+        String query = null;
+        if (spawnType.equalsIgnoreCase("server")) {
+            query = "DELETE FROM " + tablePrefix + "spawns WHERE type = ? AND server = ?";
+        } else if (spawnType.equalsIgnoreCase("global")) {
+            query = "DELETE FROM " + tablePrefix + "spawns WHERE type = ?";
+        } else {
+            return false;
+        }
+
+        System.out.println(getServer() + " " + getType());
         try {
             connection = db.hikari.getConnection();
-            statement = connection.prepareStatement("DELETE FROM " + tablePrefix + "spawns WHERE server = ? AND type = ?");
-            statement.setString(1, getServer());
-            statement.setInt(2, getType());
+            statement = connection.prepareStatement(query);
+            statement.setInt(1, getType());
+            if (spawnType.equalsIgnoreCase("server")) {
+                statement.setString(2, getServer());
+            }
             statement.execute();
             return true;
         } catch (Exception e) {

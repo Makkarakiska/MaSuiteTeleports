@@ -20,7 +20,8 @@ public class SpawnCommand {
 
     /**
      * Spawn player
-     * @param p player to spawn
+     *
+     * @param p    player to spawn
      * @param type default (0) or first (1)
      */
     public void spawn(ProxiedPlayer p, int type) {
@@ -45,8 +46,9 @@ public class SpawnCommand {
 
     /**
      * Set spawn
-     * @param p executor
-     * @param loc spawn location
+     *
+     * @param p    executor
+     * @param loc  spawn location
      * @param type default (0) or first (1)
      */
     public void setSpawn(ProxiedPlayer p, Location loc, int type) {
@@ -64,7 +66,8 @@ public class SpawnCommand {
 
     /**
      * Deletes specific spawn
-     * @param p executor
+     *
+     * @param p    executor
      * @param type default (0) or first (1)
      */
     public void deleteSpawn(ProxiedPlayer p, int type) {

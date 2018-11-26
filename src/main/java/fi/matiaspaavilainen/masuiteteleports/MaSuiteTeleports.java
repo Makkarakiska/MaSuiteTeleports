@@ -1,6 +1,5 @@
 package fi.matiaspaavilainen.masuiteteleports;
 
-import fi.matiaspaavilainen.masuitecore.MaSuiteCore;
 import fi.matiaspaavilainen.masuitecore.Updator;
 import fi.matiaspaavilainen.masuitecore.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
@@ -11,7 +10,6 @@ import fi.matiaspaavilainen.masuiteteleports.commands.TeleportRequestCommand;
 import fi.matiaspaavilainen.masuiteteleports.database.Database;
 import fi.matiaspaavilainen.masuiteteleports.managers.PlayerJoinEvent;
 import fi.matiaspaavilainen.masuiteteleports.managers.PositionListener;
-import fi.matiaspaavilainen.masuiteteleports.managers.Spawn;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -109,6 +107,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                         command.setSpawn(sender, new Location(loc[0], Double.parseDouble(loc[1]), Double.parseDouble(loc[2]), Double.parseDouble(loc[3]), Float.parseFloat(loc[4]), Float.parseFloat(loc[5])), in.readUTF().equals("default") ? 0 : 1);
                         break;
                     case "DelSpawn":
+                        //System.out.println(in.readUTF().equals("default") ? 0 : 1);
                         command.deleteSpawn(sender, in.readUTF().equals("default") ? 0 : 1);
                         break;
                 }
