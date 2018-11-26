@@ -1,5 +1,5 @@
 name: MaSuiteTeleports
 main: fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports
-version: 1.3.2
+version: 1.3.4
 author: Masagameplay
 depends: [MaSuiteCore]

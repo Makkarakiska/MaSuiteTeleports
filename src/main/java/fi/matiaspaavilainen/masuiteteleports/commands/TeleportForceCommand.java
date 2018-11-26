@@ -6,14 +6,13 @@ import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuitecore.managers.Location;
 import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
 import fi.matiaspaavilainen.masuiteteleports.managers.PlayerFinder;
+import fi.matiaspaavilainen.masuiteteleports.managers.Teleport;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
-import static fi.matiaspaavilainen.masuiteteleports.managers.Teleport.PlayerToPlayer;
 
 public class TeleportForceCommand {
 
@@ -30,7 +29,7 @@ public class TeleportForceCommand {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if(utils.isOnline(target, sender)){
             plugin.positions.requestPosition(sender);
-            PlayerToPlayer(sender, target);
+            new Teleport(plugin).playerToPlayer(sender, target);
             formator.sendMessage(sender, config.load("teleports","messages.yml")
                     .getString("teleported")
                     .replace("%player%", target.getName())
@@ -44,7 +43,7 @@ public class TeleportForceCommand {
         ProxiedPlayer target2 = new PlayerFinder().get(t2);
         if(utils.isOnline(target1, sender) &&  utils.isOnline(target2, sender)){
             plugin.positions.requestPosition(target1);
-            PlayerToPlayer(target1, target2);
+            new Teleport(plugin).playerToPlayer(target1, target2);
             formator.sendMessage(target1, config.load("teleports","messages.yml")
                     .getString("teleported")
                     .replace("%player%", target2.getName())
@@ -100,7 +99,7 @@ public class TeleportForceCommand {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if(utils.isOnline(target, sender)){
             plugin.positions.requestPosition(target);
-            PlayerToPlayer(target, sender);
+            new Teleport(plugin).playerToPlayer(target, sender);
         }
     }
 
@@ -108,7 +107,7 @@ public class TeleportForceCommand {
         if(utils.isOnline(target)){
             for(ProxiedPlayer p : ProxyServer.getInstance().getPlayers()){
                 plugin.positions.requestPosition(p);
-                PlayerToPlayer(p, target);
+                new Teleport(plugin).playerToPlayer(p, target);
             }
         }
     }

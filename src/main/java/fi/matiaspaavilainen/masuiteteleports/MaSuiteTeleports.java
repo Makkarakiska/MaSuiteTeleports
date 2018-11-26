@@ -8,6 +8,7 @@ import fi.matiaspaavilainen.masuiteteleports.commands.SpawnCommand;
 import fi.matiaspaavilainen.masuiteteleports.commands.TeleportForceCommand;
 import fi.matiaspaavilainen.masuiteteleports.commands.TeleportRequestCommand;
 import fi.matiaspaavilainen.masuiteteleports.database.Database;
+import fi.matiaspaavilainen.masuiteteleports.managers.PlayerJoinEvent;
 import fi.matiaspaavilainen.masuiteteleports.managers.PositionListener;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -37,17 +38,24 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         super.onEnable();
 
         getProxy().getPluginManager().registerListener(this, this);
+        getProxy().getPluginManager().registerListener(this, new PlayerJoinEvent(this));
 
         // Table creation
         db.connect();
         db.createTable("spawns",
-                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) UNIQUE NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, type TINYINT(1) NULL DEFAULT 0) " +
+                        "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
         // Generate configs
         config.create(this, "teleports", "messages.yml");
         config.create(this, "teleports", "settings.yml");
         config.create(this, "teleports", "syntax.yml");
         config.create(this, "teleports", "buttons.yml");
+
+        // First spawn
+        if(config.load("teleports", "settings.yml").get("enable-first-spawn") == null){
+            config.load("teleports", "settings.yml").set("enable-first-spawn", true);
+        }
 
         new Updator().checkVersion(this.getDescription(), "60125");
     }
@@ -89,18 +97,21 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                 SpawnCommand command = new SpawnCommand(this);
                 switch (childchannel) {
                     case "SpawnPlayer":
-                        command.spawn(sender);
+                        command.spawn(sender, 0);
+                        break;
+                    case "FirstSpawnPlayer":
+                        command.spawn(sender, 1);
                         break;
                     case "SetSpawn":
                         String[] loc = in.readUTF().split(":");
-                        command.setSpawn(sender, new Location(loc[0], Double.parseDouble(loc[1]), Double.parseDouble(loc[2]), Double.parseDouble(loc[3]), Float.parseFloat(loc[4]), Float.parseFloat(loc[5])));
+                        command.setSpawn(sender, new Location(loc[0], Double.parseDouble(loc[1]), Double.parseDouble(loc[2]), Double.parseDouble(loc[3]), Float.parseFloat(loc[4]), Float.parseFloat(loc[5])), in.readUTF().equals("default") ? 0 : 1);
                         break;
                     case "DelSpawn":
-                        command.deleteSpawn(sender);
+                        //System.out.println(in.readUTF().equals("default") ? 0 : 1);
+                        command.deleteSpawn(sender, in.readUTF().equals("default") ? 0 : 1);
                         break;
                 }
             }
-
 
             //Teleportation requests
             TeleportRequestCommand tprequest = new TeleportRequestCommand(this);
