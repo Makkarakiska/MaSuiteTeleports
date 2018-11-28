@@ -112,7 +112,6 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                         command.setSpawn(sender, new Location(loc[0], Double.parseDouble(loc[1]), Double.parseDouble(loc[2]), Double.parseDouble(loc[3]), Float.parseFloat(loc[4]), Float.parseFloat(loc[5])), in.readUTF().equals("default") ? 0 : 1);
                         break;
                     case "DelSpawn":
-                        //System.out.println(in.readUTF().equals("default") ? 0 : 1);
                         command.deleteSpawn(sender, in.readUTF().equals("default") ? 0 : 1);
                         break;
                 }
