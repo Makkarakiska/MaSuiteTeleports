@@ -52,11 +52,16 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         config.create(this, "teleports", "syntax.yml");
         config.create(this, "teleports", "buttons.yml");
 
-        // First spawn
-        if(config.load("teleports", "settings.yml").get("enable-first-spawn") == null){
-            config.load("teleports", "settings.yml").set("enable-first-spawn", true);
+        // Update configs
+        net.md_5.bungee.config.Configuration settings = config.load("teleports", "settings.yml");
+        if (settings.get("enable-first-spawn") == null) {
+            settings.set("enable-first-spawn", false);
+            config.save(settings, "/teleports/settings.yml");
         }
-
+        if (settings.get("spawn-on-join") == null) {
+            settings.set("spawn-on-join", false);
+            config.save(settings, "/teleports/settings.yml");
+        }
         new Updator().checkVersion(this.getDescription(), "60125");
     }
 
