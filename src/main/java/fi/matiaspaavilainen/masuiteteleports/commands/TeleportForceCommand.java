@@ -67,7 +67,7 @@ public class TeleportForceCommand {
                 out.writeDouble(z);
                 target.getServer().sendData("BungeeCord", b.toByteArray());
             } catch (IOException e) {
-                System.out.println(e.getMessage());
+                e.printStackTrace();
             }
         }
 
@@ -90,7 +90,7 @@ public class TeleportForceCommand {
                 out.writeDouble(loc.getZ());
                 target.getServer().sendData("BungeeCord", b.toByteArray());
             } catch (IOException e) {
-                System.out.println(e.getMessage());
+                e.printStackTrace();
             }
         }
     }
