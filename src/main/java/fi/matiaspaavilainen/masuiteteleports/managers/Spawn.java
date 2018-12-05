@@ -301,7 +301,6 @@ public class Spawn {
             return false;
         }
 
-        System.out.println(getServer() + " " + getType());
         try {
             connection = db.hikari.getConnection();
             statement = connection.prepareStatement(query);
