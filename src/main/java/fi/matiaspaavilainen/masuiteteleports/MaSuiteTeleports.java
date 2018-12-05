@@ -8,7 +8,8 @@ import fi.matiaspaavilainen.masuiteteleports.commands.SpawnCommand;
 import fi.matiaspaavilainen.masuiteteleports.commands.TeleportForceCommand;
 import fi.matiaspaavilainen.masuiteteleports.commands.TeleportRequestCommand;
 import fi.matiaspaavilainen.masuiteteleports.database.Database;
-import fi.matiaspaavilainen.masuiteteleports.managers.PlayerJoinEvent;
+import fi.matiaspaavilainen.masuiteteleports.listeners.PlayerJoinEvent;
+import fi.matiaspaavilainen.masuiteteleports.listeners.PlayerQuitEvent;
 import fi.matiaspaavilainen.masuiteteleports.managers.PositionListener;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -39,7 +40,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
 
         getProxy().getPluginManager().registerListener(this, this);
         getProxy().getPluginManager().registerListener(this, new PlayerJoinEvent(this));
-
+        getProxy().getPluginManager().registerListener(this, new PlayerQuitEvent());
         // Table creation
         db.connect();
         db.createTable("spawns",
