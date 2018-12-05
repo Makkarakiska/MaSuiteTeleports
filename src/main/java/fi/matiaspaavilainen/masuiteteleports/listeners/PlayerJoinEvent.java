@@ -1,4 +1,4 @@
-package fi.matiaspaavilainen.masuiteteleports.managers;
+package fi.matiaspaavilainen.masuiteteleports.listeners;
 
 import fi.matiaspaavilainen.masuitecore.config.Configuration;
 import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
