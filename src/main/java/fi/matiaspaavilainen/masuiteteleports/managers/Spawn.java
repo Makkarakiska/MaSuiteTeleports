@@ -134,7 +134,7 @@ public class Spawn {
         }
         try {
             if (type == 0) {
-                plugin.positions.requestPosition(p);
+                //plugin.positions.requestPosition(p);
             }
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(b);

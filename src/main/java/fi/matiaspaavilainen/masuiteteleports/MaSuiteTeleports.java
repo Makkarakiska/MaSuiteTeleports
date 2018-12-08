@@ -59,8 +59,8 @@ public class MaSuiteTeleports extends Plugin implements Listener {
             settings.set("enable-first-spawn", false);
             config.save(settings, "/teleports/settings.yml");
         }
-        if (settings.get("spawn-on-join") == null) {
-            settings.set("spawn-on-join", false);
+        if (settings.get("force-spawn-servers") == null) {
+            settings.set("force-spawn-servers", new String[]{"server1", "server2"});
             config.save(settings, "/teleports/settings.yml");
         }
         new Updator().checkVersion(this.getDescription(), "60125");

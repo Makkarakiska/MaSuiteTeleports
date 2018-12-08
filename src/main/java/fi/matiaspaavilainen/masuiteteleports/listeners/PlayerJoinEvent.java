@@ -29,9 +29,12 @@ public class PlayerJoinEvent implements Listener {
     public void onJoin(PostLoginEvent e) {
         if (config.load("teleports", "settings.yml").getBoolean("enable-first-spawn") && !hasPlayedBefore(e.getPlayer())) {
             ProxyServer.getInstance().getScheduler().schedule(plugin, () -> new SpawnCommand(plugin).spawn(e.getPlayer(), 1), 500, TimeUnit.MILLISECONDS);
-        } else if (config.load("teleports", "settings.yml").getBoolean("spawn-on-join")) {
-            ProxyServer.getInstance().getScheduler().schedule(plugin, () -> new SpawnCommand(plugin).spawn(e.getPlayer(), 0), 500, TimeUnit.MILLISECONDS);
         }
+        ProxyServer.getInstance().getScheduler().schedule(plugin, () -> {
+            if (config.load("teleports", "settings.yml").getStringList("force-spawn-servers").contains(e.getPlayer().getServer().getInfo().getName())) {
+                new SpawnCommand(plugin).spawn(e.getPlayer(), 0);
+            }
+        }, 500, TimeUnit.MILLISECONDS);
 
     }
 
