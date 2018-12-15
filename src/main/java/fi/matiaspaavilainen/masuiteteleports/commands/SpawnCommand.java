@@ -40,7 +40,10 @@ public class SpawnCommand {
             }
         }
         if (spawn.spawn(p, plugin, type)) {
-            formator.sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.teleported"));
+            if(type == 0){
+                formator.sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.teleported"));
+            }
+
             MaSuiteTeleports.cooldowns.put(p.getUniqueId(), System.currentTimeMillis());
         }
     }

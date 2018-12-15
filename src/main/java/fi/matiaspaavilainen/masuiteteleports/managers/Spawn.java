@@ -129,12 +129,14 @@ public class Spawn {
     public boolean spawn(ProxiedPlayer p, MaSuiteTeleports plugin, int type) {
         Spawn spawn = new Spawn().find(p.getServer().getInfo().getName(), type);
         if (spawn == null) {
-            new Formator().sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.not-found"));
+            if (type == 0) {
+                new Formator().sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.not-found"));
+            }
             return false;
         }
         try {
             if (type == 0) {
-                //plugin.positions.requestPosition(p);
+                plugin.positions.requestPosition(p);
             }
             ByteArrayOutputStream b = new ByteArrayOutputStream();
             DataOutputStream out = new DataOutputStream(b);

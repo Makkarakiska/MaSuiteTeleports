@@ -100,11 +100,13 @@ public class Request implements Listener {
                     if (type.equals("timer")) {
                         formator.sendMessage(sender, config.load("teleports", "messages.yml")
                                 .getString("sender.teleport-request-expired")
+                                .replace("%sender%", sender.getName())
                                 .replace("%receiver%", receiver.getName())
                         );
                         formator.sendMessage(receiver, config.load("teleports", "messages.yml")
                                 .getString("receiver.teleport-request-expired")
                                 .replace("%sender%", sender.getName())
+                                .replace("%receiver%", receiver.getName())
 
                         );
                     } else if (type.equals("player")) {
