@@ -11,6 +11,7 @@ import fi.matiaspaavilainen.masuiteteleports.database.Database;
 import fi.matiaspaavilainen.masuiteteleports.listeners.PlayerJoinEvent;
 import fi.matiaspaavilainen.masuiteteleports.listeners.PlayerQuitEvent;
 import fi.matiaspaavilainen.masuiteteleports.managers.PositionListener;
+import fi.matiaspaavilainen.masuiteteleports.managers.Teleport;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -65,9 +66,11 @@ public class MaSuiteTeleports extends Plugin implements Listener {
             settings.set("spawn-on-join", false);
             config.save(settings, "/teleports/settings.yml");
         }
-        if (messages.get("tpalock") == null) {
+        if (messages.get("tpalock.disabled") == null) {
             messages.set("tpalock.allow", "&aYou are now &laccepting &ateleportation requests");
             messages.set("tpalock.deny", "&cYou are now &ldenying &cteleportation requests");
+            messages.set("tpalock.disabled", "&cTeleport lock is now disabled");
+            messages.set("tpalock.not-locked", "&cYou haven't locked teleportation requests yet");
             config.save(messages, "/teleports/messages.yml");
         }
 
@@ -141,7 +144,20 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                 case "TeleportDeny":
                     tprequest.tpdeny(sender);
                 case "TeleportLock":
-                    tprequest.tplock(sender, in.readBoolean());
+                    String c = in.readUTF();
+                    if (c.equals("Enable")) {
+                        tprequest.tplock(sender, in.readBoolean());
+                        break;
+                    }
+                    if (c.equals("Disable")) {
+                        if(Teleport.lock.containsKey(sender.getUniqueId())){
+                            Teleport.lock.remove(sender.getUniqueId());
+                            formator.sendMessage(sender, config.load("teleports", "messages.yml").getString("tpalock.disabled"));
+                        } else {
+                            formator.sendMessage(sender, config.load("teleports", "messages.yml").getString("tpalock.not-locked"));
+                        }
+
+                    }
                     break;
             }
 
