@@ -16,7 +16,7 @@ public class Teleport {
     public static HashMap<UUID, UUID> senders = new HashMap<>();
     public static HashMap<UUID, UUID> receivers = new HashMap<>();
     public static HashMap<UUID, String> method = new HashMap<>();
-
+    public static HashMap<UUID, Boolean> lock = new HashMap<>();
     private MaSuiteTeleports plugin;
 
     public Teleport(MaSuiteTeleports p) {

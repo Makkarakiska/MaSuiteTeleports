@@ -30,6 +30,15 @@ public class Request implements Listener {
             Teleport.receivers.put(receiver.getUniqueId(), sender.getUniqueId());
             Teleport.method.put(sender.getUniqueId(), "to");
             Teleport.method.put(receiver.getUniqueId(), "to");
+            if (Teleport.lock.containsKey(receiver.getUniqueId())) {
+                if(Teleport.lock.get(receiver.getUniqueId())){
+                    acceptRequest(receiver);
+                } else {
+                    cancelRequest(receiver, "player");
+                }
+
+                return;
+            }
             formator.sendMessage(sender, formator.colorize(config.load("teleports", "messages.yml")
                     .getString("sender.teleport-to-request-incoming")
                     .replace("%sender%", sender.getName())

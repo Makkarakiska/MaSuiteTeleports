@@ -15,9 +15,12 @@ receiver:
   teleport-to-request-incoming: "&b%sender% &7wants teleport to you!"
   teleport-here-request-incoming: "&b%sender% &7wants you to teleport to her!"
   teleport-request-denied: "&7You denied &b%sender%'s &7teleportation request."
-  teleport-request-accepted: "&7You accepted &b%sender% &7teleportation request."
+  teleport-request-accepted: "&7You accepted &b%sender%'s &7teleportation request."
   teleport-request-expired: "&7Teleportation request from &b%sender% &7expired."
   no-pending-teleport-requests: "&7You don't have any pending teleportation requests!"
+tpalock:
+  allow: "&aYou are now &laccepting &ateleportation requests"
+  deny: "&cYou are now &ldenying &cteleportation requests"
 spawn:
   set: "&aSpawn set"
   deleted: "&aSpawn deleted"

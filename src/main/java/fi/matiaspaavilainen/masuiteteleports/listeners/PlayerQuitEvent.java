@@ -14,5 +14,6 @@ public class PlayerQuitEvent implements Listener {
         Teleport.method.remove(e.getPlayer().getUniqueId());
         Teleport.receivers.remove(e.getPlayer().getUniqueId());
         Teleport.senders.remove(e.getPlayer().getUniqueId());
+        Teleport.lock.remove(e.getPlayer().getUniqueId());
     }
 }

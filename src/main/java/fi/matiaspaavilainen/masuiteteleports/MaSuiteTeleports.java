@@ -55,6 +55,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
 
         // Update configs
         net.md_5.bungee.config.Configuration settings = config.load("teleports", "settings.yml");
+        net.md_5.bungee.config.Configuration messages = config.load("teleports", "messages.yml");
         if (settings.get("enable-first-spawn") == null) {
             settings.set("enable-first-spawn", false);
             config.save(settings, "/teleports/settings.yml");
@@ -62,6 +63,12 @@ public class MaSuiteTeleports extends Plugin implements Listener {
 
         if (settings.get("spawn-on-join") == null) {
             settings.set("spawn-on-join", false);
+            config.save(settings, "/teleports/settings.yml");
+        }
+        if (messages.get("tpalock") == null) {
+            messages.set("tpalock.allow", "&aYou are now &laccepting &ateleportation requests");
+            messages.set("tpalock.deny", "&cYou are now &ldenying &cteleportation requests");
+            config.save(messages, "/teleports/messages.yml");
         }
 
         new Updator().checkVersion(this.getDescription(), "60125");
@@ -133,6 +140,8 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                     break;
                 case "TeleportDeny":
                     tprequest.tpdeny(sender);
+                case "TeleportLock":
+                    tprequest.tplock(sender, in.readBoolean());
                     break;
             }
 
