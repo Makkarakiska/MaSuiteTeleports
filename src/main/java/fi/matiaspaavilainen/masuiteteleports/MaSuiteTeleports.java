@@ -74,6 +74,17 @@ public class MaSuiteTeleports extends Plugin implements Listener {
             config.save(messages, "/teleports/messages.yml");
         }
 
+        // Change string to section
+        if(messages.getString("sender.teleport-request-pending") != null){
+            messages.set("sender.teleport-request-pending", null);
+            config.save(messages, "/teleports/messages.yml");
+        }
+        if (messages.get("sender.teleport-request-pending") == null) {
+            messages.set("sender.teleport-request-pending.receiver", "&b%receiver% &7has already a pending teleportation request.");
+            messages.set("sender.teleport-request-pending.sender", "&cYou have already a pending teleportation request.");
+            config.save(messages, "/teleports/messages.yml");
+        }
+
         new Updator().checkVersion(this.getDescription(), "60125");
     }
 
@@ -143,6 +154,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                     break;
                 case "TeleportDeny":
                     tprequest.tpdeny(sender);
+                    break;
                 case "TeleportLock":
                     String c = in.readUTF();
                     if (c.equals("Enable")) {

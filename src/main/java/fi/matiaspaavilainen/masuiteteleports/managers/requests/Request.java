@@ -25,6 +25,7 @@ public class Request implements Listener {
     }
 
     public void createRequest(ProxiedPlayer sender, ProxiedPlayer receiver) {
+        if (checkIfPending(sender, receiver)) return;
         if (!Teleport.receivers.containsKey(receiver.getUniqueId())) {
             Teleport.senders.put(sender.getUniqueId(), receiver.getUniqueId());
             Teleport.receivers.put(receiver.getUniqueId(), sender.getUniqueId());
@@ -51,7 +52,7 @@ public class Request implements Listener {
             ProxyServer.getInstance().getScheduler().schedule(plugin, () -> cancelRequest(receiver, "timer"), config.load("teleports", "settings.yml").getInt("keep-request-alive"), TimeUnit.SECONDS);
         } else {
             formator.sendMessage(sender, formator.colorize(config.load("teleports", "messages.yml")
-                    .getString("sender.teleport-request-pending")
+                    .getString("sender.teleport-request-pending.receiver")
                     .replace("%sender%", sender.getName())
                     .replace("%receiver%", receiver.getName())
             ));
@@ -60,7 +61,7 @@ public class Request implements Listener {
     }
 
     public void createHereRequest(ProxiedPlayer sender, ProxiedPlayer receiver) {
-
+        if (checkIfPending(sender, receiver)) return;
         if (!Teleport.receivers.containsKey(receiver.getUniqueId())) {
             Teleport.senders.put(sender.getUniqueId(), receiver.getUniqueId());
             Teleport.receivers.put(receiver.getUniqueId(), sender.getUniqueId());
@@ -83,12 +84,24 @@ public class Request implements Listener {
                     TimeUnit.SECONDS);
         } else {
             formator.sendMessage(sender, config.load("teleports", "messages.yml")
-                    .getString("sender.teleport-request-pending")
+                    .getString("sender.teleport-request-pending.receiver")
                     .replace("%sender%", sender.getName())
                     .replace("%receiver%", receiver.getName())
             );
         }
 
+    }
+
+    private boolean checkIfPending(ProxiedPlayer sender, ProxiedPlayer receiver) {
+        if(Teleport.receivers.containsKey(sender.getUniqueId())){
+            formator.sendMessage(sender, formator.colorize(config.load("teleports", "messages.yml")
+                    .getString("sender.teleport-request-pending.sender")
+                    .replace("%sender%", sender.getName())
+                    .replace("%receiver%", receiver.getName())
+            ));
+            return true;
+        }
+        return false;
     }
 
     private void buttons(ProxiedPlayer receiver) {

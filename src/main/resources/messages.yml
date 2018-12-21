@@ -10,7 +10,9 @@ sender:
   teleport-request-denied: "&b%receiver% &7denied your teleportation request."
   teleport-request-accepted: "&b%receiver% &7accepted your teleportation request."
   teleport-request-expired: "&7Teleportation request for &b%receiver% &7expired."
-  teleport-request-pending: "&b%receiver% &7has already pending teleportation request."
+  teleport-request-pending:
+    receiver: "&b%receiver% &7has already a pending teleportation request."
+    sender: "&cYou have already a pending teleportation request."
 receiver:
   teleport-to-request-incoming: "&b%sender% &7wants teleport to you!"
   teleport-here-request-incoming: "&b%sender% &7wants you to teleport to her!"
