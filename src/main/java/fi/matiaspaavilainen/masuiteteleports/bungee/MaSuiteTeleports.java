@@ -33,36 +33,29 @@ public class MaSuiteTeleports extends Plugin implements Listener {
 
     private BungeeConfiguration config = new BungeeConfiguration();
     private Formator formator = new Formator();
-    public static ConnectionManager cm = null;
     public static HashMap<UUID, Long> cooldowns = new HashMap<>();
     public PositionListener positions = new PositionListener(this);
 
     @Override
     public void onEnable() {
-        super.onEnable();
-
-        getProxy().getPluginManager().registerListener(this, this);
-        getProxy().getPluginManager().registerListener(this, new PlayerJoinEvent(this));
-        getProxy().getPluginManager().registerListener(this, new PlayerQuitEvent());
-        // Table creation
-        Configuration dbInfo = config.load(null, "config.yml");
-        cm = new ConnectionManager(dbInfo.getString("database.table-prefix"), dbInfo.getString("database.address"), dbInfo.getInt("database.port"), dbInfo.getString("database.name"), dbInfo.getString("database.username"), dbInfo.getString("database.password"));
-        cm.connect();
-        cm.getDatabase().createTable("spawns",
-                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, type TINYINT(1) NULL DEFAULT 0) " +
-                        "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
         // Generate configs
         config.create(this, "teleports", "messages.yml");
         config.create(this, "teleports", "settings.yml");
-        config.create(this, "teleports", "syntax.yml");
         config.create(this, "teleports", "buttons.yml");
 
-        new Updator(new String[]{getDescription().getVersion(), getDescription().getName(), "60125"}).checkUpdates();
-    }
+        // Register listeners
+        getProxy().getPluginManager().registerListener(this, this);
+        getProxy().getPluginManager().registerListener(this, new PlayerJoinEvent(this));
+        getProxy().getPluginManager().registerListener(this, new PlayerQuitEvent());
 
-    public void onDisable() {
-        cm.close();
+        // Table creation
+        ConnectionManager.db.createTable("spawns",
+                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, type TINYINT(1) NULL DEFAULT 0) " +
+                        "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        // Check updates
+        new Updator(new String[]{getDescription().getVersion(), getDescription().getName(), "60125"}).checkUpdates();
     }
 
     @EventHandler
