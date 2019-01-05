@@ -1,8 +1,8 @@
-package fi.matiaspaavilainen.masuiteteleports.listeners;
+package fi.matiaspaavilainen.masuiteteleports.bungee.listeners;
 
-import fi.matiaspaavilainen.masuitecore.config.Configuration;
-import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
-import fi.matiaspaavilainen.masuiteteleports.commands.SpawnCommand;
+import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
+import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
+import fi.matiaspaavilainen.masuiteteleports.bungee.commands.SpawnCommand;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
@@ -18,11 +18,11 @@ import java.util.concurrent.TimeUnit;
 public class PlayerJoinEvent implements Listener {
 
     private MaSuiteTeleports plugin;
-    private Configuration config = new Configuration();
+    private BungeeConfiguration config = new BungeeConfiguration();
     private String tablePrefix = config.load(null, "config.yml").getString("database.table-prefix");
 
-    public PlayerJoinEvent(MaSuiteTeleports p) {
-        plugin = p;
+    public PlayerJoinEvent(MaSuiteTeleports plugin) {
+        this.plugin = plugin;
     }
 
     @EventHandler

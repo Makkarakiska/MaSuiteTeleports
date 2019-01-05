@@ -1,11 +1,11 @@
-package fi.matiaspaavilainen.masuiteteleports.managers.requests;
+package fi.matiaspaavilainen.masuiteteleports.bungee.managers.requests;
 
-import fi.matiaspaavilainen.masuitecore.Utils;
-import fi.matiaspaavilainen.masuitecore.chat.Formator;
-import fi.matiaspaavilainen.masuitecore.config.Configuration;
-import fi.matiaspaavilainen.masuiteteleports.Button;
-import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
-import fi.matiaspaavilainen.masuiteteleports.managers.Teleport;
+import fi.matiaspaavilainen.masuitecore.bungee.Utils;
+import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
+import fi.matiaspaavilainen.masuiteteleports.bungee.Button;
+import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
+import fi.matiaspaavilainen.masuiteteleports.bungee.managers.Teleport;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class Request implements Listener {
 
     private Formator formator = new Formator();
-    private Configuration config = new Configuration();
+    private BungeeConfiguration config = new BungeeConfiguration();
     private MaSuiteTeleports plugin;
     private Utils utils = new Utils();
 

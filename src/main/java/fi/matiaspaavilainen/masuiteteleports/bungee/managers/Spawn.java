@@ -1,11 +1,12 @@
-package fi.matiaspaavilainen.masuiteteleports.managers;
+package fi.matiaspaavilainen.masuiteteleports.bungee.managers;
 
-import fi.matiaspaavilainen.masuitecore.Debugger;
-import fi.matiaspaavilainen.masuitecore.chat.Formator;
-import fi.matiaspaavilainen.masuitecore.config.Configuration;
-import fi.matiaspaavilainen.masuiteteleports.database.Database;
-import fi.matiaspaavilainen.masuitecore.managers.Location;
-import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
+import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
+import fi.matiaspaavilainen.masuitecore.core.database.ConnectionManager;
+import fi.matiaspaavilainen.masuitecore.core.database.Database;
+import fi.matiaspaavilainen.masuitecore.core.objects.Location;
+import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
+
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -22,17 +23,19 @@ import java.util.concurrent.TimeUnit;
 
 public class Spawn {
 
-    private Database db = MaSuiteTeleports.db;
+    private Database db = ConnectionManager.db;
     private String server;
     private Location location;
     private int type;
 
     private Connection connection = null;
     private PreparedStatement statement = null;
-    private Configuration config = new Configuration();
-    private String tablePrefix = config.load(null, "config.yml").getString("database.table-prefix");
-    private Debugger debugger = new Debugger();
+    private BukkitConfiguration config = new BukkitConfiguration();
+    private String tablePrefix = db.getTablePrefix();
 
+    /**
+     * An empty constructor for Spawn
+     */
     public Spawn() {
     }
 
@@ -83,7 +86,6 @@ public class Spawn {
                 spawn.setServer(rs.getString("server"));
                 spawn.setLocation(new Location(rs.getString("world"), rs.getDouble("x"), rs.getDouble("y"), rs.getDouble("z"), rs.getFloat("yaw"), rs.getFloat("pitch")));
                 spawn.setType(type);
-                debugger.sendMessage("[MaSuite] [Teleports] [Spawn] spawn loaded.");
                 empty = false;
             }
             if (empty) {
@@ -127,7 +129,9 @@ public class Spawn {
      * @return if player has been spawned or not
      */
     public boolean spawn(ProxiedPlayer p, MaSuiteTeleports plugin, int type) {
-        Spawn spawn = new Spawn().find(p.getServer().getInfo().getName(), type);
+        new Spawn();
+        Spawn spawn = new Spawn();
+        spawn.find(p.getServer().getInfo().getName(), type);
         if (spawn == null) {
             if (type == 0) {
                 new Formator().sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.not-found"));
@@ -152,7 +156,6 @@ public class Spawn {
                 p.getServer().sendData("BungeeCord", b.toByteArray());
             }
 
-            debugger.sendMessage("[MaSuite] [Teleports] [Spawn] spawned player.");
         } catch (IOException e) {
             e.getStackTrace();
         }

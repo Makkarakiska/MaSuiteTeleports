@@ -1,23 +1,25 @@
-package fi.matiaspaavilainen.masuiteteleports;
+package fi.matiaspaavilainen.masuiteteleports.bungee;
 
-import fi.matiaspaavilainen.masuitecore.Updator;
-import fi.matiaspaavilainen.masuitecore.chat.Formator;
-import fi.matiaspaavilainen.masuitecore.config.Configuration;
-import fi.matiaspaavilainen.masuitecore.managers.Location;
-import fi.matiaspaavilainen.masuiteteleports.commands.SpawnCommand;
-import fi.matiaspaavilainen.masuiteteleports.commands.TeleportForceCommand;
-import fi.matiaspaavilainen.masuiteteleports.commands.TeleportRequestCommand;
-import fi.matiaspaavilainen.masuiteteleports.database.Database;
-import fi.matiaspaavilainen.masuiteteleports.listeners.PlayerJoinEvent;
-import fi.matiaspaavilainen.masuiteteleports.listeners.PlayerQuitEvent;
+import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.Updator;
+import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
+import fi.matiaspaavilainen.masuitecore.core.database.ConnectionManager;
+import fi.matiaspaavilainen.masuitecore.core.database.Database;
+import fi.matiaspaavilainen.masuitecore.core.objects.Location;
+import fi.matiaspaavilainen.masuiteteleports.bungee.commands.SpawnCommand;
+import fi.matiaspaavilainen.masuiteteleports.bungee.commands.TeleportForceCommand;
+import fi.matiaspaavilainen.masuiteteleports.bungee.commands.TeleportRequestCommand;
+import fi.matiaspaavilainen.masuiteteleports.bungee.listeners.PlayerJoinEvent;
+import fi.matiaspaavilainen.masuiteteleports.bungee.listeners.PlayerQuitEvent;
+import fi.matiaspaavilainen.masuiteteleports.bungee.managers.Teleport;
 import fi.matiaspaavilainen.masuiteteleports.managers.PositionListener;
-import fi.matiaspaavilainen.masuiteteleports.managers.Teleport;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.event.EventHandler;
 
 import java.io.ByteArrayInputStream;
@@ -29,9 +31,9 @@ import java.util.concurrent.TimeUnit;
 
 public class MaSuiteTeleports extends Plugin implements Listener {
 
-    private Configuration config = new Configuration();
+    private BungeeConfiguration config = new BungeeConfiguration();
     private Formator formator = new Formator();
-    public static Database db = new Database();
+    public static ConnectionManager cm = null;
     public static HashMap<UUID, Long> cooldowns = new HashMap<>();
     public PositionListener positions = new PositionListener(this);
 
@@ -43,8 +45,10 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         getProxy().getPluginManager().registerListener(this, new PlayerJoinEvent(this));
         getProxy().getPluginManager().registerListener(this, new PlayerQuitEvent());
         // Table creation
-        db.connect();
-        db.createTable("spawns",
+        Configuration dbInfo = config.load(null, "config.yml");
+        cm = new ConnectionManager(dbInfo.getString("database.table-prefix"), dbInfo.getString("database.address"), dbInfo.getInt("database.port"), dbInfo.getString("database.name"), dbInfo.getString("database.username"), dbInfo.getString("database.password"));
+        cm.connect();
+        cm.getDatabase().createTable("spawns",
                 "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, type TINYINT(1) NULL DEFAULT 0) " +
                         "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
@@ -54,42 +58,11 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         config.create(this, "teleports", "syntax.yml");
         config.create(this, "teleports", "buttons.yml");
 
-        // Update configs
-        net.md_5.bungee.config.Configuration settings = config.load("teleports", "settings.yml");
-        net.md_5.bungee.config.Configuration messages = config.load("teleports", "messages.yml");
-        if (settings.get("enable-first-spawn") == null) {
-            settings.set("enable-first-spawn", false);
-            config.save(settings, "/teleports/settings.yml");
-        }
-
-        if (settings.get("spawn-on-join") == null) {
-            settings.set("spawn-on-join", false);
-            config.save(settings, "/teleports/settings.yml");
-        }
-        if (messages.get("tpalock.disabled") == null) {
-            messages.set("tpalock.allow", "&aYou are now &laccepting &ateleportation requests");
-            messages.set("tpalock.deny", "&cYou are now &ldenying &cteleportation requests");
-            messages.set("tpalock.disabled", "&cTeleport lock is now disabled");
-            messages.set("tpalock.not-locked", "&cYou haven't locked teleportation requests yet");
-            config.save(messages, "/teleports/messages.yml");
-        }
-
-        // Change string to section
-        if(messages.getString("sender.teleport-request-pending") != null){
-            messages.set("sender.teleport-request-pending", null);
-            config.save(messages, "/teleports/messages.yml");
-        }
-        if (messages.get("sender.teleport-request-pending") == null) {
-            messages.set("sender.teleport-request-pending.receiver", "&b%receiver% &7has already a pending teleportation request.");
-            messages.set("sender.teleport-request-pending.sender", "&cYou have already a pending teleportation request.");
-            config.save(messages, "/teleports/messages.yml");
-        }
-
-        new Updator().checkVersion(this.getDescription(), "60125");
+        new Updator(new String[]{getDescription().getVersion(), getDescription().getName(), "60125"}).checkUpdates();
     }
 
     public void onDisable() {
-        db.hikari.close();
+        cm.close();
     }
 
     @EventHandler
@@ -106,7 +79,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
             if (childchannel.equals("GetLocation")) {
                 if (sender != null) {
                     String[] ploc = in.readUTF().split(":");
-                    Location loc = new Location(ploc[0], Double.parseDouble(ploc[1]), Double.parseDouble(ploc[2]), Double.parseDouble(ploc[3]), Float.parseFloat(ploc[4]), Float.parseFloat(ploc[5]));
+                    Location loc = new Location(sender.getServer().getInfo(), ploc[0], Double.parseDouble(ploc[1]), Double.parseDouble(ploc[2]), Double.parseDouble(ploc[3]), Float.parseFloat(ploc[4]), Float.parseFloat(ploc[5]));
                     String s = in.readUTF();
                     ServerInfo server = null;
                     if (s.equals("DETECTSERVER")) {
@@ -115,7 +88,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                         server = getProxy().getServerInfo(s);
                     }
 
-                    positions.locationReceived(sender, loc, server);
+                    positions.locationReceived(sender, loc);
                     return;
                 }
             }
@@ -162,7 +135,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                         break;
                     }
                     if (c.equals("Disable")) {
-                        if(Teleport.lock.containsKey(sender.getUniqueId())){
+                        if (Teleport.lock.containsKey(sender.getUniqueId())) {
                             Teleport.lock.remove(sender.getUniqueId());
                             formator.sendMessage(sender, config.load("teleports", "messages.yml").getString("tpalock.disabled"));
                         } else {
@@ -214,12 +187,10 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                         return;
                     }
                 }
-                if (positions.serverPositions.containsKey(sender.getUniqueId())) {
-                    if (!positions.serverPositions.get(sender.getUniqueId()).equals(sender.getServer().getInfo())) {
-                        sender.connect(positions.serverPositions.get(sender.getUniqueId()));
-                        ProxyServer.getInstance().getScheduler().schedule(this, () ->
-                                tpforce.tp(sender, sender.getName(), positions.positions.get(sender.getUniqueId())
-                                ), 500, TimeUnit.MILLISECONDS);
+                if (positions.positions.containsKey(sender.getUniqueId())) {
+                    if (!positions.positions.get(sender.getUniqueId()).getServer().equals(sender.getServer().getInfo())) {
+                        sender.connect(positions.positions.get(sender.getUniqueId()).getServer());
+                        ProxyServer.getInstance().getScheduler().schedule(this, () -> tpforce.tp(sender, sender.getName(), positions.positions.get(sender.getUniqueId())), 500, TimeUnit.MILLISECONDS);
                     } else {
                         tpforce.tp(sender, sender.getName(), positions.positions.get(sender.getUniqueId()));
                     }

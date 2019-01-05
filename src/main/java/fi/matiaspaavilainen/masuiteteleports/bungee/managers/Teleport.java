@@ -1,7 +1,7 @@
-package fi.matiaspaavilainen.masuiteteleports.managers;
+package fi.matiaspaavilainen.masuiteteleports.bungee.managers;
 
-import fi.matiaspaavilainen.masuitecore.Utils;
-import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
+import fi.matiaspaavilainen.masuitecore.bungee.Utils;
+import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 

@@ -1,4 +1,4 @@
-package fi.matiaspaavilainen.masuiteteleports.managers;
+package fi.matiaspaavilainen.masuiteteleports.bungee.managers;
 
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

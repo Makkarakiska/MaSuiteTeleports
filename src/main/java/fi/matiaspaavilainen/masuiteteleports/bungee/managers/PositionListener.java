@@ -1,8 +1,7 @@
 package fi.matiaspaavilainen.masuiteteleports.managers;
 
-import fi.matiaspaavilainen.masuitecore.managers.Location;
-import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
-import net.md_5.bungee.api.config.ServerInfo;
+import fi.matiaspaavilainen.masuitecore.core.objects.Location;
+import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.io.ByteArrayOutputStream;
@@ -16,15 +15,13 @@ import java.util.UUID;
  * Updated version for MaSuite: Masa
  */
 public class PositionListener {
+
     private MaSuiteTeleports plugin;
     private HashMap<UUID, Runnable> positionRunnables = new HashMap<>();
     public HashMap<UUID, Location> positions;
-    private HashMap<UUID, Location> localPositions;
-    public HashMap<UUID, ServerInfo> serverPositions = new HashMap<>();
 
-    public PositionListener(MaSuiteTeleports p) {
-        plugin = p;
-        localPositions = new HashMap<>();
+    public PositionListener(MaSuiteTeleports plugin) {
+        this.plugin = plugin;
         positions = new HashMap<>();
     }
 
@@ -42,14 +39,11 @@ public class PositionListener {
 
     }
 
-    public void locationReceived(ProxiedPlayer p, Location loc, ServerInfo serverInfo) {
+    public void locationReceived(ProxiedPlayer p, Location loc) {
         if (positionRunnables.containsKey(p.getUniqueId())) {
-            localPositions.put(p.getUniqueId(), loc);
-            serverPositions.put(p.getUniqueId(), serverInfo);
             positionRunnables.remove(p.getUniqueId()).run();
         } else {
             positions.put(p.getUniqueId(), loc);
-            serverPositions.put(p.getUniqueId(), serverInfo);
         }
     }
 }

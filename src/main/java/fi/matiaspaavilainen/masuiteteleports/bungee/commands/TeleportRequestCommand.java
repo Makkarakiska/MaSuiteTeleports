@@ -1,24 +1,24 @@
-package fi.matiaspaavilainen.masuiteteleports.commands;
+package fi.matiaspaavilainen.masuiteteleports.bungee.commands;
 
-import fi.matiaspaavilainen.masuitecore.Utils;
-import fi.matiaspaavilainen.masuitecore.chat.Formator;
-import fi.matiaspaavilainen.masuitecore.config.Configuration;
-import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
-import fi.matiaspaavilainen.masuiteteleports.managers.PlayerFinder;
-import fi.matiaspaavilainen.masuiteteleports.managers.Teleport;
-import fi.matiaspaavilainen.masuiteteleports.managers.requests.Request;
+import fi.matiaspaavilainen.masuitecore.bungee.Utils;
+import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
+import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
+import fi.matiaspaavilainen.masuiteteleports.bungee.managers.PlayerFinder;
+import fi.matiaspaavilainen.masuiteteleports.bungee.managers.Teleport;
+import fi.matiaspaavilainen.masuiteteleports.bungee.managers.requests.Request;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class TeleportRequestCommand {
 
     private MaSuiteTeleports plugin;
 
-    public TeleportRequestCommand(MaSuiteTeleports p) {
-        plugin = p;
+    public TeleportRequestCommand(MaSuiteTeleports plugin) {
+        this.plugin = plugin;
     }
 
     private Utils utils = new Utils();
-    private Configuration config = new Configuration();
+    private BungeeConfiguration config = new BungeeConfiguration();
     private Formator formator = new Formator();
 
     public void tpa(ProxiedPlayer sender, String t) {

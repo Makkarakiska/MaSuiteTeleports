@@ -1,22 +1,22 @@
-package fi.matiaspaavilainen.masuiteteleports.commands;
+package fi.matiaspaavilainen.masuiteteleports.bungee.commands;
 
-import fi.matiaspaavilainen.masuitecore.chat.Formator;
-import fi.matiaspaavilainen.masuitecore.config.Configuration;
-import fi.matiaspaavilainen.masuitecore.managers.Location;
-import fi.matiaspaavilainen.masuiteteleports.MaSuiteTeleports;
-import fi.matiaspaavilainen.masuiteteleports.managers.Spawn;
+import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
+import fi.matiaspaavilainen.masuitecore.core.objects.Location;
+import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
+import fi.matiaspaavilainen.masuiteteleports.bungee.managers.Spawn;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class SpawnCommand {
 
     private MaSuiteTeleports plugin;
 
-    public SpawnCommand(MaSuiteTeleports p) {
-        plugin = p;
+    public SpawnCommand(MaSuiteTeleports plugin) {
+        this.plugin = plugin;
     }
 
     private Formator formator = new Formator();
-    private Configuration config = new Configuration();
+    private BungeeConfiguration config = new BungeeConfiguration();
 
     /**
      * Spawn player
