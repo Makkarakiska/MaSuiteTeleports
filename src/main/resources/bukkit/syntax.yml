@@ -1,0 +1,22 @@
+tpa: "&cCorrect syntax: /tpa <player>"
+tpahere: "&cCorrect syntax: /tpahere <player>"
+tpaccept: "&cCorrect syntax: /tpaccept"
+tpdeny: "&cCorrect syntax: /tpdeny"
+tpalock: "&cCorrect syntax: /tpalock <accept/deny/yes/no/off>"
+tp:
+  title: "&cCorrect syntaxes:"
+  syntaxes:
+  - "&c/tp <player>"
+  - "&c/tp <x> <y> <z>"
+  - "&c/tp <player> <player>"
+  - "&c/tp <player> <x> <y> <z>"
+  - "&c/tp <player> <world> <x> <y> <z>"
+tphere: "&cCorrect syntax: /tphere <player>"
+tpall: "&cCorrect syntax: /tpall (<player>)"
+
+back: "&Correct syntax: /back"
+
+spawn:
+  set: "&cCorrect syntax: /setspawn <first/default>"
+  delete: "&cCorrect syntax: /delspawn <first/default>"
+  teleport: "&cCorrect syntax: /spawn"

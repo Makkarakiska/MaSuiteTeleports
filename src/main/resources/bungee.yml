@@ -1,0 +1,5 @@
+name: MaSuiteTeleports
+main: fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports
+version: ${project.version}
+author: Masagameplay
+depends: [MaSuiteCore]
