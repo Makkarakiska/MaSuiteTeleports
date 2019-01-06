@@ -71,14 +71,6 @@ public class MaSuiteTeleports extends Plugin implements Listener {
                 if (sender != null) {
                     String[] ploc = in.readUTF().split(":");
                     Location loc = new Location(sender.getServer().getInfo(), ploc[0], Double.parseDouble(ploc[1]), Double.parseDouble(ploc[2]), Double.parseDouble(ploc[3]), Float.parseFloat(ploc[4]), Float.parseFloat(ploc[5]));
-                    String s = in.readUTF();
-                    ServerInfo server = null;
-                    if (s.equals("DETECTSERVER")) {
-                        server = sender.getServer().getInfo();
-                    } else {
-                        server = getProxy().getServerInfo(s);
-                    }
-
                     positions.locationReceived(sender, loc);
                     return;
                 }
