@@ -11,6 +11,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Listener;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class Request implements Listener {
@@ -32,7 +33,7 @@ public class Request implements Listener {
             Teleport.method.put(sender.getUniqueId(), "to");
             Teleport.method.put(receiver.getUniqueId(), "to");
             if (Teleport.lock.containsKey(receiver.getUniqueId())) {
-                if(Teleport.lock.get(receiver.getUniqueId())){
+                if (Teleport.lock.get(receiver.getUniqueId())) {
                     acceptRequest(receiver);
                 } else {
                     cancelRequest(receiver, "player");
@@ -93,7 +94,7 @@ public class Request implements Listener {
     }
 
     private boolean checkIfPending(ProxiedPlayer sender, ProxiedPlayer receiver) {
-        if(Teleport.receivers.containsKey(sender.getUniqueId())){
+        if (Teleport.receivers.containsKey(sender.getUniqueId())) {
             formator.sendMessage(sender, formator.colorize(config.load("teleports", "messages.yml")
                     .getString("sender.teleport-request-pending.sender")
                     .replace("%sender%", sender.getName())
@@ -143,12 +144,14 @@ public class Request implements Listener {
                                 .replace("%receiver%", receiver.getName())
                         );
                     }
-                    Teleport.senders.remove(sender.getUniqueId(), receiver.getUniqueId());
-                    Teleport.receivers.remove(receiver.getUniqueId(), sender.getUniqueId());
-                    Teleport.method.remove(sender.getUniqueId());
-                    Teleport.method.remove(receiver.getUniqueId());
                 }
+                UUID uuid = Teleport.receivers.get(receiver.getUniqueId());
+                Teleport.senders.remove(uuid, receiver.getUniqueId());
+                Teleport.receivers.remove(receiver.getUniqueId(), uuid);
+                Teleport.method.remove(sender.getUniqueId());
+                Teleport.method.remove(uuid);
             }
+
         } else {
             if (type.equals("player")) {
                 formator.sendMessage(receiver, config.load("teleports", "messages.yml").getString("receiver.no-pending-teleport-requests"));
