@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 public class Teleport implements CommandExecutor {
 
@@ -53,48 +54,49 @@ public class Teleport implements CommandExecutor {
                         break;
                     case (3):
                         // Teleport sender to coordinates
-                        if (!isDouble(args[0]) && !isDouble(args[1]) && !isDouble(args[2])) {
-                            break;
+                        if (Double.isNaN(parse(args[0], 0)) && Double.isNaN(parse(args[1], 0)) && Double.isNaN(parse(args[2], 0))) {
+                            return;
                         }
                         out.writeUTF("TeleportToXYZ");
                         out.writeUTF(sender.getName());
-                        out.writeDouble(Double.parseDouble(args[0]));
-                        out.writeDouble(Double.parseDouble(args[1]));
-                        out.writeDouble(Double.parseDouble(args[2]));
+                        out.writeDouble(parse(args[0], p.getLocation().getX()));
+                        out.writeDouble(parse(args[1], p.getLocation().getY()));
+                        out.writeDouble(parse(args[2], p.getLocation().getZ()));
                         break;
                     case (4):
-                        if (!isDouble(args[1]) && !isDouble(args[2]) && !isDouble(args[3])) {
-                            break;
+                        if (Double.isNaN(parse(args[1], 0)) && Double.isNaN(parse(args[2], 0)) && Double.isNaN(parse(args[3], 0))) {
+                            return;
                         }
                         // If any of the server's worlds match to args[0]
                         if (Bukkit.getWorlds().stream().anyMatch(world -> world.getName().equals(args[0]))) {
                             out.writeUTF("TeleportToCoordinates");
-                            out.writeUTF(sender.getName());
+                            out.writeUTF(p.getName());
                             out.writeUTF(args[0]);
-                            out.writeDouble(Double.parseDouble(args[1]));
-                            out.writeDouble(Double.parseDouble(args[2]));
-                            out.writeDouble(Double.parseDouble(args[3]));
+                            out.writeDouble(parse(args[1], p.getLocation().getX()));
+                            out.writeDouble(parse(args[2], p.getLocation().getY()));
+                            out.writeDouble(parse(args[3], p.getLocation().getZ()));
                             break;
                         }
 
                         // If not, send target to XYZ
                         out.writeUTF("TeleportToXYZ");
                         out.writeUTF(args[0]);
-                        out.writeDouble(Double.parseDouble(args[1]));
-                        out.writeDouble(Double.parseDouble(args[2]));
-                        out.writeDouble(Double.parseDouble(args[3]));
+                        out.writeDouble(parse(args[1], p.getLocation().getX()));
+                        out.writeDouble(parse(args[2], p.getLocation().getY()));
+                        out.writeDouble(parse(args[3], p.getLocation().getZ()));
                         break;
                     case (5):
                         // Teleport target to location
-                        if (!isDouble(args[2]) && !isDouble(args[3]) && !isDouble(args[4])) {
-                            break;
-                        }
                         out.writeUTF("TeleportToCoordinates");
                         out.writeUTF(args[0]);
                         out.writeUTF(args[1]);
-                        out.writeDouble(Double.parseDouble(args[2]));
-                        out.writeDouble(Double.parseDouble(args[3]));
-                        out.writeDouble(Double.parseDouble(args[4]));
+
+                        if (Double.isNaN(parse(args[2], 0)) && Double.isNaN(parse(args[3], 0)) && Double.isNaN(parse(args[4], 0))) {
+                            return;
+                        }
+                        out.writeDouble(parse(args[2], p.getLocation().getX()));
+                        out.writeDouble(parse(args[3], p.getLocation().getY()));
+                        out.writeDouble(parse(args[4], p.getLocation().getZ()));
                         break;
                     default:
                         plugin.formator.sendMessage((Player) sender, plugin.config.load("teleports", "syntax.yml").getString("tp.title"));
@@ -110,10 +112,9 @@ public class Teleport implements CommandExecutor {
                 e.printStackTrace();
             }
 
-            plugin.in_command.remove(sender);
 
         });
-
+        plugin.in_command.remove(sender);
         return true;
     }
 
@@ -122,8 +123,20 @@ public class Teleport implements CommandExecutor {
         try {
             Double.parseDouble(string);
             return true;
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             return false;
         }
+    }
+
+    private double parse(String string, double currentCoord) {
+        if (string.startsWith("~")) {
+            if (isDouble(string.replace("~", "") + currentCoord)) {
+                String s = string.replace("~", "");
+                return !s.isEmpty() ? Double.parseDouble(s) + currentCoord : currentCoord;
+            }
+        } else if (isDouble(string)) {
+            return Double.parseDouble(string);
+        }
+        return Double.NaN;
     }
 }
