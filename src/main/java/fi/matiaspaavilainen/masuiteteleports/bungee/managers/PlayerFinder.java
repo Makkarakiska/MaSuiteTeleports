@@ -7,9 +7,12 @@ public class PlayerFinder {
 
     public ProxiedPlayer get(String name) {
         try {
-            if(ProxyServer.getInstance().getPlayers().stream().anyMatch(proxiedPlayer -> proxiedPlayer.getName().toLowerCase().startsWith(name.toLowerCase()))){
-                return ProxyServer.getInstance().getPlayers().stream().filter(proxiedPlayer -> proxiedPlayer.getName().toLowerCase().startsWith(name.toLowerCase())).findFirst().get();
-            }else{
+            if (ProxyServer.getInstance().getPlayers().stream().anyMatch(proxiedPlayer -> proxiedPlayer.getName().toLowerCase().startsWith(name.toLowerCase()))) {
+                return ProxyServer.getInstance().getPlayers().stream().filter(proxiedPlayer ->
+                        proxiedPlayer.getName().toLowerCase().startsWith(name.toLowerCase()) ||
+                                proxiedPlayer.getName().equalsIgnoreCase(name))
+                        .findFirst().get();
+            } else {
                 return null;
             }
         } catch (Exception e) {
