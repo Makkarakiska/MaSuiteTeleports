@@ -2,6 +2,7 @@ package fi.matiaspaavilainen.masuiteteleports.bukkit;
 
 import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
+import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.Back;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.All;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.Here;
@@ -14,7 +15,6 @@ import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.spawns.Delete;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.spawns.Set;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.spawns.Spawn;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.listeners.TeleportListener;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -27,9 +27,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -84,8 +81,6 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
     @EventHandler
     public void onDeath(PlayerRespawnEvent e) {
         Player p = e.getPlayer();
-        ByteArrayOutputStream b = new ByteArrayOutputStream();
-        DataOutputStream out = new DataOutputStream(b);
         switch (getConfig().getString("respawn-type").toLowerCase()) {
             case ("none"):
                 break;
@@ -93,35 +88,14 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
                 if (p.getBedSpawnLocation() != null) {
                     p.teleport(p.getBedSpawnLocation());
                 } else {
-                    try {
-                        out.writeUTF("MaSuiteTeleports");
-                        out.writeUTF("SpawnPlayer");
-                        out.writeUTF(p.getName());
-                        p.sendPluginMessage(this, "BungeeCord", b.toByteArray());
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
+                    new PluginChannel(this, p, new Object[]{"MaSuiteTeleports", "SpawnPlayer", p.getName()}).send();
                 }
                 break;
             case ("home"):
-                try {
-                    out.writeUTF("HomeCommand");
-                    out.writeUTF(p.getName());
-                    out.writeUTF("home");
-                    p.sendPluginMessage(this, "BungeeCord", b.toByteArray());
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+                new PluginChannel(this, p, new Object[]{"MaSuiteTeleports", "HomeCommand", p.getName(), "home"}).send();
                 break;
             case ("spawn"):
-                try {
-                    out.writeUTF("MaSuiteTeleports");
-                    out.writeUTF("SpawnPlayer");
-                    out.writeUTF(p.getName());
-                    p.sendPluginMessage(this, "BungeeCord", b.toByteArray());
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+                new PluginChannel(this, p, new Object[]{"MaSuiteTeleports", "SpawnPlayer", p.getName()}).send();
                 break;
 
         }
@@ -129,20 +103,9 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
-        try (ByteArrayOutputStream b = new ByteArrayOutputStream();
-             DataOutputStream out = new DataOutputStream(b)) {
-            out.writeUTF("MaSuiteTeleports");
-            out.writeUTF("GetLocation");
-            out.writeUTF(e.getEntity().getName());
-            Location loc = e.getEntity().getLocation();
-            out.writeUTF(loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch());
-            out.writeUTF("DETECTSERVER");
-            e.getEntity().sendPluginMessage(this, "BungeeCord", b.toByteArray());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        Location loc = e.getEntity().getLocation();
+        new PluginChannel(this, e.getEntity(), new Object[]{"MaSuiteTeleports", "GetLocation", e.getEntity().getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()}).send();
     }
-
 
     @EventHandler
     public void onDamage(EntityDamageEvent e) {
@@ -163,15 +126,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         if (getConfig().getBoolean("spawn.first")) {
             if (!e.getPlayer().hasPlayedBefore()) {
-                try (ByteArrayOutputStream b = new ByteArrayOutputStream();
-                     DataOutputStream out = new DataOutputStream(b)) {
-                    out.writeUTF("MaSuiteTeleports");
-                    out.writeUTF("FirstSpawnPlayer");
-                    out.writeUTF(e.getPlayer().getName());
-                    getServer().getScheduler().runTaskLaterAsynchronously(this, () -> e.getPlayer().sendPluginMessage(this, "BungeeCord", b.toByteArray()), 10);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+                getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new PluginChannel(this, e.getPlayer(), new Object[]{"MaSuiteTeleports", "FirstSpawnPlayer", e.getPlayer().getName()}).send(), 10);
             }
         }
     }

@@ -1,5 +1,6 @@
 package fi.matiaspaavilainen.masuiteteleports.bukkit.listeners;
 
+import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.MaSuiteTeleports;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -64,18 +65,9 @@ public class TeleportListener implements PluginMessageListener {
                         return;
                     }
                     String server = in.readUTF();
-                    try (ByteArrayOutputStream b = new ByteArrayOutputStream();
-                         DataOutputStream out = new DataOutputStream(b)) {
-                        out.writeUTF("MaSuiteTeleports");
-                        out.writeUTF("GetLocation");
-                        out.writeUTF(p.getName());
-                        Location loc = p.getLocation();
-                        out.writeUTF(loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch());
-                        out.writeUTF(server);
-                        p.sendPluginMessage(plugin, "BungeeCord", b.toByteArray());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    Location loc = p.getLocation();
+                    new PluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "GetLocation", p.getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch(), server}).send();
+
                 }
             }
         } catch (IOException e) {
