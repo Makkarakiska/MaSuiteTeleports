@@ -42,9 +42,9 @@ public class Set implements CommandExecutor {
             plugin.in_command.add(sender);
 
             Player p = (Player) sender;
-
             Location loc = p.getLocation();
-            new PluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "SetSpawn", p.getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":"
+            new PluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "SetSpawn", p.getName(),
+                    loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":"
                     + loc.getYaw() + ":" + loc.getPitch(), args[0].toLowerCase()}).send();
             plugin.in_command.remove(sender);
 

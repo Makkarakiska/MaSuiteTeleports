@@ -1,12 +1,11 @@
 package fi.matiaspaavilainen.masuiteteleports.bungee.managers;
 
 import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
-import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
+import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.database.ConnectionManager;
 import fi.matiaspaavilainen.masuitecore.core.database.Database;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
 import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
-
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -30,7 +29,7 @@ public class Spawn {
 
     private Connection connection = null;
     private PreparedStatement statement = null;
-    private BukkitConfiguration config = new BukkitConfiguration();
+    private BungeeConfiguration config = new BungeeConfiguration();
     private String tablePrefix = db.getTablePrefix();
 
     /**
@@ -129,9 +128,7 @@ public class Spawn {
      * @return if player has been spawned or not
      */
     public boolean spawn(ProxiedPlayer p, MaSuiteTeleports plugin, int type) {
-        new Spawn();
-        Spawn spawn = new Spawn();
-        spawn.find(p.getServer().getInfo().getName(), type);
+        Spawn spawn = new Spawn().find(p.getServer().getInfo().getName(), type);
         if (spawn == null) {
             if (type == 0) {
                 new Formator().sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.not-found"));
