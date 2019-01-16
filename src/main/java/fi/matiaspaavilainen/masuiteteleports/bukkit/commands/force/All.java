@@ -28,7 +28,7 @@ public class All implements CommandExecutor {
                 return;
             }
 
-            if (plugin.in_command.contains(sender)) { // this function is not really necessary, but safety first
+            if (plugin.in_command.contains(sender)) {
                 plugin.formator.sendMessage(sender, plugin.config.load(null, "messages.yml").getString("on-active-command"));
                 return;
             }
