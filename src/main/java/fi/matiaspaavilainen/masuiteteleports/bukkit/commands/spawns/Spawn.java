@@ -28,7 +28,6 @@ public class Spawn implements CommandExecutor {
                 return;
             }
 
-
             if (plugin.in_command.contains(sender)) {
                 plugin.formator.sendMessage(sender, plugin.config.load(null, "messages.yml").getString("on-active-command"));
                 return;
