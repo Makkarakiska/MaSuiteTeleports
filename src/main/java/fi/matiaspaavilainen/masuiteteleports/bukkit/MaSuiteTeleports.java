@@ -25,6 +25,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -129,5 +130,11 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
                 getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new PluginChannel(this, e.getPlayer(), new Object[]{"MaSuiteTeleports", "FirstSpawnPlayer", e.getPlayer().getName()}).send(), 10);
             }
         }
+    }
+
+    @EventHandler
+    public void onTeleport(PlayerTeleportEvent e){
+        Location loc = e.getPlayer().getLocation();
+        new PluginChannel(this, e.getPlayer(), new Object[]{"MaSuiteTeleports", "GetLocation", e.getPlayer().getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()}).send();
     }
 }
