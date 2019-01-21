@@ -25,7 +25,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -82,7 +81,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
     @EventHandler
     public void onDeath(PlayerRespawnEvent e) {
         Player p = e.getPlayer();
-        switch (getConfig().getString("respawn-type").toLowerCase()) {
+        switch (config.load("teleports", "config.yml").getString("respawn-type").toLowerCase()) {
             case ("none"):
                 break;
             case ("bed"):
