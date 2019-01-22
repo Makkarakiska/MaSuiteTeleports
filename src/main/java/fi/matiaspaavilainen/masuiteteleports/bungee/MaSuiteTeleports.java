@@ -11,6 +11,8 @@ import fi.matiaspaavilainen.masuiteteleports.bungee.commands.TeleportRequestComm
 import fi.matiaspaavilainen.masuiteteleports.bungee.listeners.PlayerJoinEvent;
 import fi.matiaspaavilainen.masuiteteleports.bungee.listeners.PlayerQuitEvent;
 import fi.matiaspaavilainen.masuiteteleports.bungee.managers.Teleport;
+import fi.matiaspaavilainen.masuiteteleports.core.objects.TeleportRequest;
+import fi.matiaspaavilainen.masuiteteleports.core.objects.TeleportType;
 import fi.matiaspaavilainen.masuiteteleports.managers.PositionListener;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -54,6 +56,8 @@ public class MaSuiteTeleports extends Plugin implements Listener {
 
         // Check updates
         new Updator(new String[]{getDescription().getVersion(), getDescription().getName(), "60125"}).checkUpdates();
+
+        //new TeleportRequest(UUID.randomUUID(), UUID.randomUUID(), TeleportType.REQUEST_HERE, (long) 200).create();
     }
 
     @EventHandler
