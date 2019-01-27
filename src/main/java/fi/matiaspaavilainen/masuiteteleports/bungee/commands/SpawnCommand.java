@@ -4,7 +4,7 @@ import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
 import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
-import fi.matiaspaavilainen.masuiteteleports.bungee.managers.Spawn;
+import fi.matiaspaavilainen.masuiteteleports.core.objects.Spawn;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class SpawnCommand {
