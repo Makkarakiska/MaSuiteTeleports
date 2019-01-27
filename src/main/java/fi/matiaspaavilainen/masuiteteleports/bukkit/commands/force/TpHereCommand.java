@@ -1,4 +1,4 @@
-package fi.matiaspaavilainen.masuiteteleports.bukkit.commands;
+package fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force;
 
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.MaSuiteTeleports;
@@ -8,15 +8,14 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class Back implements CommandExecutor {
+public class TpHereCommand implements CommandExecutor {
 
     private MaSuiteTeleports plugin;
 
-    public Back(MaSuiteTeleports p) {
+    public TpHereCommand(MaSuiteTeleports p) {
         plugin = p;
     }
 
-    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
             return false;
@@ -24,8 +23,8 @@ public class Back implements CommandExecutor {
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 
-            if (args.length != 0) {
-                plugin.formator.sendMessage(sender, plugin.config.load("teleports", "syntax.yml").getString("back"));
+            if (args.length != 1) {
+                plugin.formator.sendMessage(sender, plugin.config.load("teleports", "syntax.yml").getString("tphere"));
                 return;
             }
 
@@ -35,9 +34,8 @@ public class Back implements CommandExecutor {
             }
 
             plugin.in_command.add(sender);
-
             Player p = (Player) sender;
-            new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "Back", p.getName()}).send();
+            new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceHere", sender.getName(), args[0]}).send();
             plugin.in_command.remove(sender);
 
         });

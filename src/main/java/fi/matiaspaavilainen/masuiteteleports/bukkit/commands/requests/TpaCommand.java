@@ -8,11 +8,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class To implements CommandExecutor {
+public class TpaCommand implements CommandExecutor {
 
     private MaSuiteTeleports plugin;
 
-    public To(MaSuiteTeleports p) {
+    public TpaCommand(MaSuiteTeleports p) {
         plugin = p;
     }
 

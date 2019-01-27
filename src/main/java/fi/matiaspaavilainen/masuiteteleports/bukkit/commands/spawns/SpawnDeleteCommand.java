@@ -1,4 +1,4 @@
-package fi.matiaspaavilainen.masuiteteleports.bukkit.commands.requests;
+package fi.matiaspaavilainen.masuiteteleports.bukkit.commands.spawns;
 
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.MaSuiteTeleports;
@@ -8,11 +8,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class Accept implements CommandExecutor {
+public class SpawnDeleteCommand implements CommandExecutor {
 
     private MaSuiteTeleports plugin;
 
-    public Accept(MaSuiteTeleports p) {
+    public SpawnDeleteCommand(MaSuiteTeleports p) {
         plugin = p;
     }
 
@@ -23,11 +23,15 @@ public class Accept implements CommandExecutor {
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 
-            if (args.length != 0) {
-                plugin.formator.sendMessage(sender, plugin.config.load("teleports", "syntax.yml").getString("tpaccept"));
+            if (args.length != 1) {
+                plugin.formator.sendMessage(sender, plugin.config.load("teleports", "syntax.yml").getString("spawn.delete"));
                 return;
             }
 
+            if (!args[0].equalsIgnoreCase("default") && !args[0].equalsIgnoreCase("first")) {
+                plugin.formator.sendMessage(sender, plugin.config.load("teleports", "syntax.yml").getString("spawn.delete"));
+                return;
+            }
             if (plugin.in_command.contains(sender)) {
                 plugin.formator.sendMessage(sender, plugin.config.load(null, "messages.yml").getString("on-active-command"));
                 return;
@@ -35,7 +39,7 @@ public class Accept implements CommandExecutor {
 
             plugin.in_command.add(sender);
             Player p = (Player) sender;
-            new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportAccept", sender.getName()}).send();
+            new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "DelSpawn", p.getName(), args[0].toLowerCase()}).send();
             plugin.in_command.remove(sender);
 
         });

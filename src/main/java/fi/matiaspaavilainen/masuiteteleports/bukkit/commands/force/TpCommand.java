@@ -8,11 +8,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class Teleport implements CommandExecutor {
+public class TpCommand implements CommandExecutor {
 
     private MaSuiteTeleports plugin;
 
-    public Teleport(MaSuiteTeleports p) {
+    public TpCommand(MaSuiteTeleports p) {
         plugin = p;
     }
 
@@ -46,7 +46,7 @@ public class Teleport implements CommandExecutor {
                     new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportTargetToTarget", args[0], args[1]}).send();
                     break;
                 case (3):
-                    // Teleport sender to coordinates
+                    // TpCommand sender to coordinates
                     if (Double.isNaN(parse(args[0], 0)) && Double.isNaN(parse(args[1], 0)) && Double.isNaN(parse(args[2], 0))) {
                         return;
                     }
@@ -79,7 +79,7 @@ public class Teleport implements CommandExecutor {
                             parse(args[2], p.getLocation().getZ())}).send();
                     break;
                 case (5):
-                    // Teleport target to location
+                    // TpCommand target to location
                     if (Double.isNaN(parse(args[2], 0)) && Double.isNaN(parse(args[3], 0)) && Double.isNaN(parse(args[4], 0))) {
                         return;
                     }

@@ -8,10 +8,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class Here implements CommandExecutor {
+public class TpaHere implements CommandExecutor {
     private MaSuiteTeleports plugin;
 
-    public Here(MaSuiteTeleports p) {
+    public TpaHere(MaSuiteTeleports p) {
         plugin = p;
     }
 

@@ -11,11 +11,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class Lock implements CommandExecutor {
+public class TpaLockCommand implements CommandExecutor {
 
     private MaSuiteTeleports plugin;
 
-    public Lock(MaSuiteTeleports p) {
+    public TpaLockCommand(MaSuiteTeleports p) {
         plugin = p;
     }
 
@@ -51,7 +51,7 @@ public class Lock implements CommandExecutor {
             try (ByteArrayOutputStream b = new ByteArrayOutputStream();
                  DataOutputStream out = new DataOutputStream(b)) {
                 out.writeUTF("MaSuiteTeleports");
-                out.writeUTF("TeleportLock");
+                out.writeUTF("TeleportRequestLock");
                 out.writeUTF(sender.getName());
                 if (args[0].equalsIgnoreCase("yes") || args[0].equalsIgnoreCase("no") ||
                         args[0].equalsIgnoreCase("accept") || args[0].equalsIgnoreCase("deny")) {
