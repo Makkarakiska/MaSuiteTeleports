@@ -1,6 +1,8 @@
 package fi.matiaspaavilainen.masuiteteleports.bukkit;
 
 import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.Updator;
+import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.Back;
@@ -54,6 +56,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
         // Load commands
         loadCommands();
 
+        new Updator(new String[]{getDescription().getVersion(), getDescription().getName(), "60125"}).checkUpdates();
     }
 
     private void loadCommands() {
@@ -88,14 +91,14 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
                 if (p.getBedSpawnLocation() != null) {
                     p.teleport(p.getBedSpawnLocation());
                 } else {
-                    new PluginChannel(this, p, new Object[]{"MaSuiteTeleports", "SpawnPlayer", p.getName()}).send();
+                    new BukkitPluginChannel(this, p, new Object[]{"MaSuiteTeleports", "SpawnPlayer", p.getName()}).send();
                 }
                 break;
             case ("home"):
-                new PluginChannel(this, p, new Object[]{"MaSuiteTeleports", "HomeCommand", p.getName(), "home"}).send();
+                new BukkitPluginChannel(this, p, new Object[]{"MaSuiteTeleports", "HomeCommand", p.getName(), "home"}).send();
                 break;
             case ("spawn"):
-                new PluginChannel(this, p, new Object[]{"MaSuiteTeleports", "SpawnPlayer", p.getName()}).send();
+                new BukkitPluginChannel(this, p, new Object[]{"MaSuiteTeleports", "SpawnPlayer", p.getName()}).send();
                 break;
 
         }
@@ -104,7 +107,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
         Location loc = e.getEntity().getLocation();
-        new PluginChannel(this, e.getEntity(), new Object[]{"MaSuiteTeleports", "GetLocation", e.getEntity().getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()}).send();
+        new BukkitPluginChannel(this, e.getEntity(), new Object[]{"MaSuiteTeleports", "GetLocation", e.getEntity().getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()}).send();
     }
 
     @EventHandler
