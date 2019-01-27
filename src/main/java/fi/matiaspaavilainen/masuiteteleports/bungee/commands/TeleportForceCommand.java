@@ -7,16 +7,18 @@ import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
 import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
 import fi.matiaspaavilainen.masuiteteleports.bungee.managers.PlayerFinder;
-import fi.matiaspaavilainen.masuiteteleports.bungee.managers.Teleport;
+import fi.matiaspaavilainen.masuiteteleports.core.handlers.TeleportHandler;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class TeleportForceCommand {
 
     private MaSuiteTeleports plugin;
+    private TeleportHandler teleportHandler;
 
     public TeleportForceCommand(MaSuiteTeleports plugin) {
         this.plugin = plugin;
+        teleportHandler = new TeleportHandler(plugin);
     }
 
     private Utils utils = new Utils();
@@ -28,9 +30,9 @@ public class TeleportForceCommand {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if (utils.isOnline(target, sender)) {
             plugin.positions.requestPosition(sender);
-            new Teleport(plugin).playerToPlayer(sender, target);
+            teleportHandler.teleportPlayerToPlayer(sender, target);
             formator.sendMessage(sender, config.load("teleports", "messages.yml")
-                    .getString("teleported")
+                    .getString("receiver.teleported")
                     .replace("%player%", target.getName())
             );
         }
@@ -42,10 +44,14 @@ public class TeleportForceCommand {
         ProxiedPlayer target2 = new PlayerFinder().get(t2);
         if (utils.isOnline(target1, sender) && utils.isOnline(target2, sender)) {
             plugin.positions.requestPosition(target1);
-            new Teleport(plugin).playerToPlayer(target1, target2);
+            teleportHandler.teleportPlayerToPlayer(target1, target2);
             formator.sendMessage(target1, config.load("teleports", "messages.yml")
-                    .getString("teleported")
+                    .getString("receiver.teleported")
                     .replace("%player%", target2.getName())
+            );
+            formator.sendMessage(target2, config.load("teleports", "messages.yml")
+                    .getString("sender.teleported")
+                    .replace("%player%", target1.getName())
             );
         }
     }
@@ -74,15 +80,23 @@ public class TeleportForceCommand {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if (utils.isOnline(target, sender)) {
             plugin.positions.requestPosition(target);
-            new Teleport(plugin).playerToPlayer(target, sender);
+            teleportHandler.teleportPlayerToPlayer(target, sender);
+            formator.sendMessage(sender, config.load("teleports", "messages.yml")
+                    .getString("sender.teleported")
+                    .replace("%player%", target.getName())
+            );
         }
     }
 
     public void tpall(ProxiedPlayer target) {
         if (utils.isOnline(target)) {
-            for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
-                plugin.positions.requestPosition(p);
-                new Teleport(plugin).playerToPlayer(p, target);
+            for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
+                plugin.positions.requestPosition(player);
+                teleportHandler.teleportPlayerToPlayer(player, target);
+                formator.sendMessage(player, config.load("teleports", "messages.yml")
+                        .getString("receiver.teleported")
+                        .replace("%player%", target.getName())
+                );
             }
         }
     }
