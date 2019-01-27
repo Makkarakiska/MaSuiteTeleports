@@ -78,15 +78,15 @@ public class TeleportListener implements PluginMessageListener {
     }
 
     private void teleportPlayer(final String s, final String t) {
-        Player sender = Bukkit.getPlayer(s);
+        Player player = Bukkit.getPlayer(s);
         Player target = Bukkit.getPlayer(t);
         Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> {
-            if (sender != null && target != null) {
-                plugin.tpQue.add(sender.getUniqueId());
-                sender.teleport(target);
+            if (player != null && target != null) {
+                plugin.tpQue.add(player.getUniqueId());
+                player.teleport(target);
             }
         }, 5);
 
-        Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> plugin.tpQue.remove(sender.getUniqueId()), 100);
+        Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> plugin.tpQue.remove(player.getUniqueId()), 100);
     }
 }
