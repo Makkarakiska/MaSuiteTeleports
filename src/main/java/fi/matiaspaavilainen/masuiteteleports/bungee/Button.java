@@ -12,16 +12,37 @@ public class Button {
     private BungeeConfiguration config = new BungeeConfiguration();
     private Formator formator = new Formator();
 
-    public Button() {
+    private String type;
+    private String command;
+
+    public Button(String type, String command) {
+        this.type = type;
+        this.command = command;
     }
 
-    public TextComponent create(String type, String command) {
+    public TextComponent create() {
         TextComponent btn = new TextComponent();
-        btn.addExtra(formator.colorize(config.load("teleports", "buttons.yml").getString("buttons." + type + ".text")));
+        btn.addExtra(formator.colorize(config.load("teleports", "buttons.yml").getString("buttons." + this.type + ".text")));
         btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(formator.colorize(
-                        config.load("teleports", "buttons.yml").getString("buttons." + type + ".hover"))).create()
+                config.load("teleports", "buttons.yml").getString("buttons." + this.type + ".hover"))).create()
         ));
-        btn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
+        btn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, this.command));
         return btn;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getCommand() {
+        return command;
+    }
+
+    public void setCommand(String command) {
+        this.command = command;
     }
 }
