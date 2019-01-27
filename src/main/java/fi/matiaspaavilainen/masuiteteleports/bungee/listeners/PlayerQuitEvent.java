@@ -11,8 +11,11 @@ public class PlayerQuitEvent implements Listener {
     @EventHandler
     public void onQuit(PlayerDisconnectEvent e) {
         TeleportRequest request = TeleportHandler.getTeleportRequest(e.getPlayer());
-        if(request != null){
+        if (request != null) {
             request.cancel();
         }
+
+        TeleportHandler.toggles.remove(e.getPlayer().getUniqueId());
+        TeleportHandler.lock.remove(e.getPlayer().getUniqueId());
     }
 }
