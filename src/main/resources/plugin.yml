@@ -19,6 +19,10 @@ commands:
     permission: masuiteteleports.teleport.force
     aliases: [teleport]
     description: Teleports to given target
+  tptoggle:
+    permission: masuiteleports.teleport.toggle
+    aliases: [teleporttoggle]
+    description: Enable or disable force teleportations
   tphere:
     permission: masuiteteleports.teleport.force.here
     aliases: [teleporthere]

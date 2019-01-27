@@ -5,17 +5,15 @@ import fi.matiaspaavilainen.masuitecore.core.Updator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.Back;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.All;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.Here;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.Teleport;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.requests.Accept;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.requests.Deny;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.requests.Lock;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.requests.To;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.spawns.Delete;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.spawns.Set;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.spawns.Spawn;
+import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.BackCommand;
+import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.TpAllCommand;
+import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.TpHereCommand;
+import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.TpCommand;
+import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.TpToggleCommand;
+import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.requests.*;
+import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.spawns.SpawnDeleteCommand;
+import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.spawns.SpawnSetCommand;
+import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.spawns.SpawnTeleportCommand;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.listeners.TeleportListener;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -61,24 +59,25 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
 
     private void loadCommands() {
         // Force
-        getCommand("tpall").setExecutor(new All(this));
-        getCommand("tphere").setExecutor(new Here(this));
-        getCommand("tp").setExecutor(new Teleport(this));
+        getCommand("tpall").setExecutor(new TpAllCommand(this));
+        getCommand("tphere").setExecutor(new TpHereCommand(this));
+        getCommand("tp").setExecutor(new TpCommand(this));
+        getCommand("tptoggle").setExecutor(new TpToggleCommand(this));
 
         // Requests
-        getCommand("tpaccept").setExecutor(new Accept(this));
-        getCommand("tpdeny").setExecutor(new Deny(this));
-        getCommand("tpahere").setExecutor(new fi.matiaspaavilainen.masuiteteleports.bukkit.commands.requests.Here(this));
-        getCommand("tpa").setExecutor(new To(this));
-        getCommand("tpalock").setExecutor(new Lock(this));
+        getCommand("tpaccept").setExecutor(new TpAcceptCommand(this));
+        getCommand("tpdeny").setExecutor(new TpDenyCommand(this));
+        getCommand("tpahere").setExecutor(new TpaHere(this));
+        getCommand("tpa").setExecutor(new TpaCommand(this));
+        getCommand("tpalock").setExecutor(new TpaLockCommand(this));
 
         // Spawn
-        getCommand("delspawn").setExecutor(new Delete(this));
-        getCommand("setspawn").setExecutor(new Set(this));
-        getCommand("spawn").setExecutor(new Spawn(this));
+        getCommand("delspawn").setExecutor(new SpawnDeleteCommand(this));
+        getCommand("setspawn").setExecutor(new SpawnSetCommand(this));
+        getCommand("spawn").setExecutor(new SpawnTeleportCommand(this));
 
         // Back
-        getCommand("back").setExecutor(new Back(this));
+        getCommand("back").setExecutor(new BackCommand(this));
     }
 
     @EventHandler
@@ -98,7 +97,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
                 new BukkitPluginChannel(this, p, new Object[]{"MaSuiteTeleports", "HomeCommand", p.getName(), "home"}).send();
                 break;
             case ("spawn"):
-                if(p.hasPermission("masuiteleports.spawn.teleport.first")){
+                if (p.hasPermission("masuiteleports.spawn.teleport.first")) {
                     new BukkitPluginChannel(this, p, new Object[]{"MaSuiteTeleports", "FirstSpawnPlayer", p.getName()}).send();
                 } else {
                     new BukkitPluginChannel(this, p, new Object[]{"MaSuiteTeleports", "SpawnPlayer", p.getName()}).send();
