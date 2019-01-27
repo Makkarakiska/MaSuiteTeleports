@@ -29,7 +29,7 @@ public class TeleportForceCommand {
     public void tp(ProxiedPlayer sender, String t, boolean bypass) {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if (utils.isOnline(target, sender)) {
-            if(TeleportHandler.toggles.contains(target.getUniqueId()) && !bypass){
+            if (TeleportHandler.toggles.contains(target.getUniqueId()) && !bypass) {
                 formator.sendMessage(sender, config.load("teleports", "messages.yml").getString("tptoggle.disabled").replace("%player", target.getName()));
                 return;
             }
@@ -65,7 +65,7 @@ public class TeleportForceCommand {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if (utils.isOnline(target, sender)) {
             plugin.positions.requestPosition(target);
-            new BungeePluginChannel(plugin, sender.getServer().getInfo(), new Object[]{"MaSuiteTeleports", "PlayerToXYZ", x, y, z}).send();
+            new BungeePluginChannel(plugin, sender.getServer().getInfo(), new Object[]{"MaSuiteTeleports", "PlayerToXYZ", sender.getName(), x, y, z}).send();
         }
 
     }
@@ -75,7 +75,7 @@ public class TeleportForceCommand {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if (utils.isOnline(target, sender)) {
             plugin.positions.requestPosition(target);
-            new BungeePluginChannel(plugin, sender.getServer().getInfo(), new Object[]{"MaSuiteTeleports", "PlayerToLocation",
+            new BungeePluginChannel(plugin, sender.getServer().getInfo(), new Object[]{"MaSuiteTeleports", "PlayerToLocation", target.getName(),
                     loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()}).send();
         }
     }
@@ -83,7 +83,7 @@ public class TeleportForceCommand {
     public void tphere(ProxiedPlayer sender, String t, boolean bypass) {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if (utils.isOnline(target, sender)) {
-            if(TeleportHandler.toggles.contains(target.getUniqueId()) && !bypass){
+            if (TeleportHandler.toggles.contains(target.getUniqueId()) && !bypass) {
                 formator.sendMessage(sender, config.load("teleports", "messages.yml").getString("tptoggle.disabled").replace("%player", target.getName()));
                 return;
             }
