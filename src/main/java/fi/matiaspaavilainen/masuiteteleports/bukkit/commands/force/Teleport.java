@@ -1,6 +1,6 @@
 package fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force;
 
-import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
+import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.MaSuiteTeleports;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -32,20 +32,25 @@ public class Teleport implements CommandExecutor {
 
             Player p = (Player) sender;
 
+            if(args.length == 1 || args.length == 2){
+                if(!hasPerm(p, "masuiteteleports.teleport.force.player")){ return; }
+            } else if(args.length == 3 || args.length == 4 || args.length == 5){
+                if(!hasPerm(p, "masuiteteleports.teleport.force.coordinates")){ return; }
+            }
 
             switch (args.length) {
                 case (1):
-                    new PluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportSenderToTarget", args[0]}).send();
+                    new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportSenderToTarget", args[0]}).send();
                     break;
                 case (2):
-                    new PluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportTargetToTarget", args[0], args[1]}).send();
+                    new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportTargetToTarget", args[0], args[1]}).send();
                     break;
                 case (3):
                     // Teleport sender to coordinates
                     if (Double.isNaN(parse(args[0], 0)) && Double.isNaN(parse(args[1], 0)) && Double.isNaN(parse(args[2], 0))) {
                         return;
                     }
-                    new PluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportToXYZ",
+                    new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportToXYZ",
                             sender.getName(),
                             parse(args[0], p.getLocation().getX()),
                             parse(args[1], p.getLocation().getY()),
@@ -57,7 +62,7 @@ public class Teleport implements CommandExecutor {
                     }
                     // If any of the server's worlds match to args[0]
                     if (Bukkit.getWorlds().stream().anyMatch(world -> world.getName().equals(args[0]))) {
-                        new PluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportToCoordinates",
+                        new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportToCoordinates",
                                 sender.getName(),
                                 args[0],
                                 parse(args[1], p.getLocation().getX()),
@@ -67,7 +72,7 @@ public class Teleport implements CommandExecutor {
                     }
 
                     // If not, send target to XYZ
-                    new PluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportToXYZ",
+                    new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportToXYZ",
                             args[0],
                             parse(args[0], p.getLocation().getX()),
                             parse(args[1], p.getLocation().getY()),
@@ -78,7 +83,7 @@ public class Teleport implements CommandExecutor {
                     if (Double.isNaN(parse(args[2], 0)) && Double.isNaN(parse(args[3], 0)) && Double.isNaN(parse(args[4], 0))) {
                         return;
                     }
-                    new PluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportToCoordinates",
+                    new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportToCoordinates",
                             args[0],
                             args[1],
                             parse(args[2], p.getLocation().getX()),
@@ -118,5 +123,14 @@ public class Teleport implements CommandExecutor {
             return Double.parseDouble(string);
         }
         return Double.NaN;
+    }
+
+    private boolean hasPerm(Player player, String perm){
+        if(player.hasPermission(perm)){
+            return true;
+        } else {
+            plugin.formator.sendMessage(player, plugin.config.load(null, "messages.yml").getString("no-permission"));
+            return false;
+        }
     }
 }
