@@ -33,9 +33,9 @@ public class TpCommand implements CommandExecutor {
             Player p = (Player) sender;
 
             if(args.length == 1 || args.length == 2){
-                if(!hasPerm(p, "masuiteteleports.teleport.force.player")){ return; }
+                if(!hasPerm(p, "masuiteteleports.teleport.force.player")){ plugin.in_command.remove(sender); return; }
             } else if(args.length == 3 || args.length == 4 || args.length == 5){
-                if(!hasPerm(p, "masuiteteleports.teleport.force.coordinates")){ return; }
+                if(!hasPerm(p, "masuiteteleports.teleport.force.coordinates")){ plugin.in_command.remove(sender); return; }
             }
 
             switch (args.length) {
