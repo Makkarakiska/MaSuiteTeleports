@@ -42,6 +42,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         // Check updates
         new Updator(new String[]{getDescription().getVersion(), getDescription().getName(), "60125"}).checkUpdates();
 
-        //new TeleportRequest(UUID.randomUUID(), UUID.randomUUID(), TeleportType.REQUEST_HERE, (long) 200).create();
+        config.addDefault("teleports/messages.yml", "receiver.teleported", "&7You have been teleported to &b%player%&7!");
+        config.addDefault("teleports/messages.yml", "sender.teleported", "&b%player%&7 has been teleported to you!");
     }
 }
