@@ -1,12 +1,10 @@
-package fi.matiaspaavilainen.masuiteteleports.managers;
+package fi.matiaspaavilainen.masuiteteleports.bungee.listeners;
 
+import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
 import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -26,19 +24,13 @@ public class PositionListener {
     }
 
     public void requestPosition(ProxiedPlayer p) {
-        try (ByteArrayOutputStream b = new ByteArrayOutputStream();
-             DataOutputStream out = new DataOutputStream(b)) {
-            out.writeUTF("MaSuiteTeleports");
-            out.writeUTF("GetLocation");
-            out.writeUTF(p.getName());
-            out.writeUTF(p.getServer().getInfo().getName());
-            p.getServer().sendData("BungeeCord", b.toByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        new BungeePluginChannel(plugin, p.getServer().getInfo(), new Object[]{
+                "MaSuiteTeleports",
+                "GetLocation",
+                p.getName(),
+                p.getServer().getInfo().getName()
+        }).send();
     }
-
     public void locationReceived(ProxiedPlayer p, Location loc) {
         if (positionRunnables.containsKey(p.getUniqueId())) {
             positionRunnables.remove(p.getUniqueId()).run();
