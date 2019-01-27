@@ -1,6 +1,7 @@
 package fi.matiaspaavilainen.masuiteteleports.bungee.managers;
 
 import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.database.ConnectionManager;
 import fi.matiaspaavilainen.masuitecore.core.database.Database;
@@ -9,9 +10,6 @@ import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -135,27 +133,25 @@ public class Spawn {
             }
             return false;
         }
-        try {
+
             if (type == 0) {
                 plugin.positions.requestPosition(p);
             }
-            ByteArrayOutputStream b = new ByteArrayOutputStream();
-            DataOutputStream out = new DataOutputStream(b);
-            out.writeUTF("MaSuiteTeleports");
-            out.writeUTF("SpawnPlayer");
-            out.writeUTF(p.getName());
             Location loc = spawn.getLocation();
-            out.writeUTF(loc.getWorld() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch());
+            BungeePluginChannel bpc = new BungeePluginChannel(plugin, p.getServer().getInfo(), new Object[]{
+                    "MaSuiteTeleports",
+                    "SpawnPlayer",
+                    p.getName(),
+                    loc.getWorld() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()
+            });
+
             if (!spawn.getServer().equals(p.getServer().getInfo().getName())) {
                 p.connect(ProxyServer.getInstance().getServerInfo(spawn.getServer()));
-                ProxyServer.getInstance().getScheduler().schedule(plugin, () -> p.getServer().sendData("BungeeCord", b.toByteArray()), 500, TimeUnit.MILLISECONDS);
+                ProxyServer.getInstance().getScheduler().schedule(plugin, bpc::send, 500, TimeUnit.MILLISECONDS);
             } else {
-                p.getServer().sendData("BungeeCord", b.toByteArray());
+                bpc.send();
             }
 
-        } catch (IOException e) {
-            e.getStackTrace();
-        }
         return true;
     }
 
