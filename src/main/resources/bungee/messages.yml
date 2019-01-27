@@ -1,5 +1,4 @@
 invalid-coords-given: "&cInvalid coordinates given!"
-teleported: "&7You have been teleported to &b%player%&7!"
 in-cooldown: "&cYou can use that after %time% seconds"
 back:
   last-loc: "&7You have been teleported to your last location!"
@@ -13,6 +12,7 @@ sender:
   teleport-request-pending:
     receiver: "&b%receiver% &7has already a pending teleportation request."
     sender: "&cYou have already a pending teleportation request."
+  teleported: "&b%player%&7 has been teleported to you!"
 receiver:
   teleport-to-request-incoming: "&b%sender% &7wants teleport to you!"
   teleport-here-request-incoming: "&b%sender% &7wants you to teleport to them!"
@@ -20,6 +20,7 @@ receiver:
   teleport-request-accepted: "&7You accepted &b%sender%'s &7teleportation request."
   teleport-request-expired: "&7Teleportation request from &b%sender% &7expired."
   no-pending-teleport-requests: "&7You don't have any pending teleportation requests!"
+  teleported: "&7You have been teleported to &b%player%&7!"
 spawn:
   set: "&aSpawn set"
   deleted: "&aSpawn deleted"
