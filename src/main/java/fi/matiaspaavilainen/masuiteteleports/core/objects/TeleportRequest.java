@@ -1,19 +1,21 @@
 package fi.matiaspaavilainen.masuiteteleports.core.objects;
 
+import fi.matiaspaavilainen.masuiteteleports.bungee.Button;
+import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
 import fi.matiaspaavilainen.masuiteteleports.core.handlers.TeleportHandler;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
+import net.md_5.bungee.config.Configuration;
 
-import java.time.Instant;
-import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class TeleportRequest {
 
-    private UUID sender;
-    private UUID receiver;
-    private Thread scheduler;
-
+    private ProxiedPlayer sender, receiver;
+    private ScheduledTask scheduler;
+    private MaSuiteTeleports plugin;
     private TeleportType type;
-    private long created;
-    private long ends;
 
     /**
      * An empty constructor for {@link TeleportRequest}
@@ -27,78 +29,179 @@ public class TeleportRequest {
      * @param sender   unique id of the sender
      * @param receiver unique id of the receiver
      * @param type     request {@link TeleportRequest}
-     * @param ends     when the request ends
      */
-    public TeleportRequest(UUID sender, UUID receiver, TeleportType type, long ends) {
+    public TeleportRequest(MaSuiteTeleports plugin, ProxiedPlayer sender, ProxiedPlayer receiver, TeleportType type) {
+        this.plugin = plugin;
         this.sender = sender;
         this.receiver = receiver;
         this.type = type;
-        this.created = Instant.now().toEpochMilli();
-        this.ends = Instant.now().plusMillis(3000).toEpochMilli();
+
     }
 
     /**
      * Create request with given params
-     *
-     * @return created request
      */
-    public TeleportRequest create() {
+    public void create() {
         TeleportHandler.requests.add(this);
-        this.scheduler = new Thread(() -> {
-            System.out.println(this.created - this.ends);
-            if(this.ends - this.created  <= 0){
-                this.cancel();
-                System.out.println("Thread cancelled!");
-            }
+        scheduler = this.plugin.getProxy().getScheduler().schedule(this.plugin, this::expired, plugin.config.load("teleports", "settings.yml").getInt("keep-request-alive"), TimeUnit.SECONDS);
 
-        });
-        this.scheduler.start();
+        Configuration messages = plugin.config.load("teleports", "messages.yml");
+        if (this.type.equals(TeleportType.REQUEST_TO)) {
+            plugin.formator.sendMessage(sender, messages
+                    .getString("sender.teleport-to-request-incoming")
+                    .replace("%sender%", sender.getName())
+                    .replace("%receiver%", receiver.getName()));
+            plugin.formator.sendMessage(receiver, messages
+                    .getString("receiver.teleport-to-request-incoming")
+                    .replace("%sender%", sender.getName())
+                    .replace("%receiver%", receiver.getName()));
+        } else if (this.type.equals(TeleportType.REQUEST_HERE)) {
+            plugin.formator.sendMessage(sender, messages
+                    .getString("sender.teleport-here-request-incoming")
+                    .replace("%sender%", sender.getName())
+                    .replace("%receiver%", receiver.getName())
+            );
+            plugin.formator.sendMessage(receiver, messages
+                    .getString("receiver.teleport-here-request-incoming")
+                    .replace("%sender%", sender.getName())
+                    .replace("%receiver%", receiver.getName())
+            );
+        }
+        this.buttons(receiver);
 
-        return this;
     }
 
-    public void cancel(){
-        this.scheduler.interrupt();
+    /**
+     * Cancel after time has expired and send messages to players
+     */
+    public void expired() {
+        plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml")
+                .getString("sender.teleport-request-expired")
+                .replace("%sender%", sender.getName())
+                .replace("%receiver%", receiver.getName())
+        );
+        plugin.formator.sendMessage(receiver, plugin.config.load("teleports", "messages.yml")
+                .getString("receiver.teleport-request-expired")
+                .replace("%sender%", sender.getName())
+                .replace("%receiver%", receiver.getName())
+
+        );
+        TeleportHandler.requests.remove(this);
     }
 
-    public UUID getSender() {
+    /**
+     * Accept the request
+     */
+    public void accept(){
+        if(this.type.equals(TeleportType.REQUEST_TO)){
+            plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml")
+                    .getString("sender.teleport-request-accepted")
+                    .replace("%sender%", sender.getName())
+                    .replace("%receiver%", receiver.getName())
+            );
+            plugin.formator.sendMessage(receiver, plugin.config.load("teleports", "messages.yml")
+                    .getString("receiver.teleport-request-accepted")
+                    .replace("%sender%", sender.getName())
+                    .replace("%receiver%", receiver.getName())
+            );
+            new TeleportHandler(this.plugin).teleportPlayerToPlayer(this.sender, this.receiver);
+        } else if(this.type.equals(TeleportType.REQUEST_HERE)){
+            plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml")
+                    .getString("sender.teleport-request-accepted")
+                    .replace("%sender%", sender.getName())
+                    .replace("%receiver%", receiver.getName())
+            );
+            plugin.formator.sendMessage(receiver, plugin.config.load("teleports", "messages.yml")
+                    .getString("receiver.teleport-request-accepted")
+                    .replace("%sender%", sender.getName())
+                    .replace("%receiver%", receiver.getName())
+            );
+            new TeleportHandler(this.plugin).teleportPlayerToPlayer(this.receiver, this.sender);
+        }
+
+        this.cancel();
+    }
+
+    /**
+     * Deny request
+     */
+    public void deny(){
+        plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml")
+                .getString("sender.teleport-request-denied")
+                .replace("%sender%", sender.getName())
+                .replace("%receiver%", receiver.getName())
+        );
+        plugin.formator.sendMessage(receiver, plugin.config.load("teleports", "messages.yml")
+                .getString("receiver.teleport-request-denied")
+                .replace("%sender%", sender.getName())
+                .replace("%receiver%", receiver.getName())
+        );
+        new TeleportHandler(this.plugin).teleportPlayerToPlayer(this.sender, this.receiver);
+        this.cancel();
+    }
+
+    /**
+     * Cancel scheduler
+     */
+    public void cancel() {
+        this.scheduler.cancel();
+        TeleportHandler.requests.remove(this);
+
+    }
+
+    /**
+     * Show buttons for player
+     * @param receiver the player who will be used
+     */
+    private void buttons(ProxiedPlayer receiver) {
+        if (plugin.config.load("teleports", "buttons.yml").getBoolean("enabled")) {
+            TextComponent buttons = new TextComponent();
+            buttons.addExtra(new Button("accept", "/tpaccept").create());
+            buttons.addExtra(new Button("deny", "/tpdeny").create());
+            receiver.sendMessage(buttons);
+        }
+    }
+
+    /**
+     * @return creator of the request
+     */
+    public ProxiedPlayer getSender() {
         return sender;
     }
 
-    public void setSender(UUID sender) {
+    /**
+     * @param sender creator of the request
+     */
+    public void setSender(ProxiedPlayer sender) {
         this.sender = sender;
     }
 
-    public UUID getReceiver() {
+    /**
+     * @return receiver of the request
+     */
+    public ProxiedPlayer getReceiver() {
         return receiver;
     }
 
-    public void setReceiver(UUID receiver) {
+    /**
+     * @param receiver receiver of the request
+     */
+    public void setReceiver(ProxiedPlayer receiver) {
         this.receiver = receiver;
     }
 
+    /**
+     * @return {@link TeleportType} type of the request
+     */
     public TeleportType getType() {
         return type;
     }
 
+    /**
+     * @param type {@link TeleportType} type of the request
+     */
     public void setType(TeleportType type) {
         this.type = type;
-    }
-
-    public long getCreated() {
-        return created;
-    }
-
-    public void setCreated(long created) {
-        this.created = created;
-    }
-
-    public long getEnds() {
-        return ends;
-    }
-
-    public void setEnds(long ends) {
-        this.ends = ends;
     }
 }
 
