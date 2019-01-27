@@ -26,9 +26,13 @@ public class TeleportForceCommand {
     private Formator formator = new Formator();
 
     // Sender to target
-    public void tp(ProxiedPlayer sender, String t) {
+    public void tp(ProxiedPlayer sender, String t, boolean bypass) {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if (utils.isOnline(target, sender)) {
+            if(TeleportHandler.toggles.contains(target.getUniqueId()) && !bypass){
+                formator.sendMessage(sender, config.load("teleports", "messages.yml").getString("tptoggle.disabled").replace("%player", target.getName()));
+                return;
+            }
             plugin.positions.requestPosition(sender);
             teleportHandler.teleportPlayerToPlayer(sender, target);
             formator.sendMessage(sender, config.load("teleports", "messages.yml")
@@ -56,7 +60,7 @@ public class TeleportForceCommand {
         }
     }
 
-    // Teleport player to coordinates in the same world in the same world
+    // TpCommand player to coordinates in the same world in the same world
     public void tp(ProxiedPlayer sender, String t, Double x, Double y, Double z) {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if (utils.isOnline(target, sender)) {
@@ -66,7 +70,7 @@ public class TeleportForceCommand {
 
     }
 
-    // Teleport player to specific location in the same server
+    // TpCommand player to specific location in the same server
     public void tp(ProxiedPlayer sender, String t, Location loc) {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if (utils.isOnline(target, sender)) {
@@ -76,9 +80,13 @@ public class TeleportForceCommand {
         }
     }
 
-    public void tphere(ProxiedPlayer sender, String t) {
+    public void tphere(ProxiedPlayer sender, String t, boolean bypass) {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if (utils.isOnline(target, sender)) {
+            if(TeleportHandler.toggles.contains(target.getUniqueId()) && !bypass){
+                formator.sendMessage(sender, config.load("teleports", "messages.yml").getString("tptoggle.disabled").replace("%player", target.getName()));
+                return;
+            }
             plugin.positions.requestPosition(target);
             teleportHandler.teleportPlayerToPlayer(target, sender);
             formator.sendMessage(sender, config.load("teleports", "messages.yml")
