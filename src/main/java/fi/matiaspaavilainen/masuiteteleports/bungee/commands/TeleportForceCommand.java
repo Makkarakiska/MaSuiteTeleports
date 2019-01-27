@@ -2,6 +2,7 @@ package fi.matiaspaavilainen.masuiteteleports.bungee.commands;
 
 import fi.matiaspaavilainen.masuitecore.bungee.Utils;
 import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
 import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
@@ -9,10 +10,6 @@ import fi.matiaspaavilainen.masuiteteleports.bungee.managers.PlayerFinder;
 import fi.matiaspaavilainen.masuiteteleports.bungee.managers.Teleport;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 
 public class TeleportForceCommand {
 
@@ -58,19 +55,7 @@ public class TeleportForceCommand {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if (utils.isOnline(target, sender)) {
             plugin.positions.requestPosition(target);
-            ByteArrayOutputStream b = new ByteArrayOutputStream();
-            DataOutputStream out = new DataOutputStream(b);
-            try {
-                out.writeUTF("MaSuiteTeleports");
-                out.writeUTF("PlayerToXYZ");
-                out.writeUTF(target.getName());
-                out.writeDouble(x);
-                out.writeDouble(y);
-                out.writeDouble(z);
-                target.getServer().sendData("BungeeCord", b.toByteArray());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            new BungeePluginChannel(plugin, sender.getServer().getInfo(), new Object[]{"MaSuiteTeleports", "PlayerToXYZ", x, y, z}).send();
         }
 
     }
@@ -80,20 +65,8 @@ public class TeleportForceCommand {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if (utils.isOnline(target, sender)) {
             plugin.positions.requestPosition(target);
-            ByteArrayOutputStream b = new ByteArrayOutputStream();
-            DataOutputStream out = new DataOutputStream(b);
-            try {
-                out.writeUTF("MaSuiteTeleports");
-                out.writeUTF("PlayerToLocation");
-                out.writeUTF(target.getName());
-                out.writeUTF(loc.getWorld());
-                out.writeDouble(loc.getX());
-                out.writeDouble(loc.getY());
-                out.writeDouble(loc.getZ());
-                target.getServer().sendData("BungeeCord", b.toByteArray());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            new BungeePluginChannel(plugin, sender.getServer().getInfo(), new Object[]{"MaSuiteTeleports", "PlayerToLocation",
+                    loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()}).send();
         }
     }
 
