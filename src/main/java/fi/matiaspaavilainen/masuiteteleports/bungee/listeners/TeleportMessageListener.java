@@ -24,6 +24,7 @@ public class TeleportMessageListener implements Listener {
 
     private MaSuiteTeleports plugin;
     private Utils utils = new Utils();
+
     public TeleportMessageListener(MaSuiteTeleports plugin) {
         this.plugin = plugin;
     }
@@ -104,7 +105,7 @@ public class TeleportMessageListener implements Listener {
                         }
                     }
                     break;
-                case "TeleportLock":
+                case "TeleportRequestLock":
                     String c = in.readUTF();
                     if (c.equals("Enable")) {
                         if (utils.isOnline(sender)) {
@@ -128,6 +129,14 @@ public class TeleportMessageListener implements Listener {
 
                     }
                     break;
+                case "TeleportToggle":
+                    if (TeleportHandler.toggles.contains(sender.getUniqueId())) {
+                        TeleportHandler.toggles.remove(sender.getUniqueId());
+                        plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("tptoggle.off"));
+                    } else {
+                        TeleportHandler.toggles.add(sender.getUniqueId());
+                        plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("tptoggle.on"));
+                    }
             }
 
             //Teleportation forces
@@ -137,7 +146,7 @@ public class TeleportMessageListener implements Listener {
                     String superchildchannel = in.readUTF();
                     switch (superchildchannel) {
                         case "TeleportSenderToTarget":
-                            tpforce.tp(sender, in.readUTF());
+                            tpforce.tp(sender, in.readUTF(), in.readBoolean());
                             break;
                         case "TeleportTargetToTarget":
                             tpforce.tp(sender, in.readUTF(), in.readUTF());
@@ -151,7 +160,7 @@ public class TeleportMessageListener implements Listener {
                     }
                     break;
                 case "TeleportForceHere":
-                    tpforce.tphere(sender, in.readUTF());
+                    tpforce.tphere(sender, in.readUTF(), in.readBoolean());
                     break;
                 case "TeleportForceAll":
                     tpforce.tpall(sender);
@@ -176,7 +185,7 @@ public class TeleportMessageListener implements Listener {
                         sender.connect(plugin.positions.positions.get(sender.getUniqueId()).getServer());
                         ProxyServer.getInstance().getScheduler().schedule(plugin, () -> tpforce.tp(sender, sender.getName(), plugin.positions.positions.get(sender.getUniqueId())), 500, TimeUnit.MILLISECONDS);
                     } else {
-                        tpforce.tp(sender, sender.getName(),plugin.positions.positions.get(sender.getUniqueId()));
+                        tpforce.tp(sender, sender.getName(), plugin.positions.positions.get(sender.getUniqueId()));
                     }
                     plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("back.last-loc"));
                     MaSuiteTeleports.cooldowns.put(sender.getUniqueId(), System.currentTimeMillis());
