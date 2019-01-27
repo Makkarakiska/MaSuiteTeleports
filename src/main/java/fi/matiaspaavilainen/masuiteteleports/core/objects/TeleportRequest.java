@@ -46,6 +46,14 @@ public class TeleportRequest {
         scheduler = this.plugin.getProxy().getScheduler().schedule(this.plugin, this::expired, plugin.config.load("teleports", "settings.yml").getInt("keep-request-alive"), TimeUnit.SECONDS);
 
         Configuration messages = plugin.config.load("teleports", "messages.yml");
+        if (TeleportHandler.lock.containsKey(this.receiver.getUniqueId())) {
+            if (TeleportHandler.lock.get(this.receiver.getUniqueId())) {
+                this.accept();
+            } else {
+                this.deny();
+            }
+            return;
+        }
         if (this.type.equals(TeleportType.REQUEST_TO)) {
             plugin.formator.sendMessage(sender, messages
                     .getString("sender.teleport-to-request-incoming")
@@ -92,8 +100,8 @@ public class TeleportRequest {
     /**
      * Accept the request
      */
-    public void accept(){
-        if(this.type.equals(TeleportType.REQUEST_TO)){
+    public void accept() {
+        if (this.type.equals(TeleportType.REQUEST_TO)) {
             plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml")
                     .getString("sender.teleport-request-accepted")
                     .replace("%sender%", sender.getName())
@@ -105,7 +113,7 @@ public class TeleportRequest {
                     .replace("%receiver%", receiver.getName())
             );
             new TeleportHandler(this.plugin).teleportPlayerToPlayer(this.sender, this.receiver);
-        } else if(this.type.equals(TeleportType.REQUEST_HERE)){
+        } else if (this.type.equals(TeleportType.REQUEST_HERE)) {
             plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml")
                     .getString("sender.teleport-request-accepted")
                     .replace("%sender%", sender.getName())
@@ -125,7 +133,7 @@ public class TeleportRequest {
     /**
      * Deny request
      */
-    public void deny(){
+    public void deny() {
         plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml")
                 .getString("sender.teleport-request-denied")
                 .replace("%sender%", sender.getName())
@@ -136,7 +144,6 @@ public class TeleportRequest {
                 .replace("%sender%", sender.getName())
                 .replace("%receiver%", receiver.getName())
         );
-        new TeleportHandler(this.plugin).teleportPlayerToPlayer(this.sender, this.receiver);
         this.cancel();
     }
 
@@ -151,6 +158,7 @@ public class TeleportRequest {
 
     /**
      * Show buttons for player
+     *
      * @param receiver the player who will be used
      */
     private void buttons(ProxiedPlayer receiver) {
