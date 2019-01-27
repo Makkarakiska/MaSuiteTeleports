@@ -1,6 +1,6 @@
 package fi.matiaspaavilainen.masuiteteleports.bukkit.commands.requests;
 
-import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
+import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.MaSuiteTeleports;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -28,14 +28,14 @@ public class To implements CommandExecutor {
                 return;
             }
 
-            if (plugin.in_command.contains(sender)) { // this function is not really necessary, but safety first
+            if (plugin.in_command.contains(sender)) {
                 plugin.formator.sendMessage(sender, plugin.config.load(null, "messages.yml").getString("on-active-command"));
                 return;
             }
 
             plugin.in_command.add(sender);
             Player p = (Player) sender;
-            new PluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportRequestTo", sender.getName(), args[0]}).send();
+            new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportRequestTo", sender.getName(), args[0]}).send();
             plugin.in_command.remove(sender);
 
         });

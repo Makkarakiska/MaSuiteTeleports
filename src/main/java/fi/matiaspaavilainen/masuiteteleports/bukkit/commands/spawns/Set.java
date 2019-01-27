@@ -1,6 +1,6 @@
 package fi.matiaspaavilainen.masuiteteleports.bukkit.commands.spawns;
 
-import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
+import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.MaSuiteTeleports;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -43,7 +43,7 @@ public class Set implements CommandExecutor {
 
             Player p = (Player) sender;
             Location loc = p.getLocation();
-            new PluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "SetSpawn", p.getName(),
+            new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "SetSpawn", p.getName(),
                     loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":"
                     + loc.getYaw() + ":" + loc.getPitch(), args[0].toLowerCase()}).send();
             plugin.in_command.remove(sender);

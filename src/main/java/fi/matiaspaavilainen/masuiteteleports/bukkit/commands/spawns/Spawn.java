@@ -1,6 +1,6 @@
 package fi.matiaspaavilainen.masuiteteleports.bukkit.commands.spawns;
 
-import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
+import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.MaSuiteTeleports;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -34,7 +34,7 @@ public class Spawn implements CommandExecutor {
             }
             plugin.in_command.add(sender);
             Player p = (Player) sender;
-            new PluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "SpawnPlayer", p.getName()}).send();
+            new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "SpawnPlayer", p.getName()}).send();
             plugin.in_command.remove(sender);
 
         });
