@@ -1,11 +1,15 @@
 package fi.matiaspaavilainen.masuiteteleports.bungee.listeners;
 
+import fi.matiaspaavilainen.masuitecore.bungee.Utils;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
 import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
 import fi.matiaspaavilainen.masuiteteleports.bungee.commands.SpawnCommand;
 import fi.matiaspaavilainen.masuiteteleports.bungee.commands.TeleportForceCommand;
-import fi.matiaspaavilainen.masuiteteleports.bungee.commands.TeleportRequestCommand;
+import fi.matiaspaavilainen.masuiteteleports.bungee.managers.PlayerFinder;
 import fi.matiaspaavilainen.masuiteteleports.bungee.managers.Teleport;
+import fi.matiaspaavilainen.masuiteteleports.core.handlers.TeleportHandler;
+import fi.matiaspaavilainen.masuiteteleports.core.objects.TeleportRequest;
+import fi.matiaspaavilainen.masuiteteleports.core.objects.TeleportType;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
@@ -20,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class TeleportMessageListener implements Listener {
 
     private MaSuiteTeleports plugin;
-
+    private Utils utils = new Utils();
     public TeleportMessageListener(MaSuiteTeleports plugin) {
         this.plugin = plugin;
     }
@@ -65,24 +69,54 @@ public class TeleportMessageListener implements Listener {
             }
 
             //Teleportation requests
-            TeleportRequestCommand tprequest = new TeleportRequestCommand(plugin);
+            ProxiedPlayer receiver;
             switch (childchannel) {
                 case "TeleportRequestTo":
-                    tprequest.tpa(sender, in.readUTF());
+                    receiver = new PlayerFinder().get(in.readUTF());
+                    if (utils.isOnline(receiver, sender)) {
+                        TeleportRequest request = new TeleportRequest(plugin, sender, receiver, TeleportType.REQUEST_TO);
+                        request.create();
+                    }
                     break;
                 case "TeleportRequestHere":
-                    tprequest.tpahere(sender, in.readUTF());
+                    receiver = new PlayerFinder().get(in.readUTF());
+                    if (utils.isOnline(receiver, sender)) {
+                        TeleportRequest request = new TeleportRequest(plugin, sender, receiver, TeleportType.REQUEST_HERE);
+                        request.create();
+                    }
                     break;
                 case "TeleportAccept":
-                    tprequest.tpaccept(sender);
+                    if (utils.isOnline(sender)) {
+                        TeleportRequest request = TeleportHandler.getTeleportRequest(sender);
+                        if (request != null) {
+                            request.accept();
+                        } else {
+                            plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("receiver.no-pending-teleport-requests"));
+                        }
+                    }
                     break;
                 case "TeleportDeny":
-                    tprequest.tpdeny(sender);
+                    if (utils.isOnline(sender)) {
+                        TeleportRequest request = TeleportHandler.getTeleportRequest(sender);
+                        if (request != null) {
+                            request.deny();
+                        } else {
+                            plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("receiver.no-pending-teleport-requests"));
+                        }
+                    }
                     break;
                 case "TeleportLock":
                     String c = in.readUTF();
                     if (c.equals("Enable")) {
-                        tprequest.tplock(sender, in.readBoolean());
+                        if (utils.isOnline(sender)) {
+                            boolean lock = in.readBoolean();
+                            Teleport.lock.put(sender.getUniqueId(), lock);
+                            if (lock) {
+                                plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("tpalock.allow"));
+                            } else {
+                                plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("tpalock.deny"));
+                            }
+                        }
                         break;
                     }
                     if (c.equals("Disable")) {
