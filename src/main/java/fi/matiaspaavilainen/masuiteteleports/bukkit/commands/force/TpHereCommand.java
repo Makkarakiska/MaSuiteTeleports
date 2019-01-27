@@ -35,7 +35,7 @@ public class TpHereCommand implements CommandExecutor {
 
             plugin.in_command.add(sender);
             Player p = (Player) sender;
-            new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceHere", sender.getName(), args[0]}).send();
+            new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceHere", sender.getName(), args[0], p.hasPermission("masuiteteleports.teleport.toggle.bypass")}).send();
             plugin.in_command.remove(sender);
 
         });

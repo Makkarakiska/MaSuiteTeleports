@@ -40,7 +40,7 @@ public class TpCommand implements CommandExecutor {
 
             switch (args.length) {
                 case (1):
-                    new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportSenderToTarget", args[0]}).send();
+                    new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportSenderToTarget", args[0], p.hasPermission("masuiteteleports.teleport.toggle.bypass")}).send();
                     break;
                 case (2):
                     new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportTargetToTarget", args[0], args[1]}).send();
