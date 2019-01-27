@@ -1,4 +1,4 @@
-package fi.matiaspaavilainen.masuiteteleports.bungee.managers;
+package fi.matiaspaavilainen.masuiteteleports.core.objects;
 
 import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
