@@ -2,11 +2,10 @@ package fi.matiaspaavilainen.masuiteteleports.bungee.listeners;
 
 import fi.matiaspaavilainen.masuitecore.bungee.Utils;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
+import fi.matiaspaavilainen.masuitecore.core.utils.PlayerFinder;
 import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
 import fi.matiaspaavilainen.masuiteteleports.bungee.commands.SpawnCommand;
 import fi.matiaspaavilainen.masuiteteleports.bungee.commands.TeleportForceCommand;
-import fi.matiaspaavilainen.masuiteteleports.bungee.managers.PlayerFinder;
-import fi.matiaspaavilainen.masuiteteleports.bungee.managers.Teleport;
 import fi.matiaspaavilainen.masuiteteleports.core.handlers.TeleportHandler;
 import fi.matiaspaavilainen.masuiteteleports.core.objects.TeleportRequest;
 import fi.matiaspaavilainen.masuiteteleports.core.objects.TeleportType;
@@ -110,7 +109,7 @@ public class TeleportMessageListener implements Listener {
                     if (c.equals("Enable")) {
                         if (utils.isOnline(sender)) {
                             boolean lock = in.readBoolean();
-                            Teleport.lock.put(sender.getUniqueId(), lock);
+                            TeleportHandler.lock.put(sender.getUniqueId(), lock);
                             if (lock) {
                                 plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("tpalock.allow"));
                             } else {
@@ -120,8 +119,8 @@ public class TeleportMessageListener implements Listener {
                         break;
                     }
                     if (c.equals("Disable")) {
-                        if (Teleport.lock.containsKey(sender.getUniqueId())) {
-                            Teleport.lock.remove(sender.getUniqueId());
+                        if (TeleportHandler.lock.containsKey(sender.getUniqueId())) {
+                            TeleportHandler.lock.remove(sender.getUniqueId());
                             plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("tpalock.disabled"));
                         } else {
                             plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("tpalock.not-locked"));
