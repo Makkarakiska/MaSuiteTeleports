@@ -31,3 +31,7 @@ tpalock:
   deny: "&cYou are now &ldenying &cteleportation requests"
   disabled: "&cTeleport lock is now disabled"
   not-locked: "&cYou haven't locked teleportation requests"
+tptoggle:
+  on: "&cYou are now denying force teleportations!"
+  off: "&aYou are now allowing force teleportations!"
+  disabled: "&c%player has disabled force teleportations!"
