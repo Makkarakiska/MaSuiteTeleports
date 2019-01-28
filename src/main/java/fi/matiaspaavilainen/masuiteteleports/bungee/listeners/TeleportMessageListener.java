@@ -74,6 +74,8 @@ public class TeleportMessageListener implements Listener {
                 case "TeleportRequestTo":
                     receiver = new PlayerFinder().get(in.readUTF());
                     if (utils.isOnline(receiver, sender)) {
+                        if (checkIfPending(sender, sender, receiver, "sender")) return;
+                        if (checkIfPending(receiver, sender, receiver, "receiver")) return;
                         TeleportRequest request = new TeleportRequest(plugin, sender, receiver, TeleportType.REQUEST_TO);
                         request.create();
                     }
@@ -81,6 +83,8 @@ public class TeleportMessageListener implements Listener {
                 case "TeleportRequestHere":
                     receiver = new PlayerFinder().get(in.readUTF());
                     if (utils.isOnline(receiver, sender)) {
+                        if (checkIfPending(sender, sender, receiver, "sender")) return;
+                        if (checkIfPending(receiver, sender, receiver, "receiver")) return;
                         TeleportRequest request = new TeleportRequest(plugin, sender, receiver, TeleportType.REQUEST_HERE);
                         request.create();
                     }
@@ -193,6 +197,20 @@ public class TeleportMessageListener implements Listener {
                     plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("back.no-loc"));
                 }
             }
+
         }
+    }
+
+    private boolean checkIfPending(ProxiedPlayer user, ProxiedPlayer sender, ProxiedPlayer receiver, String type) {
+        TeleportRequest req = TeleportHandler.getTeleportRequest(user);
+        if (req != null) {
+            plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml")
+                    .getString("sender.teleport-request-pending." + type)
+                    .replace("%sender%", sender.getName())
+                    .replace("%receiver%", receiver.getName())
+            );
+            return true;
+        }
+        return false;
     }
 }
