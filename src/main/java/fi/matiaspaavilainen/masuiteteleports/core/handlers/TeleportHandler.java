@@ -7,6 +7,7 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class TeleportHandler {
 
@@ -20,22 +21,25 @@ public class TeleportHandler {
         this.plugin = plugin;
     }
 
-    public void teleportPlayerToPlayer(ProxiedPlayer sender, ProxiedPlayer receiver){
-        if (!receiver.getServer().getInfo().getName().equals(sender.getServer().getInfo().getName())) {
-            receiver.connect(ProxyServer.getInstance().getServerInfo(sender.getServer().getInfo().getName()));
-        }
-
-        new BungeePluginChannel(plugin, sender.getServer().getInfo(), new Object[]{
+    public void teleportPlayerToPlayer(ProxiedPlayer sender, ProxiedPlayer receiver) {
+        BungeePluginChannel bpc = new BungeePluginChannel(plugin, sender.getServer().getInfo(), new Object[]{
                 "MaSuiteTeleports",
                 "PlayerToPlayer",
                 sender.getName(),
                 receiver.getName()
-        }).send();
+        });
+
+        if (!receiver.getServer().getInfo().getName().equals(sender.getServer().getInfo().getName())) {
+            receiver.connect(ProxyServer.getInstance().getServerInfo(sender.getServer().getInfo().getName()));
+            plugin.getProxy().getScheduler().schedule(plugin, bpc::send, 500, TimeUnit.MICROSECONDS);
+        } else {
+            bpc.send();
+        }
     }
 
-    public static TeleportRequest getTeleportRequest(ProxiedPlayer player){
-        for(TeleportRequest request : requests){
-            if(request.getReceiver().equals(player)){
+    public static TeleportRequest getTeleportRequest(ProxiedPlayer player) {
+        for (TeleportRequest request : requests) {
+            if (request.getReceiver().equals(player)) {
                 return request;
             }
         }
