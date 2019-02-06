@@ -141,6 +141,7 @@ public class TeleportMessageListener implements Listener {
                         TeleportHandler.toggles.add(sender.getUniqueId());
                         plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("tptoggle.on"));
                     }
+                    break;
             }
 
             //Teleportation forces

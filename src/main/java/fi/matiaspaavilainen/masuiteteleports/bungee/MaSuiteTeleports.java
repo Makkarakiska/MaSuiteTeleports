@@ -43,7 +43,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         new Updator(new String[]{getDescription().getVersion(), getDescription().getName(), "60125"}).checkUpdates();
 
         config.addDefault("teleports/messages.yml", "receiver.teleported", "&7You have been teleported to &b%player%&7!");
-        config.addDefault("teleports/messages.yml", "sender.teleported", "&b%player%&7 has been teleported to you!");
+        config.addDefault("teleports/messages.yml", "sender.teleported", "&9%player%&7 has been teleported to you!");
         config.addDefault("teleports/messages.yml", "tptoggle.on", "&cYou are now denying force teleportations!");
         config.addDefault("teleports/messages.yml", "tptoggle.off", "&aYou are now allowing force teleportations!");
         config.addDefault("teleports/messages.yml", "tptoggle.disabled", "&c%player has disabled force teleportations!");

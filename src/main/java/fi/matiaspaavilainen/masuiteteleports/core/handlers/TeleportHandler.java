@@ -3,6 +3,7 @@ package fi.matiaspaavilainen.masuiteteleports.core.handlers;
 import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
 import fi.matiaspaavilainen.masuiteteleports.core.objects.TeleportRequest;
+import fi.matiaspaavilainen.masuiteteleports.core.objects.TeleportType;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -22,16 +23,28 @@ public class TeleportHandler {
     }
 
     public void teleportPlayerToPlayer(ProxiedPlayer sender, ProxiedPlayer receiver) {
-        BungeePluginChannel bpc = new BungeePluginChannel(plugin, sender.getServer().getInfo(), new Object[]{
+        TeleportRequest request = getTeleportRequest(receiver);
+        if (request == null || !request.getSender().equals(sender)) {
+            teleport(sender, receiver);
+            return;
+        }
+        if (request.getType().equals(TeleportType.REQUEST_HERE)) {
+            teleport(receiver, sender);
+        } else if (request.getType().equals(TeleportType.REQUEST_TO)) {
+            teleport(sender, receiver);
+        }
+    }
+
+    private void teleport(ProxiedPlayer sender, ProxiedPlayer receiver) {
+        BungeePluginChannel bpc = new BungeePluginChannel(plugin, receiver.getServer().getInfo(), new Object[]{
                 "MaSuiteTeleports",
                 "PlayerToPlayer",
                 sender.getName(),
                 receiver.getName()
         });
-
-        if (!receiver.getServer().getInfo().getName().equals(sender.getServer().getInfo().getName())) {
-            receiver.connect(ProxyServer.getInstance().getServerInfo(sender.getServer().getInfo().getName()));
-            plugin.getProxy().getScheduler().schedule(plugin, bpc::send, 500, TimeUnit.MICROSECONDS);
+        if (!sender.getServer().getInfo().getName().equals(receiver.getServer().getInfo().getName())) {
+            sender.connect(ProxyServer.getInstance().getServerInfo(receiver.getServer().getInfo().getName()));
+            ProxyServer.getInstance().getScheduler().schedule(plugin, bpc::send, 500, TimeUnit.MILLISECONDS);
         } else {
             bpc.send();
         }
