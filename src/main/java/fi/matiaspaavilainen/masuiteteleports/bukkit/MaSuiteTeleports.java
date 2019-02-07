@@ -1,14 +1,14 @@
 package fi.matiaspaavilainen.masuiteteleports.bukkit;
 
 import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.bukkit.commands.PlayerTabCompleter;
 import fi.matiaspaavilainen.masuitecore.core.Updator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
-import fi.matiaspaavilainen.masuitecore.core.objects.PluginChannel;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.BackCommand;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.TpAllCommand;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.TpHereCommand;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.TpCommand;
+import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.TpHereCommand;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.TpToggleCommand;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.requests.*;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.spawns.SpawnDeleteCommand;
@@ -53,7 +53,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
 
         // Load commands
         loadCommands();
-
+        loadTabCompleters();
         new Updator(new String[]{getDescription().getVersion(), getDescription().getName(), "60125"}).checkUpdates();
     }
 
@@ -78,6 +78,16 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
 
         // Back
         getCommand("back").setExecutor(new BackCommand(this));
+    }
+
+
+    private void loadTabCompleters() {
+        getCommand("tpall").setTabCompleter(new PlayerTabCompleter(1));
+        getCommand("tphere").setTabCompleter(new PlayerTabCompleter(1));
+        getCommand("tp").setTabCompleter(new PlayerTabCompleter(1));
+
+        getCommand("tpa").setTabCompleter(new PlayerTabCompleter(1));
+        getCommand("tpahere").setTabCompleter(new PlayerTabCompleter(1));
     }
 
     @EventHandler
@@ -133,7 +143,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         if (getConfig().getBoolean("spawn.first")) {
             if (!e.getPlayer().hasPlayedBefore()) {
-                getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new PluginChannel(this, e.getPlayer(), new Object[]{"MaSuiteTeleports", "FirstSpawnPlayer", e.getPlayer().getName()}).send(), 10);
+                getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new BukkitPluginChannel(this, e.getPlayer(), new Object[]{"MaSuiteTeleports", "FirstSpawnPlayer", e.getPlayer().getName()}).send(), 10);
             }
         }
     }
