@@ -16,7 +16,6 @@ commands:
     aliases: [spawndel, deletespawn]
     description: Deletes spawn point of the server
   tp:
-    permission: masuiteteleports.teleport.force
     aliases: [teleport]
     description: Teleports to given target
   tptoggle:
@@ -50,3 +49,4 @@ commands:
     description: Locks request to accepting or denying them
   back:
     permission: masuiteteleports.back
+    description: Teleports to your last known location
