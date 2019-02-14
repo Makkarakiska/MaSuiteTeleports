@@ -87,6 +87,8 @@ public class TeleportListener implements PluginMessageListener {
             }
         }, 5);
 
-        Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> plugin.tpQue.remove(player.getUniqueId()), 100);
+        if (player != null) {
+            Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> plugin.tpQue.remove(player.getUniqueId()), 100);
+        }
     }
 }
