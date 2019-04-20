@@ -133,6 +133,15 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
         }
 
     }
+    
+    @EventHandler (ignoreCancelled = true)
+    public void playerTeleport(PlayerTeleportEvent e) {
+        if (e.getPlayer() instanceof Player) {
+            Location loc = e.getPlayer().getLocation();
+            new PluginChannel(this, e.getPlayer(), new Object[]{"MaSuiteTeleports", "GetLocation", e.getPlayer().getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()}).send();
+
+        }
+    }
 
     @EventHandler
     public void onLeave(PlayerQuitEvent e) {
