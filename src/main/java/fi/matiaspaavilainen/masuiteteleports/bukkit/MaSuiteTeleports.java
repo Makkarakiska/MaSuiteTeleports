@@ -137,10 +137,11 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
     
     @EventHandler (ignoreCancelled = true)
     public void playerTeleport(PlayerTeleportEvent e) {
-        if (e.getPlayer() instanceof Player) {
+
+        //Ignore non-players and no command or plugins reasons
+        if (e.getPlayer() instanceof Player && (e.getCause() == PlayerTeleportEvent.TeleportCause.PLUGIN || e.getCause() == PlayerTeleportEvent.TeleportCause.COMMAND) && !e.getPlayer().hasMetadata("NPC")) {
             Location loc = e.getPlayer().getLocation();
             new BukkitPluginChannel(this, e.getPlayer(), new Object[]{"MaSuiteTeleports", "GetLocation", e.getPlayer().getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()}).send();
-
         }
     }
 
