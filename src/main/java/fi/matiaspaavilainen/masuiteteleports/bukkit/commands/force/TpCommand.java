@@ -88,9 +88,9 @@ public class TpCommand implements CommandExecutor {
                     // If not, send target to XYZ
                     new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportToXYZ",
                             args[0],
-                            parse(args[0], p.getLocation().getX()),
-                            parse(args[1], p.getLocation().getY()),
-                            parse(args[2], p.getLocation().getZ())}).send();
+                            parse(args[1], p.getLocation().getX()),
+                            parse(args[2], p.getLocation().getY()),
+                            parse(args[3], p.getLocation().getZ())}).send();
                     break;
                 case (5):
                     // TpCommand target to location
