@@ -39,6 +39,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
 
     public final List<CommandSender> in_command = new ArrayList<>();
     public List<UUID> tpQue = new ArrayList<>();
+    public static List<Player> ignoreTeleport = new ArrayList<>();
 
 
     @Override
@@ -140,6 +141,12 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
 
         //Ignore non-players and no command or plugins reasons
         if (e.getPlayer() instanceof Player && (e.getCause() == PlayerTeleportEvent.TeleportCause.PLUGIN || e.getCause() == PlayerTeleportEvent.TeleportCause.COMMAND) && !e.getPlayer().hasMetadata("NPC")) {
+
+            if(ignoreTeleport.contains(e.getPlayer())) {
+                ignoreTeleport.remove(e.getPlayer());
+                return;
+            }
+
             Location loc = e.getPlayer().getLocation();
             new BukkitPluginChannel(this, e.getPlayer(), new Object[]{"MaSuiteTeleports", "GetLocation", e.getPlayer().getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()}).send();
         }
@@ -148,10 +155,16 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
     @EventHandler
     public void onLeave(PlayerQuitEvent e) {
         in_command.remove(e.getPlayer());
+        ignoreTeleport.remove(e.getPlayer());
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
+
+        // Prevent save back location accross servers on the destination server
+        ignoreTeleport.add(e.getPlayer());
+        getServer().getScheduler().runTaskLaterAsynchronously( this, () -> ignoreTeleport.remove(e.getPlayer()), 20 );
+
         if (getConfig().getBoolean("spawn.first")) {
             if (!e.getPlayer().hasPlayedBefore()) {
                 getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new BukkitPluginChannel(this, e.getPlayer(), new Object[]{"MaSuiteTeleports", "FirstSpawnPlayer", e.getPlayer().getName()}).send(), 10);
