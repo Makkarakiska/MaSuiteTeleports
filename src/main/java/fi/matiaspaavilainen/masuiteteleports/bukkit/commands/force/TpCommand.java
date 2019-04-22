@@ -57,6 +57,20 @@ public class TpCommand implements CommandExecutor {
                             parse(args[2], p.getLocation().getZ())}).send();
                     break;
                 case (4):
+
+                    // tp <x> <y> <z> <world>
+                    if(!Double.isNaN(parse(args[0], 0)) && !Double.isNaN(parse(args[1], 0)) && !Double.isNaN(parse(args[2], 0))) {
+                        if (Bukkit.getWorlds().stream().anyMatch(world -> world.getName().equals(args[3]))) {
+                            new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportToCoordinates",
+                                    sender.getName(),
+                                    args[3],
+                                    parse(args[0], p.getLocation().getX()),
+                                    parse(args[1], p.getLocation().getY()),
+                                    parse(args[2], p.getLocation().getZ())}).send();
+                            break;
+                        }
+                    }
+
                     if (Double.isNaN(parse(args[1], 0)) && Double.isNaN(parse(args[2], 0)) && Double.isNaN(parse(args[3], 0))) {
                         return;
                     }
@@ -74,9 +88,9 @@ public class TpCommand implements CommandExecutor {
                     // If not, send target to XYZ
                     new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "TeleportForceTo", sender.getName(), "TeleportToXYZ",
                             args[0],
-                            parse(args[0], p.getLocation().getX()),
-                            parse(args[1], p.getLocation().getY()),
-                            parse(args[2], p.getLocation().getZ())}).send();
+                            parse(args[1], p.getLocation().getX()),
+                            parse(args[2], p.getLocation().getY()),
+                            parse(args[3], p.getLocation().getZ())}).send();
                     break;
                 case (5):
                     // TpCommand target to location
