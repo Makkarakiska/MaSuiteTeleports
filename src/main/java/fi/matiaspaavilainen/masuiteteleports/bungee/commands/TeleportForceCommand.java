@@ -34,7 +34,7 @@ public class TeleportForceCommand {
                 return;
             }
             plugin.positions.requestPosition(sender);
-            teleportHandler.teleportPlayerToPlayer(sender, target);
+            teleportHandler.teleport(sender, target);
             formator.sendMessage(sender, config.load("teleports", "messages.yml")
                     .getString("receiver.teleported")
                     .replace("%player%", target.getName())
@@ -48,7 +48,7 @@ public class TeleportForceCommand {
         ProxiedPlayer target2 = new PlayerFinder().get(t2);
         if (utils.isOnline(target1, sender) && utils.isOnline(target2, sender)) {
             plugin.positions.requestPosition(target1);
-            teleportHandler.teleportPlayerToPlayer(target1, target2);
+            teleportHandler.teleport(target1, target2);
             formator.sendMessage(target1, config.load("teleports", "messages.yml")
                     .getString("receiver.teleported")
                     .replace("%player%", target2.getName())
@@ -88,7 +88,7 @@ public class TeleportForceCommand {
                 return;
             }
             plugin.positions.requestPosition(target);
-            teleportHandler.teleportPlayerToPlayer(target, sender);
+            teleportHandler.teleport(target, sender);
             formator.sendMessage(sender, config.load("teleports", "messages.yml")
                     .getString("sender.teleported")
                     .replace("%player%", target.getName())
@@ -100,7 +100,7 @@ public class TeleportForceCommand {
         if (utils.isOnline(target)) {
             for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
                 plugin.positions.requestPosition(player);
-                teleportHandler.teleportPlayerToPlayer(player, target);
+                teleportHandler.teleport(player, target);
                 formator.sendMessage(player, config.load("teleports", "messages.yml")
                         .getString("receiver.teleported")
                         .replace("%player%", target.getName())

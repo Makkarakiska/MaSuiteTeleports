@@ -35,7 +35,8 @@ public class TeleportHandler {
         }
     }
 
-    private void teleport(ProxiedPlayer sender, ProxiedPlayer receiver) {
+
+    public void teleport(ProxiedPlayer sender, ProxiedPlayer receiver) {
         BungeePluginChannel bpc = new BungeePluginChannel(plugin, receiver.getServer().getInfo(), new Object[]{
                 "MaSuiteTeleports",
                 "PlayerToPlayer",
