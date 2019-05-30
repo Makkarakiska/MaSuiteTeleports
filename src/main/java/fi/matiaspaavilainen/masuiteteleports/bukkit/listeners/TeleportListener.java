@@ -39,6 +39,7 @@ public class TeleportListener implements PluginMessageListener {
                         return;
                     }
                     plugin.tpQue.add(p.getUniqueId());
+                    p.eject();
                     p.teleport(new Location(p.getWorld(), in.readDouble(), in.readDouble(), in.readDouble()));
                     Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> plugin.tpQue.remove(p.getUniqueId()), 100);
                 }
@@ -48,6 +49,7 @@ public class TeleportListener implements PluginMessageListener {
                         return;
                     }
                     plugin.tpQue.add(p.getUniqueId());
+                    p.eject();
                     p.teleport(new Location(Bukkit.getWorld(in.readUTF()), in.readDouble(), in.readDouble(), in.readDouble()));
                     Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> plugin.tpQue.remove(p.getUniqueId()), 100);
                 }
@@ -59,6 +61,7 @@ public class TeleportListener implements PluginMessageListener {
                     }
                     String[] locInfo = in.readUTF().split(":");
                     Location loc = new Location(Bukkit.getWorld(locInfo[0]), Double.parseDouble(locInfo[1]), Double.parseDouble(locInfo[2]), Double.parseDouble(locInfo[3]), Float.parseFloat(locInfo[4]), Float.parseFloat(locInfo[5]));
+                    p.eject();
                     p.teleport(loc);
                 }
                 if (method.equals("GetLocation")) {
@@ -83,6 +86,7 @@ public class TeleportListener implements PluginMessageListener {
         Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> {
             if (player != null && target != null) {
                 plugin.tpQue.add(player.getUniqueId());
+                player.eject();
                 player.teleport(target);
             }
         }, 5);
