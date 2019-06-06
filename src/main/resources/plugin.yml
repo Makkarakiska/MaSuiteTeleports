@@ -3,6 +3,7 @@ main: fi.matiaspaavilainen.masuiteteleports.bukkit.MaSuiteTeleports
 version: ${project.version}
 author: Masagameplay
 depends: [MaSuiteCore]
+softdepend: [Multiverse, Multiworld]
 commands:
   spawn:
     permission: masuiteteleports.spawn.teleport
