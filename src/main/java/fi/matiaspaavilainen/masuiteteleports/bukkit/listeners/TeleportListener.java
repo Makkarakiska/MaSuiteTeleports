@@ -43,11 +43,11 @@ public class TeleportListener implements PluginMessageListener {
                     
                     Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                     	try {
-							p.teleport(new Location(p.getWorld(), in.readDouble(), in.readDouble(), in.readDouble()));
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-	                 }, 1);
+				p.teleport(new Location(p.getWorld(), in.readDouble(), in.readDouble(), in.readDouble()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	            }, 1);
                     
                     Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> plugin.tpQue.remove(p.getUniqueId()), 100);
                 }
@@ -61,11 +61,11 @@ public class TeleportListener implements PluginMessageListener {
                     
                     Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                     	try {
-                    		p.teleport(new Location(Bukkit.getWorld(in.readUTF()), in.readDouble(), in.readDouble(), in.readDouble()));
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-	                 }, 1);
+				p.teleport(new Location(Bukkit.getWorld(in.readUTF()), in.readDouble(), in.readDouble(), in.readDouble()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	            }, 1);
                     
                     Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> plugin.tpQue.remove(p.getUniqueId()), 100);
                 }
@@ -79,9 +79,9 @@ public class TeleportListener implements PluginMessageListener {
                     Location loc = new Location(Bukkit.getWorld(locInfo[0]), Double.parseDouble(locInfo[1]), Double.parseDouble(locInfo[2]), Double.parseDouble(locInfo[3]), Float.parseFloat(locInfo[4]), Float.parseFloat(locInfo[5]));
                     p.leaveVehicle();
                     
-                    Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+		    Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
                     	p.teleport(loc);
-	                 }, 1);
+		    }, 1);
                 }
                 if (method.equals("GetLocation")) {
                     Player p = Bukkit.getPlayer(in.readUTF());
