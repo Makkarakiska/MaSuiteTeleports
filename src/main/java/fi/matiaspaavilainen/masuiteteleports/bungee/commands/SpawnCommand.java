@@ -44,7 +44,8 @@ public class SpawnCommand {
                 formator.sendMessage(p, config.load("teleports", "messages.yml").getString("spawn.teleported"));
             }
 
-            MaSuiteTeleports.cooldowns.put(p.getUniqueId(), System.currentTimeMillis());
+            if(!p.hasPermission("masuiteteleports.cooldown.override"))
+                MaSuiteTeleports.cooldowns.put(p.getUniqueId(), System.currentTimeMillis());
         }
     }
 

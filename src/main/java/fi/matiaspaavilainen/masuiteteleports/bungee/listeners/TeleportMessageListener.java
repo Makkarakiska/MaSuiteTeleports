@@ -193,7 +193,8 @@ public class TeleportMessageListener implements Listener {
                         tpforce.tp(sender, sender.getName(), plugin.positions.positions.get(sender.getUniqueId()));
                     }
                     plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("back.last-loc"));
-                    MaSuiteTeleports.cooldowns.put(sender.getUniqueId(), System.currentTimeMillis());
+                    if(!sender.hasPermission("masuiteteleports.cooldown.override"))
+                        MaSuiteTeleports.cooldowns.put(sender.getUniqueId(), System.currentTimeMillis());
                 } else {
                     plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("back.no-loc"));
                 }
