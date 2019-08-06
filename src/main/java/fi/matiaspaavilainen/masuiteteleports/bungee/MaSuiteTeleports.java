@@ -47,6 +47,6 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         config.addDefault("teleports/messages.yml", "tptoggle.on", "&cYou are now denying force teleportations!");
         config.addDefault("teleports/messages.yml", "tptoggle.off", "&aYou are now allowing force teleportations!");
         config.addDefault("teleports/messages.yml", "tptoggle.disabled", "&c%player has disabled force teleportations!");
-        config.addDefault("teleports/settings.yml", "teleport-delay", 500);
+        config.addDefault("teleports/settings.yml", "teleport-delay", 750);
     }
 }

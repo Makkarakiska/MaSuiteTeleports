@@ -147,7 +147,7 @@ public class Spawn {
 
             if (!spawn.getServer().equals(p.getServer().getInfo().getName())) {
                 p.connect(ProxyServer.getInstance().getServerInfo(spawn.getServer()));
-                ProxyServer.getInstance().getScheduler().schedule(plugin, bpc::send, 500, TimeUnit.MILLISECONDS);
+                ProxyServer.getInstance().getScheduler().schedule(plugin, bpc::send, plugin.config.load("teleports", "settings.yml").getInt("teleport-delay"), TimeUnit.MILLISECONDS);
             } else {
                 bpc.send();
             }
