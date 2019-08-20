@@ -126,6 +126,7 @@ public class Spawn {
      * @return if player has been spawned or not
      */
     public boolean spawn(ProxiedPlayer p, MaSuiteTeleports plugin, int type) {
+        if (p == null) return false;
         Spawn spawn = new Spawn().find(p.getServer().getInfo().getName(), type);
         if (spawn == null) {
             if (type == 0) {
@@ -134,23 +135,24 @@ public class Spawn {
             return false;
         }
 
-            if (type == 0) {
-                plugin.positions.requestPosition(p);
-            }
-            Location loc = spawn.getLocation();
-            BungeePluginChannel bpc = new BungeePluginChannel(plugin, p.getServer().getInfo(), new Object[]{
-                    "MaSuiteTeleports",
-                    "SpawnPlayer",
-                    p.getName(),
-                    loc.getWorld() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()
-            });
 
-            if (!spawn.getServer().equals(p.getServer().getInfo().getName())) {
-                p.connect(ProxyServer.getInstance().getServerInfo(spawn.getServer()));
-                ProxyServer.getInstance().getScheduler().schedule(plugin, bpc::send, plugin.config.load("teleports", "settings.yml").getInt("teleport-delay"), TimeUnit.MILLISECONDS);
-            } else {
-                bpc.send();
-            }
+        if (type == 0) {
+            plugin.positions.requestPosition(p);
+        }
+        Location loc = spawn.getLocation();
+        BungeePluginChannel bpc = new BungeePluginChannel(plugin, p.getServer().getInfo(), new Object[]{
+                "MaSuiteTeleports",
+                "SpawnPlayer",
+                p.getName(),
+                loc.getWorld() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()
+        });
+
+        if (!spawn.getServer().equals(p.getServer().getInfo().getName())) {
+            p.connect(ProxyServer.getInstance().getServerInfo(spawn.getServer()));
+            ProxyServer.getInstance().getScheduler().schedule(plugin, bpc::send, plugin.config.load("teleports", "settings.yml").getInt("teleport-delay"), TimeUnit.MILLISECONDS);
+        } else {
+            bpc.send();
+        }
 
         return true;
     }
