@@ -188,7 +188,7 @@ public class TeleportMessageListener implements Listener {
                 if (plugin.positions.positions.containsKey(sender.getUniqueId())) {
                     if (!plugin.positions.positions.get(sender.getUniqueId()).getServer().equals(sender.getServer().getInfo())) {
                         sender.connect(plugin.positions.positions.get(sender.getUniqueId()).getServer());
-                        ProxyServer.getInstance().getScheduler().schedule(plugin, () -> tpforce.tp(sender, sender.getName(), plugin.positions.positions.get(sender.getUniqueId())), config.load("teleports", "settings.yml").getInt("teleport-delay"), TimeUnit.MILLISECONDS);
+                        ProxyServer.getInstance().getScheduler().schedule(plugin, () -> tpforce.tp(sender, sender.getName(), plugin.positions.positions.get(sender.getUniqueId())), plugin.config.load("teleports", "settings.yml").getInt("teleport-delay"), TimeUnit.MILLISECONDS);
                     } else {
                         tpforce.tp(sender, sender.getName(), plugin.positions.positions.get(sender.getUniqueId()));
                     }
