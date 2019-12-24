@@ -3,15 +3,11 @@ package fi.matiaspaavilainen.masuiteteleports.core.objects;
 import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
-import fi.matiaspaavilainen.masuitecore.core.database.ConnectionManager;
-import fi.matiaspaavilainen.masuitecore.core.database.Database;
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
 import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -20,15 +16,11 @@ import java.util.concurrent.TimeUnit;
 
 public class Spawn {
 
-    private Database db = ConnectionManager.db;
     private String server;
     private Location location;
     private int type;
 
-    private Connection connection = null;
-    private PreparedStatement statement = null;
     private BungeeConfiguration config = new BungeeConfiguration();
-    private String tablePrefix = db.getTablePrefix();
 
     /**
      * An empty constructor for Spawn

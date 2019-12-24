@@ -2,8 +2,8 @@ package fi.matiaspaavilainen.masuiteteleports.bungee;
 
 import fi.matiaspaavilainen.masuitecore.bungee.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.Updator;
+import fi.matiaspaavilainen.masuitecore.core.api.MaSuiteCoreAPI;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
-import fi.matiaspaavilainen.masuitecore.core.database.ConnectionManager;
 import fi.matiaspaavilainen.masuiteteleports.bungee.listeners.PlayerJoinEvent;
 import fi.matiaspaavilainen.masuiteteleports.bungee.listeners.PlayerQuitEvent;
 import fi.matiaspaavilainen.masuiteteleports.bungee.listeners.PositionListener;
@@ -21,6 +21,8 @@ public class MaSuiteTeleports extends Plugin implements Listener {
     public static HashMap<UUID, Long> cooldowns = new HashMap<>();
     public PositionListener positions = new PositionListener(this);
 
+    public MaSuiteCoreAPI api = new MaSuiteCoreAPI();
+
     @Override
     public void onEnable() {
 
@@ -33,14 +35,8 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         getProxy().getPluginManager().registerListener(this, new TeleportMessageListener(this));
         getProxy().getPluginManager().registerListener(this, new PlayerJoinEvent(this));
         getProxy().getPluginManager().registerListener(this, new PlayerQuitEvent());
-
-        // Table creation
-        ConnectionManager.db.createTable("spawns",
-                "(id INT(10) unsigned NOT NULL PRIMARY KEY AUTO_INCREMENT, server VARCHAR(100) NOT NULL, world VARCHAR(100) NOT NULL, x DOUBLE, y DOUBLE, z DOUBLE, yaw FLOAT, pitch FLOAT, type TINYINT(1) NULL DEFAULT 0) " +
-                        "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-
         // Check updates
-        new Updator(new String[]{getDescription().getVersion(), getDescription().getName(), "60125"}).checkUpdates();
+        new Updator(getDescription().getVersion(), getDescription().getName(), "60125").checkUpdates();
 
         config.addDefault("teleports/messages.yml", "receiver.teleported", "&7You have been teleported to &b%player%&7!");
         config.addDefault("teleports/messages.yml", "sender.teleported", "&9%player%&7 has been teleported to you!");

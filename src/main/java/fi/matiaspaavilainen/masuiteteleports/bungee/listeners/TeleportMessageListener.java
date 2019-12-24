@@ -42,7 +42,7 @@ public class TeleportMessageListener implements Listener {
             if (childchannel.equals("GetLocation")) {
                 if (sender != null) {
                     String[] ploc = in.readUTF().split(":");
-                    Location loc = new Location(sender.getServer().getInfo(), ploc[0], Double.parseDouble(ploc[1]), Double.parseDouble(ploc[2]), Double.parseDouble(ploc[3]), Float.parseFloat(ploc[4]), Float.parseFloat(ploc[5]));
+                    Location loc = new Location(sender.getServer().getInfo().getName(), ploc[0], Double.parseDouble(ploc[1]), Double.parseDouble(ploc[2]), Double.parseDouble(ploc[3]), Float.parseFloat(ploc[4]), Float.parseFloat(ploc[5]));
                     plugin.positions.locationReceived(sender, loc);
                     return;
                 }

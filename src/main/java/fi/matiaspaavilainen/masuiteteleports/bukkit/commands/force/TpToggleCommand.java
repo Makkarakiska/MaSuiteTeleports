@@ -1,13 +1,15 @@
 package fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force;
 
+import fi.matiaspaavilainen.masuitecore.acf.BaseCommand;
+import fi.matiaspaavilainen.masuitecore.acf.annotation.CommandAlias;
+import fi.matiaspaavilainen.masuitecore.acf.annotation.CommandPermission;
+import fi.matiaspaavilainen.masuitecore.acf.annotation.Description;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.MaSuiteTeleports;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class TpToggleCommand implements CommandExecutor {
+@CommandAlias("tptoggle")
+public class TpToggleCommand extends BaseCommand {
 
     private MaSuiteTeleports plugin;
 
@@ -15,16 +17,10 @@ public class TpToggleCommand implements CommandExecutor {
         plugin = p;
     }
 
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
-            return false;
-        }
-
-        new BukkitPluginChannel(plugin, (Player) sender, new Object[]{
-                "MaSuiteTeleports",
-                "TeleportToggle",
-                sender.getName()
-        }).send();
-        return false;
+    @CommandPermission("masuiteleports.teleport.toggle")
+    @Description("Enable or disable force teleportations")
+    @CommandAlias("teleporttoggle")
+    public void teleportToggleCommand(Player player) {
+        new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "TeleportToggle", player.getName()).send();
     }
 }

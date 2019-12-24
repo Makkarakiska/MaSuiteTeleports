@@ -1,10 +1,12 @@
 package fi.matiaspaavilainen.masuiteteleports.bukkit;
 
+import fi.matiaspaavilainen.masuitecore.acf.PaperCommandManager;
 import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.bukkit.commands.PlayerTabCompleter;
 import fi.matiaspaavilainen.masuitecore.core.Updator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
+import fi.matiaspaavilainen.masuitecore.core.utils.CommandManagerUtil;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.BackCommand;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.TpAllCommand;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.TpCommand;
@@ -40,7 +42,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
     public final List<CommandSender> in_command = new ArrayList<>();
     public List<UUID> tpQue = new ArrayList<>();
     public static List<Player> ignoreTeleport = new ArrayList<>();
-
+    PaperCommandManager manager;
 
     @Override
     public void onEnable() {
@@ -55,16 +57,19 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
 
         // Load commands
         loadCommands();
-        loadTabCompleters();
-        new Updator(new String[]{getDescription().getVersion(), getDescription().getName(), "60125"}).checkUpdates();
+        manager = new PaperCommandManager(this);
+        CommandManagerUtil.registerMaSuitePlayerCommandCompletion(manager);
+
+        new Updator(getDescription().getVersion(), getDescription().getName(), "60125").checkUpdates();
     }
 
     private void loadCommands() {
         // Force
-        getCommand("tpall").setExecutor(new TpAllCommand(this));
-        getCommand("tphere").setExecutor(new TpHereCommand(this));
-        getCommand("tp").setExecutor(new TpCommand(this));
-        getCommand("tptoggle").setExecutor(new TpToggleCommand(this));
+
+        manager.registerCommand(new TpAllCommand(this));
+        manager.registerCommand(new TpCommand(this));
+        manager.registerCommand(new TpHereCommand(this));
+        manager.registerCommand(new TpToggleCommand(this));
 
         // Requests
         getCommand("tpaccept").setExecutor(new TpAcceptCommand(this));
@@ -165,7 +170,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
 
-        // Prevent save back location accross servers on the destination server
+        // Prevent save back location across servers on the destination server
         ignoreTeleport.add(e.getPlayer());
         getServer().getScheduler().runTaskLaterAsynchronously( this, () -> ignoreTeleport.remove(e.getPlayer()), 20 );
 

@@ -16,21 +16,6 @@ commands:
     permission: masuiteteleports.spawn.delete
     aliases: [spawndel, deletespawn]
     description: Deletes spawn point of the server
-  tp:
-    aliases: [teleport]
-    description: Teleports to given target
-  tptoggle:
-    permission: masuiteleports.teleport.toggle
-    aliases: [teleporttoggle]
-    description: Enable or disable force teleportations
-  tphere:
-    permission: masuiteteleports.teleport.force.here
-    aliases: [teleporthere]
-    description: Teleports target to sender
-  tpall:
-    permission: masuiteteleports.teleport.force.all
-    aliases: [teleportall]
-    description: Teleports all of the players to sender
   tpaccept:
     permission: masuiteteleports.teleport.accept
     aliases: [tpyes, teleportaccept]
