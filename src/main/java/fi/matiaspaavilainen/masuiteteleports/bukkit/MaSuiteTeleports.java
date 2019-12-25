@@ -1,24 +1,21 @@
 package fi.matiaspaavilainen.masuiteteleports.bukkit;
 
+import fi.matiaspaavilainen.masuitecore.acf.InvalidCommandArgument;
 import fi.matiaspaavilainen.masuitecore.acf.PaperCommandManager;
 import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
-import fi.matiaspaavilainen.masuitecore.bukkit.commands.PlayerTabCompleter;
 import fi.matiaspaavilainen.masuitecore.core.Updator;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.utils.CommandManagerUtil;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.BackCommand;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.TpAllCommand;
+import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.SpawnCommands;
+import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.TeleportForceCommands;
+import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.TeleportRequestCommands;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.TpCommand;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.TpHereCommand;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.force.TpToggleCommand;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.requests.*;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.spawns.SpawnDeleteCommand;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.spawns.SpawnSetCommand;
-import fi.matiaspaavilainen.masuiteteleports.bukkit.commands.spawns.SpawnTeleportCommand;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.listeners.TeleportListener;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -39,7 +36,6 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
     public BukkitConfiguration config = new BukkitConfiguration();
     public Formator formator = new Formator();
 
-    public final List<CommandSender> in_command = new ArrayList<>();
     public List<UUID> tpQue = new ArrayList<>();
     public static List<Player> ignoreTeleport = new ArrayList<>();
     PaperCommandManager manager;
@@ -56,45 +52,20 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
         getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new TeleportListener(this));
 
         // Load commands
-        loadCommands();
         manager = new PaperCommandManager(this);
+        loadCommands();
         CommandManagerUtil.registerMaSuitePlayerCommandCompletion(manager);
+        CommandManagerUtil.registerLocationContext(manager);
 
         new Updator(getDescription().getVersion(), getDescription().getName(), "60125").checkUpdates();
     }
 
     private void loadCommands() {
-        // Force
-
-        manager.registerCommand(new TpAllCommand(this));
+        manager.registerCommand(new TeleportForceCommands(this));
         manager.registerCommand(new TpCommand(this));
-        manager.registerCommand(new TpHereCommand(this));
-        manager.registerCommand(new TpToggleCommand(this));
-
-        // Requests
-        getCommand("tpaccept").setExecutor(new TpAcceptCommand(this));
-        getCommand("tpdeny").setExecutor(new TpDenyCommand(this));
-        getCommand("tpahere").setExecutor(new TpaHere(this));
-        getCommand("tpa").setExecutor(new TpaCommand(this));
-        getCommand("tpalock").setExecutor(new TpaLockCommand(this));
-
-        // Spawn
-        getCommand("delspawn").setExecutor(new SpawnDeleteCommand(this));
-        getCommand("setspawn").setExecutor(new SpawnSetCommand(this));
-        getCommand("spawn").setExecutor(new SpawnTeleportCommand(this));
-
-        // Back
-        getCommand("back").setExecutor(new BackCommand(this));
-    }
-
-
-    private void loadTabCompleters() {
-        getCommand("tpall").setTabCompleter(new PlayerTabCompleter(1));
-        getCommand("tphere").setTabCompleter(new PlayerTabCompleter(1));
-        getCommand("tp").setTabCompleter(new PlayerTabCompleter(1));
-
-        getCommand("tpa").setTabCompleter(new PlayerTabCompleter(1));
-        getCommand("tpahere").setTabCompleter(new PlayerTabCompleter(1));
+        manager.registerCommand(new TeleportRequestCommands(this));
+        manager.registerCommand(new SpawnCommands(this));
+        manager.registerCommand(new BackCommand(this));
     }
 
     @EventHandler
@@ -128,7 +99,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
         Location loc = e.getEntity().getLocation();
-        new BukkitPluginChannel(this, e.getEntity(), new Object[]{"MaSuiteTeleports", "GetLocation", e.getEntity().getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()}).send();
+        new BukkitPluginChannel(this, e.getEntity(), "MaSuiteTeleports", "GetLocation", e.getEntity().getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()).send();
     }
 
     @EventHandler
@@ -140,39 +111,35 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
         }
 
     }
-    
-    @EventHandler (ignoreCancelled = true)
+
+    @EventHandler(ignoreCancelled = true)
     public void playerTeleport(PlayerTeleportEvent e) {
-
         //Ignore non-players and no command or plugins reasons
-        if (e.getPlayer() instanceof Player && (e.getCause() == PlayerTeleportEvent.TeleportCause.PLUGIN || e.getCause() == PlayerTeleportEvent.TeleportCause.COMMAND) && !e.getPlayer().hasMetadata("NPC")) {
+        if ((e.getCause() == PlayerTeleportEvent.TeleportCause.PLUGIN || e.getCause() == PlayerTeleportEvent.TeleportCause.COMMAND) && !e.getPlayer().hasMetadata("NPC")) {
 
-            if(ignoreTeleport.contains(e.getPlayer())) {
+            if (ignoreTeleport.contains(e.getPlayer())) {
                 ignoreTeleport.remove(e.getPlayer());
                 return;
             }
 
             Location loc = e.getPlayer().getLocation();
-            new BukkitPluginChannel(this, e.getPlayer(), new Object[]{"MaSuiteTeleports", "GetLocation", e.getPlayer().getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()}).send();
+            new BukkitPluginChannel(this, e.getPlayer(), "MaSuiteTeleports", "GetLocation", e.getPlayer().getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()).send();
         }
     }
 
     @EventHandler
     public void onLeave(PlayerQuitEvent e) {
-        in_command.remove(e.getPlayer());
-
         ignoreTeleport.remove(e.getPlayer());
 
         Location loc = e.getPlayer().getLocation();
-        new BukkitPluginChannel(this, e.getPlayer(), new Object[]{"MaSuiteTeleports", "GetLocation", e.getPlayer().getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()}).send();
+        new BukkitPluginChannel(this, e.getPlayer(), "MaSuiteTeleports", "GetLocation", e.getPlayer().getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()).send();
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-
         // Prevent save back location across servers on the destination server
         ignoreTeleport.add(e.getPlayer());
-        getServer().getScheduler().runTaskLaterAsynchronously( this, () -> ignoreTeleport.remove(e.getPlayer()), 20 );
+        getServer().getScheduler().runTaskLaterAsynchronously(this, () -> ignoreTeleport.remove(e.getPlayer()), 20);
 
         if (getConfig().getBoolean("spawn.first")) {
             if (!e.getPlayer().hasPlayedBefore()) {

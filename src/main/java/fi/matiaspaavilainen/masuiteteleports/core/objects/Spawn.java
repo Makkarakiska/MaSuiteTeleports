@@ -49,7 +49,7 @@ public class Spawn {
      * @return spawn
      */
     public Spawn find(String server, int type) {
-        Spawn spawn = new Spawn();
+        /*Spawn spawn = new Spawn();
         ResultSet rs = null;
         String spawnType = config.load("teleports", "settings.yml").getString("spawn-type");
         String select = null;
@@ -105,8 +105,8 @@ public class Spawn {
                     e.printStackTrace();
                 }
             }
-        }
-        return spawn;
+        }*/
+        return null;
     }
 
     /**
@@ -118,6 +118,7 @@ public class Spawn {
      * @return if player has been spawned or not
      */
     public boolean spawn(ProxiedPlayer p, MaSuiteTeleports plugin, int type) {
+        /*
         if (p == null) return false;
         Spawn spawn = new Spawn().find(p.getServer().getInfo().getName(), type);
         if (spawn == null) {
@@ -145,7 +146,7 @@ public class Spawn {
         } else {
             bpc.send();
         }
-
+*/
         return true;
     }
 
@@ -156,7 +157,7 @@ public class Spawn {
      * @return if saving was success
      */
     public boolean create(Spawn spawn) {
-        String spawnType = config.load("teleports", "settings.yml").getString("spawn-type");
+        /*String spawnType = config.load("teleports", "settings.yml").getString("spawn-type");
         String query = null;
         Set<Spawn> spawns = spawn.all();
         if (spawn.getType() == 1) {
@@ -226,7 +227,8 @@ public class Spawn {
                     e.printStackTrace();
                 }
             }
-        }
+        }*/
+        return true;
     }
 
     /**
@@ -235,7 +237,9 @@ public class Spawn {
      * @return list all spawns
      */
     public Set<Spawn> all() {
+
         Set<Spawn> spawns = new HashSet<>();
+        /*
         ResultSet rs = null;
 
         try {
@@ -273,7 +277,7 @@ public class Spawn {
                     e.printStackTrace();
                 }
             }
-        }
+        }*/
         return spawns;
     }
 
@@ -283,6 +287,7 @@ public class Spawn {
      * @return if deleting was successful
      */
     public boolean delete() {
+        /*
         String spawnType = config.load("teleports", "settings.yml").getString("spawn-type");
         String query = null;
         if (spawnType.equalsIgnoreCase("server")) {
@@ -320,7 +325,8 @@ public class Spawn {
                     e.printStackTrace();
                 }
             }
-        }
+        }*/
+        return true;
     }
 
     public String getServer() {

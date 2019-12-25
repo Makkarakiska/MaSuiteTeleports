@@ -4,35 +4,3 @@ version: ${project.version}
 author: Masagameplay
 depends: [MaSuiteCore]
 softdepend: [Multiverse, MultiWorld]
-commands:
-  spawn:
-    permission: masuiteteleports.spawn.teleport
-    description: Teleports to spawn
-  setspawn:
-    permission: masuiteteleports.spawn.set
-    aliases: [spawnset, createspawn]
-    description: Sets spawn point of the server
-  delspawn:
-    permission: masuiteteleports.spawn.delete
-    aliases: [spawndel, deletespawn]
-    description: Deletes spawn point of the server
-  tpaccept:
-    permission: masuiteteleports.teleport.accept
-    aliases: [tpyes, teleportaccept]
-    description: Accepts teleportation request
-  tpdeny:
-    permission: masuiteteleports.teleport.deny
-    aliases: [tpno, teleportdeny]
-    description: Denies teleportation request
-  tpa:
-    permission: masuiteteleports.teleport.request
-    description: Sends teleportationg request to target
-  tpahere:
-    permission: masuiteteleports.teleport.here
-    description: Sends teleportation request to target
-  tpalock:
-    permission: masuiteteleports.teleport.lock
-    description: Locks request to accepting or denying them
-  back:
-    permission: masuiteteleports.back
-    description: Teleports to your last known location

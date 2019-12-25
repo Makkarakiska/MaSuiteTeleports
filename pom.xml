@@ -68,10 +68,6 @@
             <id>codemc-repo</id>
             <url>https://repo.codemc.org/repository/maven-snapshots/</url>
         </repository>
-        <repository>
-            <id>aikar</id>
-            <url>https://repo.aikar.co/content/groups/aikar/</url>
-        </repository>
     </repositories>
     <dependencies>
         <dependency>
@@ -96,7 +92,7 @@
         <dependency>
             <groupId>fi.matiaspaavilainen</groupId>
             <artifactId>MaSuiteCore</artifactId>
-            <version>2.0-20191224.122851-7</version>
+            <version>2.0-20191225.115508-8</version>
             <scope>provided</scope>
         </dependency>
 

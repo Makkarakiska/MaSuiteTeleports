@@ -79,7 +79,7 @@ public class adad implements CommandExecutor {
             return true;
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        /*Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 
             if (plugin.in_command.contains(sender)) {
                 plugin.formator.sendMessage(sender, plugin.config.load(null, "messages.yml").getString("on-active-command"));
@@ -171,7 +171,7 @@ public class adad implements CommandExecutor {
             }
             plugin.in_command.remove(sender);
         });
-
+*/
         return true;
     }
 
@@ -197,12 +197,4 @@ public class adad implements CommandExecutor {
         return Double.NaN;
     }
 
-    private boolean hasPerm(Player player, String perm){
-        if(player.hasPermission(perm)){
-            return true;
-        } else {
-            plugin.formator.sendMessage(player, plugin.config.load(null, "messages.yml").getString("no-permission"));
-            return false;
-        }
-    }
 }
