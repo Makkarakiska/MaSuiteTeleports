@@ -1,25 +1,64 @@
 package fi.matiaspaavilainen.masuiteteleports.core.services;
 
+import fi.matiaspaavilainen.masuitecore.core.channels.BungeePluginChannel;
+import fi.matiaspaavilainen.masuitecore.core.objects.Location;
 import fi.matiaspaavilainen.masuitecore.core.utils.HibernateUtil;
 import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
 import fi.matiaspaavilainen.masuiteteleports.core.models.Spawn;
+import fi.matiaspaavilainen.masuiteteleports.core.objects.SpawnType;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class SpawnService {
 
-    private EntityManager entityManager = HibernateUtil.getEntityManager();
+    private EntityManager entityManager = HibernateUtil.addClasses(Spawn.class).getEntityManager();
     public HashMap<String, List<Spawn>> spawns = new HashMap<>();
 
     private MaSuiteTeleports plugin;
 
     public SpawnService(MaSuiteTeleports plugin) {
         this.plugin = plugin;
+    }
+
+    public boolean teleportToSpawn(ProxiedPlayer player, SpawnType spawnType) {
+        Spawn spawn = this.getSpawn(player.getServer().getInfo(), spawnType);
+        if (spawn == null) {
+            if (spawnType == SpawnType.DEFAULT) {
+                plugin.formator.sendMessage(player, plugin.config.load("teleports", "messages.yml").getString("spawn.not-found"));
+            }
+
+            return false;
+        }
+
+        if (spawnType == SpawnType.DEFAULT) {
+            plugin.playerPositionService.requestPosition(player);
+        }
+
+        Location loc = spawn.getLocation();
+        BungeePluginChannel bpc = new BungeePluginChannel(plugin,
+                player.getServer().getInfo(),
+                "MaSuiteTeleports",
+                "SpawnPlayer",
+                player.getName(),
+                loc.getWorld() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()
+        );
+
+        if (!loc.getServer().equals(player.getServer().getInfo().getName())) {
+            player.connect(plugin.getProxy().getServerInfo(loc.getServer()));
+            plugin.getProxy().getScheduler().schedule(plugin, bpc::send, plugin.config.load("teleports", "settings.yml").getInt("teleport-delay"), TimeUnit.MILLISECONDS);
+        } else {
+            bpc.send();
+        }
+
+        return true;
     }
 
     /**
@@ -29,8 +68,19 @@ public class SpawnService {
      * @param type   type of the spawn
      * @return returns {@link Spawn} or null
      */
-    public Spawn getSpawn(String server, int type) {
+    public Spawn getSpawn(String server, SpawnType type) {
         return this.loadSpawn(server, type);
+    }
+
+    /**
+     * Load {@link Spawn} from database or cache
+     *
+     * @param server name of the server
+     * @param type   type of the spawn
+     * @return returns {@link Spawn} or null
+     */
+    public Spawn getSpawn(ServerInfo server, SpawnType type) {
+        return this.loadSpawn(server.getName(), type);
     }
 
     /**
@@ -42,6 +92,10 @@ public class SpawnService {
         entityManager.getTransaction().begin();
         entityManager.persist(spawn);
         entityManager.getTransaction().commit();
+
+        if (!spawns.containsKey(spawn.getLocation().getServer())) {
+            spawns.put(spawn.getLocation().getServer(), new ArrayList<>());
+        }
         spawns.get(spawn.getLocation().getServer()).add(spawn);
 
         return spawn;
@@ -67,7 +121,7 @@ public class SpawnService {
      *
      * @param spawn spawn to remove
      */
-    public void removeHome(Spawn spawn) {
+    public void removeSpawn(Spawn spawn) {
         entityManager.getTransaction().begin();
         entityManager.remove(spawn);
         entityManager.getTransaction().commit();
@@ -83,7 +137,7 @@ public class SpawnService {
      * @param type   type of the spawn
      * @return returns {@link Spawn} or null
      */
-    private Spawn loadSpawn(String server, int type) {
+    private Spawn loadSpawn(String server, SpawnType type) {
         /// Try to load from cache
         if (spawns.containsKey(server)) {
             Optional<Spawn> cachedHome = spawns.get(server).stream().filter(spawn -> spawn.getType() == type).findFirst();
@@ -106,7 +160,6 @@ public class SpawnService {
             if (!spawns.containsKey(spawn.getLocation().getServer())) {
                 spawns.put(spawn.getLocation().getServer(), new ArrayList<>());
             }
-
             spawns.get(spawn.getLocation().getServer()).add(spawn);
         }
 

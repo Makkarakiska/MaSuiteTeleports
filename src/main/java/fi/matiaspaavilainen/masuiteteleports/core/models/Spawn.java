@@ -1,16 +1,16 @@
 package fi.matiaspaavilainen.masuiteteleports.core.models;
 
 import fi.matiaspaavilainen.masuitecore.core.objects.Location;
+import fi.matiaspaavilainen.masuiteteleports.core.objects.SpawnType;
 import lombok.*;
 
 import javax.persistence.*;
 
-@AllArgsConstructor
 @RequiredArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
-
+@Table(name = "masuite_spawns")
 @NamedQuery(
         name = "findSpawnByType",
         query = "SELECT s FROM Spawn s WHERE s.type = :type"
@@ -18,7 +18,7 @@ import javax.persistence.*;
 
 @NamedQuery(
         name = "findSpawnByTypeAndServer",
-        query = "SELECT s FROM Spawn s WHERE s.type = :type AND s.server = :server"
+        query = "SELECT s FROM Spawn s WHERE s.type = :type AND s.location.server = :server"
 )
 public class Spawn {
 
@@ -28,18 +28,18 @@ public class Spawn {
 
     @Embedded
     @AttributeOverrides(value = {
+            @AttributeOverride(name = "server", column = @Column(name = "server")),
             @AttributeOverride(name = "x", column = @Column(name = "x")),
             @AttributeOverride(name = "y", column = @Column(name = "y")),
             @AttributeOverride(name = "z", column = @Column(name = "z")),
             @AttributeOverride(name = "yaw", column = @Column(name = "yaw")),
-            @AttributeOverride(name = "pitch", column = @Column(name = "pitch")),
-            @AttributeOverride(name = "server", column = @Column(name = "server"))
+            @AttributeOverride(name = "pitch", column = @Column(name = "pitch"))
     })
     @NonNull
     private Location location;
 
-    @Column(name = "type")
+    @Column(name = "type", columnDefinition = "smallint")
     @NonNull
-    private int type;
+    private SpawnType type;
 
 }

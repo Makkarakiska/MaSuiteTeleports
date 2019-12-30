@@ -33,7 +33,7 @@ public class TeleportForceCommand {
                 formator.sendMessage(sender, config.load("teleports", "messages.yml").getString("tptoggle.disabled").replace("%player", target.getName()));
                 return;
             }
-            plugin.positions.requestPosition(sender);
+            plugin.playerPositionService.requestPosition(sender);
             teleportHandler.teleport(sender, target);
             formator.sendMessage(sender, config.load("teleports", "messages.yml")
                     .getString("receiver.teleported")
@@ -47,7 +47,7 @@ public class TeleportForceCommand {
         ProxiedPlayer target1 = new PlayerFinder().get(t1);
         ProxiedPlayer target2 = new PlayerFinder().get(t2);
         if (utils.isOnline(target1, sender) && utils.isOnline(target2, sender)) {
-            plugin.positions.requestPosition(target1);
+            plugin.playerPositionService.requestPosition(target1);
             teleportHandler.teleport(target1, target2);
             formator.sendMessage(target1, config.load("teleports", "messages.yml")
                     .getString("receiver.teleported")
@@ -64,7 +64,7 @@ public class TeleportForceCommand {
     public void tp(ProxiedPlayer sender, String t, Double x, Double y, Double z) {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if (utils.isOnline(target, sender)) {
-            plugin.positions.requestPosition(target);
+            plugin.playerPositionService.requestPosition(target);
             new BungeePluginChannel(plugin, sender.getServer().getInfo(), new Object[]{"MaSuiteTeleports", "PlayerToXYZ", sender.getName(), x, y, z}).send();
         }
 
@@ -74,7 +74,7 @@ public class TeleportForceCommand {
     public void tp(ProxiedPlayer sender, String t, Location loc) {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if (utils.isOnline(target, sender)) {
-            plugin.positions.requestPosition(target);
+            plugin.playerPositionService.requestPosition(target);
             new BungeePluginChannel(plugin, sender.getServer().getInfo(), new Object[]{"MaSuiteTeleports", "PlayerToLocation", target.getName(),
                     loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()}).send();
         }
@@ -87,7 +87,7 @@ public class TeleportForceCommand {
                 formator.sendMessage(sender, config.load("teleports", "messages.yml").getString("tptoggle.disabled").replace("%player", target.getName()));
                 return;
             }
-            plugin.positions.requestPosition(target);
+            plugin.playerPositionService.requestPosition(target);
             teleportHandler.teleport(target, sender);
             formator.sendMessage(sender, config.load("teleports", "messages.yml")
                     .getString("sender.teleported")
@@ -99,7 +99,7 @@ public class TeleportForceCommand {
     public void tpall(ProxiedPlayer target) {
         if (utils.isOnline(target)) {
             for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-                plugin.positions.requestPosition(player);
+                plugin.playerPositionService.requestPosition(player);
                 teleportHandler.teleport(player, target);
                 formator.sendMessage(player, config.load("teleports", "messages.yml")
                         .getString("receiver.teleported")

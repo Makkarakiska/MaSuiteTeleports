@@ -7,7 +7,7 @@ import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
 import fi.matiaspaavilainen.masuiteteleports.bungee.commands.SpawnCommand;
 import fi.matiaspaavilainen.masuiteteleports.bungee.commands.TeleportForceCommand;
 import fi.matiaspaavilainen.masuiteteleports.core.handlers.TeleportHandler;
-import fi.matiaspaavilainen.masuiteteleports.core.objects.TeleportRequest;
+import fi.matiaspaavilainen.masuiteteleports.core.services.TeleportRequestService;
 import fi.matiaspaavilainen.masuiteteleports.core.objects.TeleportType;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -43,7 +43,7 @@ public class TeleportMessageListener implements Listener {
                 if (sender != null) {
                     String[] ploc = in.readUTF().split(":");
                     Location loc = new Location(sender.getServer().getInfo().getName(), ploc[0], Double.parseDouble(ploc[1]), Double.parseDouble(ploc[2]), Double.parseDouble(ploc[3]), Float.parseFloat(ploc[4]), Float.parseFloat(ploc[5]));
-                    plugin.positions.locationReceived(sender, loc);
+                    plugin.playerPositionService.locationReceived(sender, loc);
                     return;
                 }
             }
@@ -76,7 +76,7 @@ public class TeleportMessageListener implements Listener {
                     if (utils.isOnline(receiver, sender)) {
                         if (checkIfPending(sender, sender, receiver, "sender")) return;
                         if (checkIfPending(receiver, sender, receiver, "receiver")) return;
-                        TeleportRequest request = new TeleportRequest(plugin, sender, receiver, TeleportType.REQUEST_TO);
+                        TeleportRequestService request = new TeleportRequestService(plugin, sender, receiver, TeleportType.REQUEST_TO);
                         request.create();
                     }
                     break;
@@ -85,13 +85,13 @@ public class TeleportMessageListener implements Listener {
                     if (utils.isOnline(receiver, sender)) {
                         if (checkIfPending(sender, sender, receiver, "sender")) return;
                         if (checkIfPending(receiver, sender, receiver, "receiver")) return;
-                        TeleportRequest request = new TeleportRequest(plugin, sender, receiver, TeleportType.REQUEST_HERE);
+                        TeleportRequestService request = new TeleportRequestService(plugin, sender, receiver, TeleportType.REQUEST_HERE);
                         request.create();
                     }
                     break;
                 case "TeleportAccept":
                     if (utils.isOnline(sender)) {
-                        TeleportRequest request = TeleportHandler.getTeleportRequest(sender);
+                        TeleportRequestService request = TeleportHandler.getTeleportRequest(sender);
                         if (request != null) {
                             request.accept();
                         } else {
@@ -101,7 +101,7 @@ public class TeleportMessageListener implements Listener {
                     break;
                 case "TeleportDeny":
                     if (utils.isOnline(sender)) {
-                        TeleportRequest request = TeleportHandler.getTeleportRequest(sender);
+                        TeleportRequestService request = TeleportHandler.getTeleportRequest(sender);
                         if (request != null) {
                             request.deny();
                         } else {
@@ -185,12 +185,12 @@ public class TeleportMessageListener implements Listener {
                         return;
                     }
                 }
-                if (plugin.positions.positions.containsKey(sender.getUniqueId())) {
-                    if (!plugin.positions.positions.get(sender.getUniqueId()).getServer().equals(sender.getServer().getInfo())) {
-                        sender.connect(plugin.getProxy().getServerInfo(plugin.positions.positions.get(sender.getUniqueId()).getServer()));
-                        ProxyServer.getInstance().getScheduler().schedule(plugin, () -> tpforce.tp(sender, sender.getName(), plugin.positions.positions.get(sender.getUniqueId())), plugin.config.load("teleports", "settings.yml").getInt("teleport-delay"), TimeUnit.MILLISECONDS);
+                if (plugin.playerPositionService.positions.containsKey(sender.getUniqueId())) {
+                    if (!plugin.playerPositionService.positions.get(sender.getUniqueId()).getServer().equals(sender.getServer().getInfo().getName())) {
+                        sender.connect(plugin.getProxy().getServerInfo(plugin.playerPositionService.positions.get(sender.getUniqueId()).getServer()));
+                        ProxyServer.getInstance().getScheduler().schedule(plugin, () -> tpforce.tp(sender, sender.getName(), plugin.playerPositionService.positions.get(sender.getUniqueId())), plugin.config.load("teleports", "settings.yml").getInt("teleport-delay"), TimeUnit.MILLISECONDS);
                     } else {
-                        tpforce.tp(sender, sender.getName(), plugin.positions.positions.get(sender.getUniqueId()));
+                        tpforce.tp(sender, sender.getName(), plugin.playerPositionService.positions.get(sender.getUniqueId()));
                     }
                     plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("back.last-loc"));
                     if(!sender.hasPermission("masuiteteleports.cooldown.override"))
@@ -204,7 +204,7 @@ public class TeleportMessageListener implements Listener {
     }
 
     private boolean checkIfPending(ProxiedPlayer user, ProxiedPlayer sender, ProxiedPlayer receiver, String type) {
-        TeleportRequest req = TeleportHandler.getTeleportRequest(user);
+        TeleportRequestService req = TeleportHandler.getTeleportRequest(user);
         if (req != null) {
             plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml")
                     .getString("sender.teleport-request-pending." + type)

@@ -1,8 +1,10 @@
-package fi.matiaspaavilainen.masuiteteleports.core.objects;
+package fi.matiaspaavilainen.masuiteteleports.core.services;
 
 import fi.matiaspaavilainen.masuiteteleports.bungee.Button;
 import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
 import fi.matiaspaavilainen.masuiteteleports.core.handlers.TeleportHandler;
+import fi.matiaspaavilainen.masuiteteleports.core.objects.TeleportType;
+import lombok.Data;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
@@ -10,7 +12,8 @@ import net.md_5.bungee.config.Configuration;
 
 import java.util.concurrent.TimeUnit;
 
-public class TeleportRequest {
+@Data
+public class TeleportRequestService {
 
     private ProxiedPlayer sender, receiver;
     private ScheduledTask scheduler;
@@ -18,19 +21,13 @@ public class TeleportRequest {
     private TeleportType type;
 
     /**
-     * An empty constructor for {@link TeleportRequest}
-     */
-    public TeleportRequest() {
-    }
-
-    /**
-     * A constructor for {@link TeleportRequest}
+     * A constructor for {@link TeleportRequestService}
      *
      * @param sender   unique id of the sender
      * @param receiver unique id of the receiver
-     * @param type     request {@link TeleportRequest}
+     * @param type     request {@link TeleportRequestService}
      */
-    public TeleportRequest(MaSuiteTeleports plugin, ProxiedPlayer sender, ProxiedPlayer receiver, TeleportType type) {
+    public TeleportRequestService(MaSuiteTeleports plugin, ProxiedPlayer sender, ProxiedPlayer receiver, TeleportType type) {
         this.plugin = plugin;
         this.sender = sender;
         this.receiver = receiver;
@@ -168,48 +165,6 @@ public class TeleportRequest {
             buttons.addExtra(new Button("deny", "/tpdeny").create());
             receiver.sendMessage(buttons);
         }
-    }
-
-    /**
-     * @return creator of the request
-     */
-    public ProxiedPlayer getSender() {
-        return sender;
-    }
-
-    /**
-     * @param sender creator of the request
-     */
-    public void setSender(ProxiedPlayer sender) {
-        this.sender = sender;
-    }
-
-    /**
-     * @return receiver of the request
-     */
-    public ProxiedPlayer getReceiver() {
-        return receiver;
-    }
-
-    /**
-     * @param receiver receiver of the request
-     */
-    public void setReceiver(ProxiedPlayer receiver) {
-        this.receiver = receiver;
-    }
-
-    /**
-     * @return {@link TeleportType} type of the request
-     */
-    public TeleportType getType() {
-        return type;
-    }
-
-    /**
-     * @param type {@link TeleportType} type of the request
-     */
-    public void setType(TeleportType type) {
-        this.type = type;
     }
 }
 
