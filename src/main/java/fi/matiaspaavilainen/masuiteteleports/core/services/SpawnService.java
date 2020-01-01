@@ -10,6 +10,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +54,7 @@ public class SpawnService {
 
         if (!loc.getServer().equals(player.getServer().getInfo().getName())) {
             player.connect(plugin.getProxy().getServerInfo(loc.getServer()));
-            plugin.getProxy().getScheduler().schedule(plugin, bpc::send, plugin.config.load("teleports", "settings.yml").getInt("teleport-delay"), TimeUnit.MILLISECONDS);
+            plugin.getProxy().getScheduler().schedule(plugin, bpc::send, plugin.config.load(null, "config").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
         } else {
             bpc.send();
         }
@@ -150,10 +151,15 @@ public class SpawnService {
         String spawnType = plugin.config.load("teleports", "settings.yml").getString("spawn-type");
         String query = spawnType.equalsIgnoreCase("server") ? "findSpawnByTypeAndServer" : "findSpawnByType";
 
-        Spawn spawn = entityManager.createNamedQuery(query, Spawn.class)
-                .setParameter("type", type)
-                .setParameter("server", server)
-                .getResultList().stream().findFirst().orElse(null);
+        TypedQuery<Spawn> namedQuery = entityManager.createNamedQuery(query, Spawn.class).setParameter("type", type);
+
+        // Add server if spawn type is server
+        if (query.equals("findSpawnByTypeAndServer")) {
+            namedQuery.setParameter("server", server);
+        }
+
+        // Execute query
+        Spawn spawn = namedQuery.getResultList().stream().findFirst().orElse(null);
 
         // If not null, try to add cache
         if (spawn != null) {
@@ -162,7 +168,6 @@ public class SpawnService {
             }
             spawns.get(spawn.getLocation().getServer()).add(spawn);
         }
-
         return spawn;
     }
 }
