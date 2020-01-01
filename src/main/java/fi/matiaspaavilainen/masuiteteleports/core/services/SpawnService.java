@@ -54,7 +54,7 @@ public class SpawnService {
 
         if (!loc.getServer().equals(player.getServer().getInfo().getName())) {
             player.connect(plugin.getProxy().getServerInfo(loc.getServer()));
-            plugin.getProxy().getScheduler().schedule(plugin, bpc::send, plugin.config.load(null, "config").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
+            plugin.getProxy().getScheduler().schedule(plugin, bpc::send, plugin.config.load(null, "config.yml").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
         } else {
             bpc.send();
         }

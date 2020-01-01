@@ -36,7 +36,7 @@ public class PlayerJoinEvent implements Listener {
                 if (utils.isOnline(e.getPlayer())) {
                     plugin.spawnService.teleportToSpawn(e.getPlayer(), SpawnType.DEFAULT);
                 }
-            }, plugin.config.load(null, "config").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
+            }, plugin.config.load(null, "config.yml").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
         }
     }
 

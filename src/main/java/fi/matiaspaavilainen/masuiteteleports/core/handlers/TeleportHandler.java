@@ -45,7 +45,7 @@ public class TeleportHandler {
         );
         if (!sender.getServer().getInfo().getName().equals(receiver.getServer().getInfo().getName())) {
             sender.connect(plugin.getProxy().getServerInfo(receiver.getServer().getInfo().getName()));
-           plugin.getProxy().getScheduler().schedule(plugin, bpc::send, plugin.config.load(null, "config").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
+           plugin.getProxy().getScheduler().schedule(plugin, bpc::send, plugin.config.load(null, "config.yml").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
         } else {
             bpc.send();
         }
