@@ -7,9 +7,8 @@ import fi.matiaspaavilainen.masuiteteleports.bungee.MaSuiteTeleports;
 import fi.matiaspaavilainen.masuiteteleports.bungee.commands.SpawnCommand;
 import fi.matiaspaavilainen.masuiteteleports.bungee.commands.TeleportForceCommand;
 import fi.matiaspaavilainen.masuiteteleports.core.handlers.TeleportHandler;
-import fi.matiaspaavilainen.masuiteteleports.core.services.TeleportRequestService;
 import fi.matiaspaavilainen.masuiteteleports.core.objects.TeleportType;
-import net.md_5.bungee.api.ProxyServer;
+import fi.matiaspaavilainen.masuiteteleports.core.services.TeleportRequestService;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -38,7 +37,7 @@ public class TeleportMessageListener implements Listener {
         String subchannel = in.readUTF();
         if (subchannel.equals("MaSuiteTeleports")) {
             String childchannel = in.readUTF();
-            ProxiedPlayer sender = ProxyServer.getInstance().getPlayer(in.readUTF());
+            ProxiedPlayer sender = plugin.getProxy().getPlayer(in.readUTF());
             if (childchannel.equals("GetLocation")) {
                 if (sender != null) {
                     String[] ploc = in.readUTF().split(":");
@@ -188,7 +187,7 @@ public class TeleportMessageListener implements Listener {
                 if (plugin.playerPositionService.positions.containsKey(sender.getUniqueId())) {
                     if (!plugin.playerPositionService.positions.get(sender.getUniqueId()).getServer().equals(sender.getServer().getInfo().getName())) {
                         sender.connect(plugin.getProxy().getServerInfo(plugin.playerPositionService.positions.get(sender.getUniqueId()).getServer()));
-                        ProxyServer.getInstance().getScheduler().schedule(plugin, () -> tpforce.tp(sender, sender.getName(), plugin.playerPositionService.positions.get(sender.getUniqueId())), plugin.config.load("teleports", "settings.yml").getInt("teleport-delay"), TimeUnit.MILLISECONDS);
+                        plugin.getProxy().getScheduler().schedule(plugin, () -> tpforce.tp(sender, sender.getName(), plugin.playerPositionService.positions.get(sender.getUniqueId())), plugin.config.load(null, "config").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
                     } else {
                         tpforce.tp(sender, sender.getName(), plugin.playerPositionService.positions.get(sender.getUniqueId()));
                     }
