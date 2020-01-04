@@ -45,7 +45,7 @@ public class SpawnService {
 
         Location loc = spawn.getLocation();
         BungeePluginChannel bpc = new BungeePluginChannel(plugin,
-                player.getServer().getInfo(),
+                plugin.getProxy().getServerInfo(loc.getServer()),
                 "MaSuiteTeleports",
                 "SpawnPlayer",
                 player.getName(),
