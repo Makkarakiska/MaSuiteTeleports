@@ -140,7 +140,7 @@ public class Spawn {
             plugin.positions.requestPosition(p);
         }
         Location loc = spawn.getLocation();
-        BungeePluginChannel bpc = new BungeePluginChannel(plugin, p.getServer().getInfo(), new Object[]{
+        BungeePluginChannel bpc = new BungeePluginChannel(plugin, loc.getServer(), new Object[]{
                 "MaSuiteTeleports",
                 "SpawnPlayer",
                 p.getName(),
