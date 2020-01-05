@@ -185,11 +185,13 @@ public class TeleportMessageListener implements Listener {
                     }
                 }
                 if (plugin.playerPositionService.positions.containsKey(sender.getUniqueId())) {
-                    if (!plugin.playerPositionService.positions.get(sender.getUniqueId()).getServer().equals(sender.getServer().getInfo().getName())) {
-                        sender.connect(plugin.getProxy().getServerInfo(plugin.playerPositionService.positions.get(sender.getUniqueId()).getServer()));
-                        plugin.getProxy().getScheduler().schedule(plugin, () -> tpforce.tp(sender, sender.getName(), plugin.playerPositionService.positions.get(sender.getUniqueId())), plugin.config.load(null, "config.yml").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
+                    Location loc = plugin.playerPositionService.positions.get(sender.getUniqueId());
+                    plugin.playerPositionService.requestPosition(sender);
+                    if (!loc.getServer().equals(sender.getServer().getInfo().getName())) {
+                        sender.connect(plugin.getProxy().getServerInfo(loc.getServer()));
+                        plugin.getProxy().getScheduler().schedule(plugin, () -> tpforce.tp(sender, sender.getName(), loc), plugin.config.load(null, "config.yml").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
                     } else {
-                        tpforce.tp(sender, sender.getName(), plugin.playerPositionService.positions.get(sender.getUniqueId()));
+                        tpforce.tp(sender, sender.getName(), loc);
                     }
                     plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("back.last-loc"));
                     if(!sender.hasPermission("masuiteteleports.cooldown.override"))
