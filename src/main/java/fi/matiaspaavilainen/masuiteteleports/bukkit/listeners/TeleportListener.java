@@ -1,9 +1,10 @@
 package fi.matiaspaavilainen.masuiteteleports.bukkit.listeners;
 
+import fi.matiaspaavilainen.masuitecore.core.adapters.BukkitAdapter;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
+import fi.matiaspaavilainen.masuitecore.core.objects.Location;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.MaSuiteTeleports;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
@@ -40,15 +41,15 @@ public class TeleportListener implements PluginMessageListener {
                     }
                     plugin.tpQue.add(p.getUniqueId());
                     p.leaveVehicle();
-                    
+
                     Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                    	try {
-				p.teleport(new Location(p.getWorld(), in.readDouble(), in.readDouble(), in.readDouble()));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-	            }, 1);
-                    
+                        try {
+                            p.teleport(new org.bukkit.Location(p.getWorld(), in.readDouble(), in.readDouble(), in.readDouble()));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }, 1);
+
                     Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> plugin.tpQue.remove(p.getUniqueId()), 100);
                 }
                 if (method.equals("PlayerToLocation")) {
@@ -58,15 +59,16 @@ public class TeleportListener implements PluginMessageListener {
                     }
                     plugin.tpQue.add(p.getUniqueId());
                     p.leaveVehicle();
-                    
+
                     Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                    	try {
-				p.teleport(new Location(Bukkit.getWorld(in.readUTF()), in.readDouble(), in.readDouble(), in.readDouble()));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-	            }, 1);
-                    
+                        try {
+                            org.bukkit.Location location = BukkitAdapter.adapt(new Location().deserialize(in.readUTF()));
+                            p.teleport(location);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }, 1);
+
                     Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> plugin.tpQue.remove(p.getUniqueId()), 100);
                 }
 
@@ -75,13 +77,9 @@ public class TeleportListener implements PluginMessageListener {
                     if (p == null) {
                         return;
                     }
-                    String[] locInfo = in.readUTF().split(":");
-                    Location loc = new Location(Bukkit.getWorld(locInfo[0]), Double.parseDouble(locInfo[1]), Double.parseDouble(locInfo[2]), Double.parseDouble(locInfo[3]), Float.parseFloat(locInfo[4]), Float.parseFloat(locInfo[5]));
+                    Location loc = new Location().deserialize(in.readUTF());
                     p.leaveVehicle();
-                    
-		    Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                    	p.teleport(loc);
-		    }, 1);
+                    Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> p.teleport(BukkitAdapter.adapt(loc)), 1);
                 }
                 if (method.equals("GetLocation")) {
                     Player p = Bukkit.getPlayer(in.readUTF());
@@ -89,14 +87,14 @@ public class TeleportListener implements PluginMessageListener {
                         return;
                     }
                     String server = in.readUTF();
-                    Location loc = p.getLocation();
-                    new BukkitPluginChannel(plugin, p, new Object[]{"MaSuiteTeleports", "GetLocation", p.getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch(), server}).send();
-
+                    new BukkitPluginChannel(plugin, p, "MaSuiteTeleports", "GetLocation", p.getName(), BukkitAdapter.adapt(p.getLocation()).serialize(), server).send();
                 }
             }
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             e.printStackTrace();
         }
+
     }
 
     private void teleportPlayer(final String s, final String t) {
@@ -106,11 +104,11 @@ public class TeleportListener implements PluginMessageListener {
             if (player != null && target != null) {
                 plugin.tpQue.add(player.getUniqueId());
                 player.leaveVehicle();
-                
+
                 Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                	player.teleport(target);
-                 }, 1);
-                
+                    player.teleport(target);
+                }, 1);
+
             }
         }, 5);
 

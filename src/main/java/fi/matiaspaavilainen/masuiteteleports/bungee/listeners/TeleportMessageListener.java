@@ -40,8 +40,8 @@ public class TeleportMessageListener implements Listener {
             ProxiedPlayer sender = plugin.getProxy().getPlayer(in.readUTF());
             if (childchannel.equals("GetLocation")) {
                 if (sender != null) {
-                    String[] ploc = in.readUTF().split(":");
-                    Location loc = new Location(sender.getServer().getInfo().getName(), ploc[0], Double.parseDouble(ploc[1]), Double.parseDouble(ploc[2]), Double.parseDouble(ploc[3]), Float.parseFloat(ploc[4]), Float.parseFloat(ploc[5]));
+                    Location loc = new Location().deserialize(in.readUTF());
+                    loc.setServer(sender.getServer().getInfo().getName());
                     plugin.playerPositionService.locationReceived(sender, loc);
                     return;
                 }
@@ -194,7 +194,7 @@ public class TeleportMessageListener implements Listener {
                         tpforce.tp(sender, sender.getName(), loc);
                     }
                     plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("back.last-loc"));
-                    if(!sender.hasPermission("masuiteteleports.cooldown.override"))
+                    if (!sender.hasPermission("masuiteteleports.cooldown.override"))
                         MaSuiteTeleports.cooldowns.put(sender.getUniqueId(), System.currentTimeMillis());
                 } else {
                     plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("back.no-loc"));

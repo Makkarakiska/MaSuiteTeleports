@@ -3,6 +3,7 @@ package fi.matiaspaavilainen.masuiteteleports.bukkit;
 import fi.matiaspaavilainen.masuitecore.acf.PaperCommandManager;
 import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
 import fi.matiaspaavilainen.masuitecore.core.Updator;
+import fi.matiaspaavilainen.masuitecore.core.adapters.BukkitAdapter;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BukkitConfiguration;
 import fi.matiaspaavilainen.masuitecore.core.utils.CommandManagerUtil;
@@ -67,25 +68,25 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onDeath(PlayerRespawnEvent e) {
-        Player p = e.getPlayer();
+        Player player = e.getPlayer();
         switch (config.load("teleports", "config.yml").getString("respawn-type").toLowerCase()) {
             case ("none"):
                 break;
             case ("bed"):
-                if (p.getBedSpawnLocation() != null) {
-                    p.teleport(p.getBedSpawnLocation());
+                if (player.getBedSpawnLocation() != null) {
+                    player.teleport(player.getBedSpawnLocation());
                 } else {
-                    new BukkitPluginChannel(this, p, new Object[]{"MaSuiteTeleports", "SpawnPlayer", p.getName()}).send();
+                    new BukkitPluginChannel(this, player, "MaSuiteTeleports", "SpawnPlayer", player.getName()).send();
                 }
                 break;
             case ("home"):
-                new BukkitPluginChannel(this, p, new Object[]{"MaSuiteTeleports", "HomeCommand", p.getName(), "home"}).send();
+                new BukkitPluginChannel(this, player, "MaSuiteTeleports", "HomeCommand", player.getName(), "home").send();
                 break;
             case ("spawn"):
-                if (p.hasPermission("masuiteleports.spawn.teleport.first")) {
-                    new BukkitPluginChannel(this, p, new Object[]{"MaSuiteTeleports", "FirstSpawnPlayer", p.getName()}).send();
+                if (player.hasPermission("masuiteleports.spawn.teleport.first")) {
+                    new BukkitPluginChannel(this, player, "MaSuiteTeleports", "FirstSpawnPlayer", player.getName()).send();
                 } else {
-                    new BukkitPluginChannel(this, p, new Object[]{"MaSuiteTeleports", "SpawnPlayer", p.getName()}).send();
+                    new BukkitPluginChannel(this, player, "MaSuiteTeleports", "SpawnPlayer", player.getName()).send();
                 }
 
                 break;
@@ -96,7 +97,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
         Location loc = e.getEntity().getLocation();
-        new BukkitPluginChannel(this, e.getEntity(), "MaSuiteTeleports", "GetLocation", e.getEntity().getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()).send();
+        new BukkitPluginChannel(this, e.getEntity(), "MaSuiteTeleports", "GetLocation", e.getEntity().getName(), BukkitAdapter.adapt(loc).serialize()).send();
     }
 
     @EventHandler
@@ -120,7 +121,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
             }
 
             Location loc = e.getPlayer().getLocation();
-            new BukkitPluginChannel(this, e.getPlayer(), "MaSuiteTeleports", "GetLocation", e.getPlayer().getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()).send();
+            new BukkitPluginChannel(this, e.getPlayer(), "MaSuiteTeleports", "GetLocation", e.getPlayer().getName(), BukkitAdapter.adapt(loc).serialize()).send();
         }
     }
 
@@ -129,7 +130,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
         ignoreTeleport.remove(e.getPlayer());
 
         Location loc = e.getPlayer().getLocation();
-        new BukkitPluginChannel(this, e.getPlayer(), "MaSuiteTeleports", "GetLocation", e.getPlayer().getName(), loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()).send();
+        new BukkitPluginChannel(this, e.getPlayer(), "MaSuiteTeleports", "GetLocation", e.getPlayer().getName(), BukkitAdapter.adapt(e.getPlayer().getLocation()).serialize()).send();
     }
 
     @EventHandler
@@ -140,7 +141,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
 
         if (getConfig().getBoolean("spawn.first")) {
             if (!e.getPlayer().hasPlayedBefore()) {
-                getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new BukkitPluginChannel(this, e.getPlayer(), new Object[]{"MaSuiteTeleports", "FirstSpawnPlayer", e.getPlayer().getName()}).send(), 10);
+                getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new BukkitPluginChannel(this, e.getPlayer(), "MaSuiteTeleports", "FirstSpawnPlayer", e.getPlayer().getName()).send(), 10);
             }
         }
     }

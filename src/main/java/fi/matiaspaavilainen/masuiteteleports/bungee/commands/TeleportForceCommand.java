@@ -65,7 +65,7 @@ public class TeleportForceCommand {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if (utils.isOnline(target, sender)) {
             plugin.playerPositionService.requestPosition(target);
-            new BungeePluginChannel(plugin, sender.getServer().getInfo(), new Object[]{"MaSuiteTeleports", "PlayerToXYZ", sender.getName(), x, y, z}).send();
+            new BungeePluginChannel(plugin, sender.getServer().getInfo(), "MaSuiteTeleports", "PlayerToXYZ", sender.getName(), x, y, z).send();
         }
 
     }
@@ -75,8 +75,7 @@ public class TeleportForceCommand {
         ProxiedPlayer target = new PlayerFinder().get(t);
         if (utils.isOnline(target, sender)) {
             plugin.playerPositionService.requestPosition(target);
-            new BungeePluginChannel(plugin, sender.getServer().getInfo(), new Object[]{"MaSuiteTeleports", "PlayerToLocation", target.getName(),
-                    loc.getWorld(), loc.getX(), loc.getY(), loc.getZ()}).send();
+            new BungeePluginChannel(plugin, sender.getServer().getInfo(), "MaSuiteTeleports", "PlayerToLocation", target.getName(), loc.serialize()).send();
         }
     }
 

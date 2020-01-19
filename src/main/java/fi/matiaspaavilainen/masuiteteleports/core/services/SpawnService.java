@@ -49,7 +49,7 @@ public class SpawnService {
                 "MaSuiteTeleports",
                 "SpawnPlayer",
                 player.getName(),
-                loc.getWorld() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch()
+                loc.serialize()
         );
 
         if (!loc.getServer().equals(player.getServer().getInfo().getName())) {
