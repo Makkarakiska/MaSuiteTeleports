@@ -83,7 +83,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
                 new BukkitPluginChannel(this, player, "MaSuiteTeleports", "HomeCommand", player.getName(), "home").send();
                 break;
             case ("spawn"):
-                if (player.hasPermission("masuiteleports.spawn.teleport.first")) {
+                if (player.hasPermission("masuiteteleports.spawn.teleport.first")) {
                     new BukkitPluginChannel(this, player, "MaSuiteTeleports", "FirstSpawnPlayer", player.getName()).send();
                 } else {
                     new BukkitPluginChannel(this, player, "MaSuiteTeleports", "SpawnPlayer", player.getName()).send();
