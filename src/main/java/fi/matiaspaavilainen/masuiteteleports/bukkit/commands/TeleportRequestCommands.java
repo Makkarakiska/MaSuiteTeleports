@@ -16,7 +16,7 @@ public class TeleportRequestCommands extends BaseCommand {
 
     @CommandAlias("tpa")
     @Description("Sends teleportation request to target")
-    @CommandPermission("masuiteteleports.teleport.request")
+    @CommandPermission("masuiteteleports.teleport.request.to")
     @CommandCompletion("@masuite_players")
     @Conditions("cooldown:type=requests,bypass:masuiteteleports.cooldown.override")
     public void createRequestToTarget(Player player, String target) {
