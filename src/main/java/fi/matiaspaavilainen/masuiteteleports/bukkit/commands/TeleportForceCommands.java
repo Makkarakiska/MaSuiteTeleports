@@ -16,7 +16,7 @@ public class TeleportForceCommands extends BaseCommand {
 
     @CommandAlias("tptoggle")
     @Description("Enable or disable force teleportations")
-    @CommandPermission("masuiteteleports.teleport.toggle")
+    @CommandPermission("masuiteteleports.teleport.force.toggle")
     public void teleportToggleCommand(Player player) {
         new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "TeleportToggle", player.getName()).send();
     }
@@ -26,7 +26,7 @@ public class TeleportForceCommands extends BaseCommand {
     @CommandPermission("masuiteteleports.teleport.force.here")
     @CommandCompletion("@masuite_players")
     public void teleportHereCommand(Player player, String target) {
-        new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "TeleportForceHere", player.getName(), target, player.hasPermission("masuiteteleports.teleport.toggle.bypass")).send();
+        new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "TeleportForceHere", player.getName(), target, player.hasPermission("masuiteteleports.teleport.force.toggle.bypass")).send();
     }
 
     @CommandAlias("tpall")

@@ -25,7 +25,7 @@ public class TeleportRequestCommands extends BaseCommand {
 
     @CommandAlias("tpahere")
     @Description("Sends teleportation request to target")
-    @CommandPermission("masuiteteleports.teleport.here")
+    @CommandPermission("masuiteteleports.teleport.request.here")
     @CommandCompletion("@masuite_players")
     @Conditions("cooldown:type=requests,bypass:masuiteteleports.cooldown.override")
     public void createRequestToSender(Player player, String target) {
@@ -34,7 +34,7 @@ public class TeleportRequestCommands extends BaseCommand {
 
     @CommandAlias("tpaccept|tpyes")
     @Description("Accepts teleportation request")
-    @CommandPermission("masuiteteleports.teleport.accept")
+    @CommandPermission("masuiteteleports.teleport.request.accept")
     @Conditions("cooldown:type=requests,bypass:masuiteteleports.cooldown.override")
     public void acceptRequest(Player player) {
         new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "TeleportAccept", player.getName()).send();
@@ -42,7 +42,7 @@ public class TeleportRequestCommands extends BaseCommand {
 
     @CommandAlias("tpdeny|tpno")
     @Description("Denies teleportation request")
-    @CommandPermission("masuiteteleports.teleport.deny")
+    @CommandPermission("masuiteteleports.teleport.request.deny")
     @Conditions("cooldown:type=requests,bypass:masuiteteleports.cooldown.override")
     public void denyRequest(Player player) {
         new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "TeleportDeny", player.getName()).send();
@@ -50,7 +50,7 @@ public class TeleportRequestCommands extends BaseCommand {
 
     @CommandAlias("tpalock")
     @Description("Locks request to accepting or denying them")
-    @CommandPermission("masuiteteleports.teleport.lock")
+    @CommandPermission("masuiteteleports.teleport.request.lock")
     @CommandCompletion("accept|yes|deny|no|off")
     public void lockRequests(Player player, String type) {
         if(type.equalsIgnoreCase("accept") || type.equalsIgnoreCase("yes")) {
