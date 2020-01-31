@@ -1,7 +1,7 @@
 package fi.matiaspaavilainen.masuiteteleports.bukkit;
 
 import fi.matiaspaavilainen.masuitecore.acf.PaperCommandManager;
-import fi.matiaspaavilainen.masuitecore.bukkit.chat.Formator;
+import fi.matiaspaavilainen.masuitecore.bukkit.MaSuiteCore;
 import fi.matiaspaavilainen.masuitecore.core.Updator;
 import fi.matiaspaavilainen.masuitecore.core.adapters.BukkitAdapter;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
@@ -32,7 +32,6 @@ import java.util.UUID;
 public class MaSuiteTeleports extends JavaPlugin implements Listener {
 
     public BukkitConfiguration config = new BukkitConfiguration();
-    public Formator formator = new Formator();
 
     public List<UUID> tpQue = new ArrayList<>();
     public static List<Player> ignoreTeleport = new ArrayList<>();
@@ -56,6 +55,10 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
         CommandManagerUtil.registerLocationContext(manager);
 
         new Updator(getDescription().getVersion(), getDescription().getName(), "60125").checkUpdates();
+
+        MaSuiteCore.cooldownService.addCooldownLength("requests", config.load("teleports", "config.yml").getInt("cooldown"));
+        MaSuiteCore.cooldownService.addCooldownLength("spawns", config.load("teleports", "config.yml").getInt("cooldown"));
+        MaSuiteCore.cooldownService.addCooldownLength("back", config.load("teleports", "config.yml").getInt("cooldown"));
     }
 
     private void loadCommands() {
@@ -88,9 +91,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
                 } else {
                     new BukkitPluginChannel(this, player, "MaSuiteTeleports", "SpawnPlayer", player.getName()).send();
                 }
-
                 break;
-
         }
     }
 
@@ -128,9 +129,8 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
     @EventHandler
     public void onLeave(PlayerQuitEvent e) {
         ignoreTeleport.remove(e.getPlayer());
-
         Location loc = e.getPlayer().getLocation();
-        new BukkitPluginChannel(this, e.getPlayer(), "MaSuiteTeleports", "GetLocation", e.getPlayer().getName(), BukkitAdapter.adapt(e.getPlayer().getLocation()).serialize()).send();
+        new BukkitPluginChannel(this, e.getPlayer(), "MaSuiteTeleports", "GetLocation", e.getPlayer().getName(), BukkitAdapter.adapt(loc).serialize()).send();
     }
 
     @EventHandler
