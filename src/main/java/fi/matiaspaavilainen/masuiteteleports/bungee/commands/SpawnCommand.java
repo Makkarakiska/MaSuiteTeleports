@@ -25,7 +25,7 @@ public class SpawnCommand {
             return;
         }
         if (plugin.spawnService.teleportToSpawn(player, SpawnType.getType(type))) {
-            if (type == 0) {
+            if (SpawnType.getType(type) == SpawnType.DEFAULT) {
                 plugin.formator.sendMessage(player, plugin.config.load("teleports", "messages.yml").getString("spawn.teleported"));
             }
         }
@@ -45,7 +45,16 @@ public class SpawnCommand {
         loc.setServer(player.getServer().getInfo().getName());
         Spawn spawn = new Spawn(loc, SpawnType.getType(type));
 
-        plugin.spawnService.createSpawn(spawn);
+        // Check if spawn exists in specific server with specific type
+
+        Spawn cachedSpawn = plugin.spawnService.spawns.get(player.getServer().getInfo().getName()).stream().filter(filteredSpawn -> filteredSpawn.getType() == spawn.getType()).findFirst().orElse(null);
+        if (cachedSpawn != null) {
+            cachedSpawn.setLocation(spawn.getLocation());
+            plugin.spawnService.updateSpawn(cachedSpawn);
+        } else {
+            plugin.spawnService.createSpawn(spawn);
+        }
+
         plugin.formator.sendMessage(player, plugin.config.load("teleports", "messages.yml").getString("spawn.set"));
     }
 
