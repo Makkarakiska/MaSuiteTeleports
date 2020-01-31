@@ -26,7 +26,7 @@ public class TeleportForceCommands extends BaseCommand {
     @CommandPermission("masuiteteleports.teleport.force.here")
     @CommandCompletion("@masuite_players")
     public void teleportHereCommand(Player player, String target) {
-        new BukkitPluginChannel(plugin, player, new Object[]{"MaSuiteTeleports", "TeleportForceHere", player.getName(), target, player.hasPermission("masuiteteleports.teleport.toggle.bypass")}).send();
+        new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "TeleportForceHere", player.getName(), target, player.hasPermission("masuiteteleports.teleport.toggle.bypass")).send();
     }
 
     @CommandAlias("tpall")
