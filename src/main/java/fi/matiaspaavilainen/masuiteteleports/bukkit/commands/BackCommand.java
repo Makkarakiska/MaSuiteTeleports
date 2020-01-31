@@ -19,7 +19,7 @@ public class BackCommand extends BaseCommand {
 
     @CommandAlias("back")
     @Description("Teleports to your last known location")
-    @CommandPermission("masuiteteleports.back")
+    @CommandPermission("masuiteteleports.teleport.back")
     @Conditions("cooldown:type=back,bypass:masuiteteleports.cooldown.override")
     public void teleportBack(Player player) {
         new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "Back", player.getName()).send();
