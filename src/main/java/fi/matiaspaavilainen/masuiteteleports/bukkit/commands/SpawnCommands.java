@@ -2,6 +2,7 @@ package fi.matiaspaavilainen.masuiteteleports.bukkit.commands;
 
 import fi.matiaspaavilainen.masuitecore.acf.BaseCommand;
 import fi.matiaspaavilainen.masuitecore.acf.annotation.*;
+import fi.matiaspaavilainen.masuitecore.core.adapters.BukkitAdapter;
 import fi.matiaspaavilainen.masuitecore.core.channels.BukkitPluginChannel;
 import fi.matiaspaavilainen.masuiteteleports.bukkit.MaSuiteTeleports;
 import org.bukkit.Location;
@@ -19,6 +20,7 @@ public class SpawnCommands extends BaseCommand {
     @Description("Teleports to spawn")
     @CommandPermission("masuiteteleports.spawn.teleport")
     @CommandCompletion("@masuite_players")
+    @Conditions("cooldown:type=spawns,bypass:masuiteteleports.cooldown.override")
     public void teleportToSpawn(Player player, @Optional @CommandPermission("masuiteteleports.spawn.teleport.other") String target) {
         new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "SpawnPlayer", target == null ? player.getName() : target).send();
     }
@@ -31,7 +33,8 @@ public class SpawnCommands extends BaseCommand {
         Location loc = player.getLocation();
         new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "SetSpawn",
                 player.getName(),
-                loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ() + ":" + loc.getYaw() + ":" + loc.getPitch(), spawnType.toLowerCase()).send();
+                BukkitAdapter.adapt(loc).serialize(),
+                spawnType.toLowerCase()).send();
     }
 
     @CommandAlias("delspawn|spawndel|deletespawn")
