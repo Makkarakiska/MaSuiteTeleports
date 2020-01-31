@@ -97,6 +97,7 @@ public class SpawnService {
         if (!spawns.containsKey(spawn.getLocation().getServer())) {
             spawns.put(spawn.getLocation().getServer(), new ArrayList<>());
         }
+
         spawns.get(spawn.getLocation().getServer()).add(spawn);
 
         return spawn;
@@ -129,6 +130,15 @@ public class SpawnService {
 
         // Update cache
         spawns.put(spawn.getLocation().getServer(), spawns.get(spawn.getLocation().getServer()).stream().filter(cachedSpawn -> cachedSpawn.getType() != spawn.getType()).collect(Collectors.toList()));
+    }
+
+    /**
+     * Initialize spawns for use
+     */
+    public void initializeSpawns() {
+        List<Spawn> spawnList = entityManager.createQuery("SELECT s FROM Spawn s", Spawn.class).getResultList();
+        spawnList.forEach(spawn -> spawns.put(spawn.getLocation().getServer(),
+                spawnList.stream().filter(listedSpawn -> listedSpawn.getLocation().getServer().equalsIgnoreCase(spawn.getLocation().getServer())).collect(Collectors.toList())));
     }
 
     /**

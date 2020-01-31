@@ -38,6 +38,8 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         playerPositionService = new PlayerPositionService(this);
         spawnService = new SpawnService(this);
 
+        this.spawnService.initializeSpawns();
+
         // Register listeners
         getProxy().getPluginManager().registerListener(this, new TeleportMessageListener(this));
         getProxy().getPluginManager().registerListener(this, new PlayerJoinEvent(this));
