@@ -42,7 +42,8 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
         // Create configs
         config.create(this, "teleports", "config.yml");
         config.create(this, "teleports", "messages.yml");
-        config.create(this, "teleports", "syntax.yml");
+
+        config.addDefault("teleports/config.yml", "cooldown", 3);
 
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
