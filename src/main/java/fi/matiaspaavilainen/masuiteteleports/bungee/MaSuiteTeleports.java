@@ -6,6 +6,7 @@ import fi.matiaspaavilainen.masuitecore.core.api.MaSuiteCoreAPI;
 import fi.matiaspaavilainen.masuitecore.core.configuration.BungeeConfiguration;
 import fi.matiaspaavilainen.masuiteteleports.bungee.listeners.PlayerJoinEvent;
 import fi.matiaspaavilainen.masuiteteleports.bungee.listeners.PlayerQuitEvent;
+import fi.matiaspaavilainen.masuiteteleports.bungee.listeners.PlayerServerConnectEvent;
 import fi.matiaspaavilainen.masuiteteleports.bungee.listeners.TeleportMessageListener;
 import fi.matiaspaavilainen.masuiteteleports.core.services.PlayerPositionService;
 import fi.matiaspaavilainen.masuiteteleports.core.services.SpawnService;
@@ -39,6 +40,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         // Register listeners
         getProxy().getPluginManager().registerListener(this, new TeleportMessageListener(this));
         getProxy().getPluginManager().registerListener(this, new PlayerJoinEvent(this));
+        getProxy().getPluginManager().registerListener(this, new PlayerServerConnectEvent(this));
         getProxy().getPluginManager().registerListener(this, new PlayerQuitEvent());
 
         // Check updates
