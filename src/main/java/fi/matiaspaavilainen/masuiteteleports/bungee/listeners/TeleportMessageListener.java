@@ -175,17 +175,6 @@ public class TeleportMessageListener implements Listener {
 
         // Back
         if (childchannel.equals("Back")) {
-            if (MaSuiteTeleports.cooldowns.containsKey(sender.getUniqueId())) {
-                if (System.currentTimeMillis() - MaSuiteTeleports.cooldowns.get(sender.getUniqueId()) <
-                        plugin.config.load("teleports", "settings.yml").getInt("cooldown") * 1000) {
-                    plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml")
-                            .getString("in-cooldown")
-                            .replace("%time%", String.valueOf(plugin.config.load("teleports", "settings.yml").getInt("cooldown"))
-                            ));
-                    MaSuiteTeleports.cooldowns.remove(sender.getUniqueId());
-                    return;
-                }
-            }
             if (plugin.playerPositionService.positions.containsKey(sender.getUniqueId())) {
                 Location loc = plugin.playerPositionService.positions.get(sender.getUniqueId());
                 plugin.playerPositionService.requestPosition(sender);
@@ -196,8 +185,6 @@ public class TeleportMessageListener implements Listener {
                     tpforce.tp(sender, sender.getName(), loc);
                 }
                 plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("back.last-loc"));
-                if (!sender.hasPermission("masuiteteleports.cooldown.override"))
-                    MaSuiteTeleports.cooldowns.put(sender.getUniqueId(), System.currentTimeMillis());
             } else {
                 plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("back.no-loc"));
             }
