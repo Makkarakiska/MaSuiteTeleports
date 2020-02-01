@@ -6,6 +6,8 @@ import fi.matiaspaavilainen.masuiteteleports.core.models.Spawn;
 import fi.matiaspaavilainen.masuiteteleports.core.objects.SpawnType;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.ArrayList;
+
 public class SpawnCommand {
 
     private MaSuiteTeleports plugin;
@@ -47,6 +49,7 @@ public class SpawnCommand {
 
         // Check if spawn exists in specific server with specific type
 
+        plugin.spawnService.spawns.computeIfAbsent(player.getServer().getInfo().getName(), k -> new ArrayList<>());
         Spawn cachedSpawn = plugin.spawnService.spawns.get(player.getServer().getInfo().getName()).stream().filter(filteredSpawn -> filteredSpawn.getType() == spawn.getType()).findFirst().orElse(null);
         if (cachedSpawn != null) {
             cachedSpawn.setLocation(spawn.getLocation());
