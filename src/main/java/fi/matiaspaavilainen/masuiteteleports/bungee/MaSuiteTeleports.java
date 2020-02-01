@@ -12,14 +12,10 @@ import fi.matiaspaavilainen.masuiteteleports.core.services.SpawnService;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 
-import java.util.HashMap;
-import java.util.UUID;
-
 public class MaSuiteTeleports extends Plugin implements Listener {
 
     public BungeeConfiguration config = new BungeeConfiguration();
     public Formator formator = new Formator();
-    public static HashMap<UUID, Long> cooldowns = new HashMap<>();
 
     public PlayerPositionService playerPositionService;
     public SpawnService spawnService;
