@@ -40,7 +40,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         // Register listeners
         getProxy().getPluginManager().registerListener(this, new TeleportMessageListener(this));
         getProxy().getPluginManager().registerListener(this, new PlayerJoinEvent(this));
-        getProxy().getPluginManager().registerListener(this, new PlayerServerConnectEvent(this));
+        //getProxy().getPluginManager().registerListener(this, new PlayerServerConnectEvent(this));
         getProxy().getPluginManager().registerListener(this, new PlayerQuitEvent());
 
         // Check updates
