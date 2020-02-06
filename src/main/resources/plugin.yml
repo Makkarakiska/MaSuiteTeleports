@@ -1,5 +1,5 @@
 name: MaSuiteTeleports
-main: fi.matiaspaavilainen.masuiteteleports.bukkit.MaSuiteTeleports
+main: dev.masa.masuiteteleports.bukkit.MaSuiteTeleports
 version: ${project.version}
 author: Masagameplay
 depends: [MaSuiteCore]
