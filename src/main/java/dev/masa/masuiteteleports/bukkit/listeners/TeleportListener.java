@@ -29,69 +29,84 @@ public class TeleportListener implements PluginMessageListener {
         String method = null;
         try {
             subchannel = in.readUTF();
-            if (subchannel.equals("MaSuiteTeleports")) {
-                method = in.readUTF();
-                if (method.equals("PlayerToPlayer")) {
-                    teleportPlayer(in.readUTF(), in.readUTF());
-                }
-                if (method.equals("PlayerToXYZ")) {
-                    Player p = Bukkit.getPlayer(in.readUTF());
-                    if (p == null) {
-                        return;
-                    }
-                    plugin.tpQue.add(p.getUniqueId());
-                    p.leaveVehicle();
-
-                    Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                        try {
-                            p.teleport(new org.bukkit.Location(p.getWorld(), in.readDouble(), in.readDouble(), in.readDouble()));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }, 1);
-
-                    Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> plugin.tpQue.remove(p.getUniqueId()), 100);
-                }
-                if (method.equals("PlayerToLocation")) {
-                    Player p = Bukkit.getPlayer(in.readUTF());
-                    if (p == null) {
-                        return;
-                    }
-                    plugin.tpQue.add(p.getUniqueId());
-                    p.leaveVehicle();
-
-                    Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-                        try {
-                            org.bukkit.Location location = BukkitAdapter.adapt(new Location().deserialize(in.readUTF()));
-                            p.teleport(location);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }, 1);
-
-                    Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> plugin.tpQue.remove(p.getUniqueId()), 100);
-                }
-
-                if (method.equals("SpawnPlayer")) {
-                    Player p = Bukkit.getPlayer(in.readUTF());
-                    if (p == null) {
-                        return;
-                    }
-                    Location loc = new Location().deserialize(in.readUTF());
-                    p.leaveVehicle();
-                    Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> p.teleport(BukkitAdapter.adapt(loc)), 1);
-                }
-                if (method.equals("GetLocation")) {
-                    Player p = Bukkit.getPlayer(in.readUTF());
-                    if (p == null) {
-                        return;
-                    }
-                    String server = in.readUTF();
-                    new BukkitPluginChannel(plugin, p, "MaSuiteTeleports", "GetLocation", p.getName(), BukkitAdapter.adapt(p.getLocation()).serialize(), server).send();
-                }
+            if (!subchannel.equals("MaSuiteTeleports")) {
+                return;
             }
-        } catch (
-                IOException e) {
+            method = in.readUTF();
+            if (method.equals("PlayerToPlayer")) {
+                teleportPlayer(in.readUTF(), in.readUTF());
+            }
+            if (method.equals("PlayerToXYZ")) {
+                Player p = Bukkit.getPlayer(in.readUTF());
+                if (p == null) {
+                    return;
+                }
+                plugin.tpQue.add(p.getUniqueId());
+                p.leaveVehicle();
+
+                Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+                    try {
+                        p.teleport(new org.bukkit.Location(p.getWorld(), in.readDouble(), in.readDouble(), in.readDouble()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }, 1);
+
+                Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> plugin.tpQue.remove(p.getUniqueId()), 100);
+            }
+            if (method.equals("PlayerToLocation")) {
+                Player p = Bukkit.getPlayer(in.readUTF());
+                if (p == null) {
+                    return;
+                }
+                plugin.tpQue.add(p.getUniqueId());
+                p.leaveVehicle();
+
+                Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+                    try {
+                        org.bukkit.Location location = BukkitAdapter.adapt(new Location().deserialize(in.readUTF()));
+                        p.teleport(location);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }, 1);
+
+                Bukkit.getServer().getScheduler().runTaskLater(plugin, () -> plugin.tpQue.remove(p.getUniqueId()), 100);
+            }
+
+            if (method.equals("SpawnPlayer")) {
+                Player p = Bukkit.getPlayer(in.readUTF());
+                if (p == null) {
+                    return;
+                }
+                Location loc = new Location().deserialize(in.readUTF());
+                p.leaveVehicle();
+                Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> p.teleport(BukkitAdapter.adapt(loc)), 1);
+            }
+            if (method.equals("GetLocation")) {
+                Player p = Bukkit.getPlayer(in.readUTF());
+                if (p == null) {
+                    return;
+                }
+                String server = in.readUTF();
+                new BukkitPluginChannel(plugin, p, "MaSuiteTeleports", "GetLocation", p.getName(), BukkitAdapter.adapt(p.getLocation()).serialize(), server).send();
+            }
+
+            if (method.equals("ApplyWarmup")) {
+                Player p = Bukkit.getPlayer(in.readUTF());
+                if (p == null) {
+                    return;
+                }
+
+                plugin.api.getWarmupService().applyWarmup(player, "masuiteteleports.warmup.bypass", "warps", success -> {
+                    if (success) {
+                        new BukkitPluginChannel(plugin, player, "MaSuiteWarps", "TeleportRequest", true, p.getUniqueId().toString());
+                        return;
+                    }
+                    new BukkitPluginChannel(plugin, player, "MaSuiteWarps", "TeleportRequest", false, p.getUniqueId().toString());
+                });
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
