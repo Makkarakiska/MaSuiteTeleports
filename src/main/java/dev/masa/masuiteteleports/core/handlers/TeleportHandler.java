@@ -2,8 +2,8 @@ package dev.masa.masuiteteleports.core.handlers;
 
 import dev.masa.masuitecore.core.channels.BungeePluginChannel;
 import dev.masa.masuiteteleports.bungee.MaSuiteTeleports;
-import dev.masa.masuiteteleports.core.services.TeleportRequestService;
-import dev.masa.masuiteteleports.core.objects.TeleportType;
+import dev.masa.masuiteteleports.core.services.TeleportRequestServiceOLD;
+import dev.masa.masuiteteleports.core.objects.TeleportRequestType;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.*;
@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TeleportHandler {
 
-    public static List<TeleportRequestService> requests = new ArrayList<>();
+    public static List<TeleportRequestServiceOLD> requests = new ArrayList<>();
     public static HashMap<UUID, Boolean> lock = new HashMap<>();
     public static HashSet<UUID> toggles = new HashSet<>();
 
@@ -22,14 +22,14 @@ public class TeleportHandler {
     }
 
     public void teleportPlayerToPlayer(ProxiedPlayer sender, ProxiedPlayer receiver) {
-        TeleportRequestService request = getTeleportRequest(receiver);
+        TeleportRequestServiceOLD request = getTeleportRequest(receiver);
         if (request == null || !request.getSender().equals(sender)) {
             teleport(sender, receiver);
             return;
         }
-        if (request.getType().equals(TeleportType.REQUEST_HERE)) {
+        if (request.getType().equals(TeleportRequestType.REQUEST_HERE)) {
             teleport(receiver, sender);
-        } else if (request.getType().equals(TeleportType.REQUEST_TO)) {
+        } else if (request.getType().equals(TeleportRequestType.REQUEST_TO)) {
             teleport(sender, receiver);
         }
     }
@@ -50,8 +50,8 @@ public class TeleportHandler {
         }
     }
 
-    public static TeleportRequestService getTeleportRequest(ProxiedPlayer player) {
-        for (TeleportRequestService request : requests) {
+    public static TeleportRequestServiceOLD getTeleportRequest(ProxiedPlayer player) {
+        for (TeleportRequestServiceOLD request : requests) {
             if (request.getReceiver().equals(player)) {
                 return request;
             }
