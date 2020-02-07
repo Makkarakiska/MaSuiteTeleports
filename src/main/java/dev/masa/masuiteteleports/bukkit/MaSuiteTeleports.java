@@ -1,9 +1,9 @@
 package dev.masa.masuiteteleports.bukkit;
 
 import dev.masa.masuitecore.acf.PaperCommandManager;
-import dev.masa.masuitecore.bukkit.MaSuiteCore;
 import dev.masa.masuitecore.core.Updator;
 import dev.masa.masuitecore.core.adapters.BukkitAdapter;
+import dev.masa.masuitecore.core.api.MaSuiteCoreBukkitAPI;
 import dev.masa.masuitecore.core.channels.BukkitPluginChannel;
 import dev.masa.masuitecore.core.configuration.BukkitConfiguration;
 import dev.masa.masuitecore.core.utils.CommandManagerUtil;
@@ -32,6 +32,7 @@ import java.util.UUID;
 public class MaSuiteTeleports extends JavaPlugin implements Listener {
 
     public BukkitConfiguration config = new BukkitConfiguration();
+    public MaSuiteCoreBukkitAPI api = new MaSuiteCoreBukkitAPI();
 
     public List<UUID> tpQue = new ArrayList<>();
     public static List<Player> ignoreTeleport = new ArrayList<>();
@@ -57,9 +58,9 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
 
         new Updator(getDescription().getVersion(), getDescription().getName(), "60125").checkUpdates();
 
-        MaSuiteCore.cooldownService.addCooldownLength("requests", config.load("teleports", "config.yml").getInt("cooldown"));
-        MaSuiteCore.cooldownService.addCooldownLength("spawns", config.load("teleports", "config.yml").getInt("cooldown"));
-        MaSuiteCore.cooldownService.addCooldownLength("back", config.load("teleports", "config.yml").getInt("cooldown"));
+        api.getCooldownService().addCooldownLength("requests", config.load("teleports", "config.yml").getInt("cooldown"));
+        api.getCooldownService().addCooldownLength("spawns", config.load("teleports", "config.yml").getInt("cooldown"));
+        api.getCooldownService().addCooldownLength("back", config.load("teleports", "config.yml").getInt("cooldown"));
     }
 
     private void loadCommands() {
