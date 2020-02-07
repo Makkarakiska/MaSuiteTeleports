@@ -2,163 +2,142 @@ package dev.masa.masuiteteleports.core.services;
 
 import dev.masa.masuiteteleports.bungee.Button;
 import dev.masa.masuiteteleports.bungee.MaSuiteTeleports;
-import dev.masa.masuiteteleports.core.handlers.TeleportHandler;
-import dev.masa.masuiteteleports.core.objects.TeleportType;
-import lombok.Data;
+import dev.masa.masuiteteleports.core.objects.TeleportRequest;
+import dev.masa.masuiteteleports.core.objects.TeleportRequestType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
-import net.md_5.bungee.config.Configuration;
 
+import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-@Data
 public class TeleportRequestService {
 
-    private ProxiedPlayer sender, receiver;
-    private ScheduledTask scheduler;
+    public HashMap<UUID, TeleportRequest> requests = new HashMap<>();
     private MaSuiteTeleports plugin;
-    private TeleportType type;
 
-    /**
-     * A constructor for {@link TeleportRequestService}
-     *
-     * @param sender   unique id of the sender
-     * @param receiver unique id of the receiver
-     * @param type     request {@link TeleportRequestService}
-     */
-    public TeleportRequestService(MaSuiteTeleports plugin, ProxiedPlayer sender, ProxiedPlayer receiver, TeleportType type) {
+    private int keepRequestAlive = 0;
+
+    public TeleportRequestService(MaSuiteTeleports plugin) {
         this.plugin = plugin;
-        this.sender = sender;
-        this.receiver = receiver;
-        this.type = type;
-
+        this.keepRequestAlive = plugin.config.load("teleports", "settings.yml").getInt("keep-request-alive");
     }
 
     /**
-     * Create request with given params
+     * Get teleportation request of the user
+     *
+     * @param uuid uuid of the receiver
+     * @return returns {@link TeleportRequest} or null
      */
-    public void create() {
-        TeleportHandler.requests.add(this);
-        scheduler = this.plugin.getProxy().getScheduler().schedule(this.plugin, this::expired, plugin.config.load("teleports", "settings.yml").getInt("keep-request-alive"), TimeUnit.SECONDS);
+    public TeleportRequest getRequest(UUID uuid) {
+        return this.requests.get(uuid);
+    }
 
-        Configuration messages = plugin.config.load("teleports", "messages.yml");
-        if (TeleportHandler.lock.containsKey(this.receiver.getUniqueId())) {
-            if (TeleportHandler.lock.get(this.receiver.getUniqueId())) {
-                this.accept();
-            } else {
-                this.deny();
-            }
+    /**
+     * Create a new teleportation request
+     *
+     * @param sender   sender of the request
+     * @param receiver receiver of the request
+     * @param type     type ({@link TeleportRequestType}) of the request
+     */
+    public void createRequest(UUID sender, UUID receiver, TeleportRequestType type) {
+        // Check if receiver has pending request
+        TeleportRequest pendingRequest = getRequest(receiver);
+        if (pendingRequest != null) {
+            plugin.formator.sendMessage(plugin.getProxy().getPlayer(sender),
+                    formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-request-pending." + type), pendingRequest));
             return;
         }
-        if (this.type.equals(TeleportType.REQUEST_TO)) {
-            plugin.formator.sendMessage(sender, messages
-                    .getString("sender.teleport-to-request-incoming")
-                    .replace("%sender%", sender.getName())
-                    .replace("%receiver%", receiver.getName()));
-            plugin.formator.sendMessage(receiver, messages
-                    .getString("receiver.teleport-to-request-incoming")
-                    .replace("%sender%", sender.getName())
-                    .replace("%receiver%", receiver.getName()));
-        } else if (this.type.equals(TeleportType.REQUEST_HERE)) {
-            plugin.formator.sendMessage(sender, messages
-                    .getString("sender.teleport-here-request-incoming")
-                    .replace("%sender%", sender.getName())
-                    .replace("%receiver%", receiver.getName())
-            );
-            plugin.formator.sendMessage(receiver, messages
-                    .getString("receiver.teleport-here-request-incoming")
-                    .replace("%sender%", sender.getName())
-                    .replace("%receiver%", receiver.getName())
-            );
-        }
-        this.buttons(receiver);
 
-    }
+        // Create request and save it to cache
+        TeleportRequest request = new TeleportRequest(sender, receiver, type);
+        ScheduledTask timer = this.plugin.getProxy().getScheduler().schedule(this.plugin, () -> this.expireRequest(request), keepRequestAlive, TimeUnit.SECONDS);
+        request.setTimer(timer);
+        requests.put(receiver, request);
 
-    /**
-     * Cancel after time has expired and send messages to players
-     */
-    public void expired() {
-        plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml")
-                .getString("sender.teleport-request-expired")
-                .replace("%sender%", sender.getName())
-                .replace("%receiver%", receiver.getName())
-        );
-        plugin.formator.sendMessage(receiver, plugin.config.load("teleports", "messages.yml")
-                .getString("receiver.teleport-request-expired")
-                .replace("%sender%", sender.getName())
-                .replace("%receiver%", receiver.getName())
-
-        );
-        TeleportHandler.requests.remove(this);
-    }
-
-    /**
-     * Accept the request
-     */
-    public void accept() {
-        if (this.type.equals(TeleportType.REQUEST_TO)) {
-            plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml")
-                    .getString("sender.teleport-request-accepted")
-                    .replace("%sender%", sender.getName())
-                    .replace("%receiver%", receiver.getName())
-            );
-            plugin.formator.sendMessage(receiver, plugin.config.load("teleports", "messages.yml")
-                    .getString("receiver.teleport-request-accepted")
-                    .replace("%sender%", sender.getName())
-                    .replace("%receiver%", receiver.getName())
-            );
-            new TeleportHandler(this.plugin).teleportPlayerToPlayer(this.sender, this.receiver);
-        } else if (this.type.equals(TeleportType.REQUEST_HERE)) {
-            plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml")
-                    .getString("sender.teleport-request-accepted")
-                    .replace("%sender%", sender.getName())
-                    .replace("%receiver%", receiver.getName())
-            );
-            plugin.formator.sendMessage(receiver, plugin.config.load("teleports", "messages.yml")
-                    .getString("receiver.teleport-request-accepted")
-                    .replace("%sender%", sender.getName())
-                    .replace("%receiver%", receiver.getName())
-            );
-            new TeleportHandler(this.plugin).teleportPlayerToPlayer(this.receiver, this.sender);
+        // Send correct messages
+        if (request.getType().equals(TeleportRequestType.REQUEST_TO)) {
+            plugin.formator.sendMessage(request.getSenderAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-to-request-incoming"), request));
+            plugin.formator.sendMessage(request.getReceiverAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-to-request-incoming"), request));
         }
 
-        this.cancel();
+        if (request.getType().equals(TeleportRequestType.REQUEST_HERE)) {
+            plugin.formator.sendMessage(request.getSenderAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-here-request-incoming"), request));
+            plugin.formator.sendMessage(request.getReceiverAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-here-request-incoming"), request));
+        }
+
+        // Send buttons
+        this.createControlButtons(request.getReceiverAsPlayer());
     }
 
     /**
-     * Deny request
-     */
-    public void deny() {
-        plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml")
-                .getString("sender.teleport-request-denied")
-                .replace("%sender%", sender.getName())
-                .replace("%receiver%", receiver.getName())
-        );
-        plugin.formator.sendMessage(receiver, plugin.config.load("teleports", "messages.yml")
-                .getString("receiver.teleport-request-denied")
-                .replace("%sender%", sender.getName())
-                .replace("%receiver%", receiver.getName())
-        );
-        this.cancel();
-    }
-
-    /**
-     * Cancel scheduler
-     */
-    public void cancel() {
-        this.scheduler.cancel();
-        TeleportHandler.requests.remove(this);
-
-    }
-
-    /**
-     * Show buttons for player
+     * Expire the teleportation request
      *
-     * @param receiver the player who will be used
+     * @param request request to expire
      */
-    private void buttons(ProxiedPlayer receiver) {
+    public void expireRequest(TeleportRequest request) {
+        requests.remove(request.getReceiver());
+        plugin.formator.sendMessage(request.getSenderAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-request-expired"), request));
+        plugin.formator.sendMessage(request.getReceiverAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("receiver.teleport-request-expired"), request));
+    }
+
+    /**
+     * Accept the teleportation request
+     *
+     * @param request request to accept
+     */
+    public void acceptRequest(TeleportRequest request) {
+        plugin.formator.sendMessage(request.getSenderAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.receiver.teleport-request-accepted"), request));
+        plugin.formator.sendMessage(request.getReceiverAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("receiver.receiver.teleport-request-accepted"), request));
+        this.teleport(request);
+    }
+
+    /**
+     * Deny the teleportation request
+     *
+     * @param request the teleportation request to cancel
+     */
+    public void denyRequest(TeleportRequest request) {
+        plugin.formator.sendMessage(request.getSenderAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-request-denied"), request));
+        plugin.formator.sendMessage(request.getReceiverAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("receiver.teleport-request-denied"), request));
+
+        this.cancelRequest(request);
+    }
+
+    /**
+     * Cancel the teleportation request
+     *
+     * @param request the request to cancel
+     */
+    public void cancelRequest(TeleportRequest request) {
+        request.getTimer().cancel();
+        requests.remove(request.getReceiver());
+    }
+
+    /**
+     * Format message
+     *
+     * @param message message to format
+     * @param request the request to use in formatting
+     * @return returns formatted message
+     */
+    private String formatMessage(String message, TeleportRequest request) {
+        ProxiedPlayer sender = request.getSenderAsPlayer();
+        ProxiedPlayer receiver = request.getReceiverAsPlayer();
+
+        return message
+                .replace("%sender%", sender.getName())
+                .replace("%receiver%", receiver.getName())
+                .replace("%server%", receiver.getServer().getInfo().getName());
+    }
+
+    /**
+     * Create control buttons to accept or deny the request
+     *
+     * @param receiver receiver of the request
+     */
+    private void createControlButtons(ProxiedPlayer receiver) {
         if (plugin.config.load("teleports", "buttons.yml").getBoolean("enabled")) {
             TextComponent buttons = new TextComponent();
             buttons.addExtra(new Button("accept", "/tpaccept").create());
@@ -166,5 +145,17 @@ public class TeleportRequestService {
             receiver.sendMessage(buttons);
         }
     }
-}
 
+    /**
+     * Teleports player to the correct position
+     *
+     * @param request request to use
+     */
+    private void teleport(TeleportRequest request) {
+        if (request.getType().equals(TeleportRequestType.REQUEST_TO)) {
+            plugin.playerTeleportService.teleportPlayerToPlayer(request.getSenderAsPlayer(), request.getReceiverAsPlayer());
+        } else {
+            plugin.playerTeleportService.teleportPlayerToPlayer(request.getReceiverAsPlayer(), request.getSenderAsPlayer());
+        }
+    }
+}
