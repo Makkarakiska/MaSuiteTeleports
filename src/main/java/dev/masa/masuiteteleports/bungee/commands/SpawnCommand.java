@@ -48,7 +48,6 @@ public class SpawnCommand {
         Spawn spawn = new Spawn(loc, SpawnType.getType(type));
 
         // Check if spawn exists in specific server with specific type
-
         plugin.spawnService.spawns.computeIfAbsent(player.getServer().getInfo().getName(), k -> new ArrayList<>());
         Spawn cachedSpawn = plugin.spawnService.spawns.get(player.getServer().getInfo().getName()).stream().filter(filteredSpawn -> filteredSpawn.getType() == spawn.getType()).findFirst().orElse(null);
         if (cachedSpawn != null) {
