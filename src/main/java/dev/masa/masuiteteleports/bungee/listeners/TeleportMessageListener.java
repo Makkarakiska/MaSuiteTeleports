@@ -7,8 +7,8 @@ import dev.masa.masuiteteleports.bungee.MaSuiteTeleports;
 import dev.masa.masuiteteleports.bungee.commands.SpawnCommand;
 import dev.masa.masuiteteleports.bungee.commands.TeleportForceCommand;
 import dev.masa.masuiteteleports.core.handlers.TeleportHandler;
-import dev.masa.masuiteteleports.core.objects.TeleportType;
-import dev.masa.masuiteteleports.core.services.TeleportRequestService;
+import dev.masa.masuiteteleports.core.objects.TeleportRequestType;
+import dev.masa.masuiteteleports.core.services.TeleportRequestServiceOLD;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -48,6 +48,13 @@ public class TeleportMessageListener implements Listener {
                 return;
             }
         }
+
+        if(childchannel.equals("TeleportRequest")) {
+            String channel = in.readUTF();
+            boolean status = in.readBoolean();
+
+        }
+
         // Spawn
         String spawnType = plugin.config.load("teleports", "settings.yml").getString("spawn-type");
         if (spawnType.equalsIgnoreCase("server") || spawnType.equalsIgnoreCase("global")) {
@@ -77,7 +84,7 @@ public class TeleportMessageListener implements Listener {
                 if (utils.isOnline(receiver, sender)) {
                     if (checkIfPending(sender, sender, receiver, "sender")) return;
                     if (checkIfPending(receiver, sender, receiver, "receiver")) return;
-                    TeleportRequestService request = new TeleportRequestService(plugin, sender, receiver, TeleportType.REQUEST_TO);
+                    TeleportRequestServiceOLD request = new TeleportRequestServiceOLD(plugin, sender, receiver, TeleportRequestType.REQUEST_TO);
                     request.create();
                 }
                 break;
@@ -86,13 +93,13 @@ public class TeleportMessageListener implements Listener {
                 if (utils.isOnline(receiver, sender)) {
                     if (checkIfPending(sender, sender, receiver, "sender")) return;
                     if (checkIfPending(receiver, sender, receiver, "receiver")) return;
-                    TeleportRequestService request = new TeleportRequestService(plugin, sender, receiver, TeleportType.REQUEST_HERE);
+                    TeleportRequestServiceOLD request = new TeleportRequestServiceOLD(plugin, sender, receiver, TeleportRequestType.REQUEST_HERE);
                     request.create();
                 }
                 break;
             case "TeleportAccept":
                 if (utils.isOnline(sender)) {
-                    TeleportRequestService request = TeleportHandler.getTeleportRequest(sender);
+                    TeleportRequestServiceOLD request = TeleportHandler.getTeleportRequest(sender);
                     if (request != null) {
                         request.accept();
                     } else {
@@ -102,7 +109,7 @@ public class TeleportMessageListener implements Listener {
                 break;
             case "TeleportDeny":
                 if (utils.isOnline(sender)) {
-                    TeleportRequestService request = TeleportHandler.getTeleportRequest(sender);
+                    TeleportRequestServiceOLD request = TeleportHandler.getTeleportRequest(sender);
                     if (request != null) {
                         request.deny();
                     } else {
@@ -193,7 +200,7 @@ public class TeleportMessageListener implements Listener {
     }
 
     private boolean checkIfPending(ProxiedPlayer user, ProxiedPlayer sender, ProxiedPlayer receiver, String type) {
-        TeleportRequestService req = TeleportHandler.getTeleportRequest(user);
+        TeleportRequestServiceOLD req = TeleportHandler.getTeleportRequest(user);
         if (req != null) {
             plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml")
                     .getString("sender.teleport-request-pending." + type)
