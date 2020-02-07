@@ -42,9 +42,9 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
     public void onEnable() {
         // Create configs
         config.create(this, "teleports", "config.yml");
-        config.create(this, "teleports", "messages.yml");
 
         config.addDefault("teleports/config.yml", "cooldown", 3);
+        config.addDefault("teleports/config.yml", "warmup", 3);
 
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
@@ -61,6 +61,8 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
         api.getCooldownService().addCooldownLength("requests", config.load("teleports", "config.yml").getInt("cooldown"));
         api.getCooldownService().addCooldownLength("spawns", config.load("teleports", "config.yml").getInt("cooldown"));
         api.getCooldownService().addCooldownLength("back", config.load("teleports", "config.yml").getInt("cooldown"));
+
+        api.getWarmupService().addWarmupTime("warps", config.load("teleports", "config.yml").getInt("warmup"));
     }
 
     private void loadCommands() {
