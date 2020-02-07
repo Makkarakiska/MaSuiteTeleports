@@ -1,8 +1,6 @@
 package dev.masa.masuiteteleports.core.objects;
 
-public enum TeleportType {
-    FORCE_HERE,
-    FORCE_TO,
+public enum TeleportRequestType {
     REQUEST_HERE,
     REQUEST_TO
 }
