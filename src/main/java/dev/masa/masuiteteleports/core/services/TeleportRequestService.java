@@ -15,6 +15,8 @@ import java.util.concurrent.TimeUnit;
 public class TeleportRequestService {
 
     public HashMap<UUID, TeleportRequest> requests = new HashMap<>();
+    public HashMap<UUID, Boolean> locks = new HashMap<>();
+
     private MaSuiteTeleports plugin;
 
     private int keepRequestAlive = 0;
@@ -55,6 +57,16 @@ public class TeleportRequestService {
         ScheduledTask timer = this.plugin.getProxy().getScheduler().schedule(this.plugin, () -> this.expireRequest(request), keepRequestAlive, TimeUnit.SECONDS);
         request.setTimer(timer);
         requests.put(receiver, request);
+
+        // Check if receiver has teleportation lock enabled
+        if (locks.containsKey(receiver)) {
+            if (locks.get(receiver)) {
+                this.acceptRequest(request);
+                return;
+            }
+            this.cancelRequest(request);
+            return;
+        }
 
         // Send correct messages
         if (request.getType().equals(TeleportRequestType.REQUEST_TO)) {
@@ -130,6 +142,26 @@ public class TeleportRequestService {
                 .replace("%sender%", sender.getName())
                 .replace("%receiver%", receiver.getName())
                 .replace("%server%", receiver.getServer().getInfo().getName());
+    }
+
+
+    /**
+     * Toggle teleportation lock for player
+     *
+     * @param uuid  uuid of the player
+     * @param value enabled or disabled
+     */
+    public void toggleTeleportationLock(UUID uuid, boolean value) {
+        this.locks.put(uuid, value);
+    }
+
+    /**
+     * Remove teleportation lock from a player
+     *
+     * @param uuid uuid of the player
+     */
+    public void removeTeleportationLock(UUID uuid) {
+        this.locks.remove(uuid);
     }
 
     /**
