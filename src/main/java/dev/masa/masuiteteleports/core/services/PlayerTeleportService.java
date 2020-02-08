@@ -4,11 +4,15 @@ import dev.masa.masuitecore.core.channels.BungeePluginChannel;
 import dev.masa.masuiteteleports.bungee.MaSuiteTeleports;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.HashSet;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class PlayerTeleportService {
 
     private MaSuiteTeleports plugin;
+
+    public HashSet<UUID> toggles = new HashSet<>();
 
     public PlayerTeleportService(MaSuiteTeleports plugin) {
         this.plugin = plugin;
@@ -33,5 +37,23 @@ public class PlayerTeleportService {
         } else {
             bpc.send();
         }
+    }
+
+    /**
+     * Add toggle mode to the player
+     *
+     * @param uuid uuid of the player
+     */
+    public void addToggle(UUID uuid) {
+        toggles.add(uuid);
+    }
+
+    /**
+     * Remove toggle mode from the player
+     *
+     * @param uuid uuid of the player
+     */
+    public void removeToggle(UUID uuid) {
+        toggles.remove(uuid);
     }
 }
