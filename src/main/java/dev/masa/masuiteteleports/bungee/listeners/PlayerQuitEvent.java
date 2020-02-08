@@ -1,7 +1,6 @@
 package dev.masa.masuiteteleports.bungee.listeners;
 
 import dev.masa.masuiteteleports.bungee.MaSuiteTeleports;
-import dev.masa.masuiteteleports.core.handlers.TeleportHandler;
 import dev.masa.masuiteteleports.core.objects.TeleportRequest;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -22,7 +21,7 @@ public class PlayerQuitEvent implements Listener {
             plugin.teleportRequestService.cancelRequest(request);
         }
 
-        TeleportHandler.toggles.remove(event.getPlayer().getUniqueId());
-        TeleportHandler.lock.remove(event.getPlayer().getUniqueId());
+        plugin.playerTeleportService.removeToggle(event.getPlayer().getUniqueId());
+        plugin.teleportRequestService.locks.remove(event.getPlayer().getUniqueId());
     }
 }
