@@ -1,5 +1,6 @@
 package dev.masa.masuiteteleports.bungee;
 
+import dev.masa.masuitecore.bungee.Utils;
 import dev.masa.masuitecore.bungee.chat.Formator;
 import dev.masa.masuitecore.core.Updator;
 import dev.masa.masuitecore.core.api.MaSuiteCoreAPI;
@@ -20,6 +21,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
 
     public BungeeConfiguration config = new BungeeConfiguration();
     public Formator formator = new Formator();
+    public Utils utils = new Utils();
 
     public PlayerPositionService playerPositionService;
     public PlayerTeleportService playerTeleportService;
