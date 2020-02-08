@@ -7,8 +7,8 @@ import dev.masa.masuiteteleports.bungee.MaSuiteTeleports;
 import dev.masa.masuiteteleports.bungee.commands.SpawnCommand;
 import dev.masa.masuiteteleports.bungee.commands.TeleportForceCommand;
 import dev.masa.masuiteteleports.core.handlers.TeleportHandler;
+import dev.masa.masuiteteleports.core.objects.TeleportRequest;
 import dev.masa.masuiteteleports.core.objects.TeleportRequestType;
-import dev.masa.masuiteteleports.core.services.TeleportRequestServiceOLD;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -49,7 +49,7 @@ public class TeleportMessageListener implements Listener {
             }
         }
 
-        if(childchannel.equals("TeleportRequest")) {
+        if (childchannel.equals("TeleportRequest")) {
             String channel = in.readUTF();
             boolean status = in.readBoolean();
 
@@ -82,26 +82,20 @@ public class TeleportMessageListener implements Listener {
             case "TeleportRequestTo":
                 receiver = new PlayerFinder().get(in.readUTF());
                 if (utils.isOnline(receiver, sender)) {
-                    if (checkIfPending(sender, sender, receiver, "sender")) return;
-                    if (checkIfPending(receiver, sender, receiver, "receiver")) return;
-                    TeleportRequestServiceOLD request = new TeleportRequestServiceOLD(plugin, sender, receiver, TeleportRequestType.REQUEST_TO);
-                    request.create();
+                    plugin.teleportRequestService.createRequest(sender.getUniqueId(), receiver.getUniqueId(), TeleportRequestType.REQUEST_TO);
                 }
                 break;
             case "TeleportRequestHere":
                 receiver = new PlayerFinder().get(in.readUTF());
                 if (utils.isOnline(receiver, sender)) {
-                    if (checkIfPending(sender, sender, receiver, "sender")) return;
-                    if (checkIfPending(receiver, sender, receiver, "receiver")) return;
-                    TeleportRequestServiceOLD request = new TeleportRequestServiceOLD(plugin, sender, receiver, TeleportRequestType.REQUEST_HERE);
-                    request.create();
+                    plugin.teleportRequestService.createRequest(sender.getUniqueId(), receiver.getUniqueId(), TeleportRequestType.REQUEST_HERE);
                 }
                 break;
             case "TeleportAccept":
                 if (utils.isOnline(sender)) {
-                    TeleportRequestServiceOLD request = TeleportHandler.getTeleportRequest(sender);
+                    TeleportRequest request = plugin.teleportRequestService.getRequest(sender.getUniqueId());
                     if (request != null) {
-                        request.accept();
+                        plugin.teleportRequestService.acceptRequest(request);
                     } else {
                         plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("receiver.no-pending-teleport-requests"));
                     }
@@ -109,9 +103,9 @@ public class TeleportMessageListener implements Listener {
                 break;
             case "TeleportDeny":
                 if (utils.isOnline(sender)) {
-                    TeleportRequestServiceOLD request = TeleportHandler.getTeleportRequest(sender);
+                    TeleportRequest request = plugin.teleportRequestService.getRequest(sender.getUniqueId());
                     if (request != null) {
-                        request.deny();
+                        plugin.teleportRequestService.denyRequest(request);
                     } else {
                         plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("receiver.no-pending-teleport-requests"));
                     }
@@ -122,7 +116,7 @@ public class TeleportMessageListener implements Listener {
                 if (c.equals("Enable")) {
                     if (utils.isOnline(sender)) {
                         boolean lock = in.readBoolean();
-                        TeleportHandler.lock.put(sender.getUniqueId(), lock);
+                        plugin.teleportRequestService.toggleTeleportationLock(sender.getUniqueId(), lock);
                         if (lock) {
                             plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("tpalock.allow"));
                         } else {
@@ -133,7 +127,7 @@ public class TeleportMessageListener implements Listener {
                 }
                 if (c.equals("Disable")) {
                     if (TeleportHandler.lock.containsKey(sender.getUniqueId())) {
-                        TeleportHandler.lock.remove(sender.getUniqueId());
+                        plugin.teleportRequestService.removeTeleportationLock(sender.getUniqueId());
                         plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("tpalock.disabled"));
                     } else {
                         plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("tpalock.not-locked"));
@@ -197,18 +191,5 @@ public class TeleportMessageListener implements Listener {
             }
         }
 
-    }
-
-    private boolean checkIfPending(ProxiedPlayer user, ProxiedPlayer sender, ProxiedPlayer receiver, String type) {
-        TeleportRequestServiceOLD req = TeleportHandler.getTeleportRequest(user);
-        if (req != null) {
-            plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml")
-                    .getString("sender.teleport-request-pending." + type)
-                    .replace("%sender%", sender.getName())
-                    .replace("%receiver%", receiver.getName())
-            );
-            return true;
-        }
-        return false;
     }
 }
