@@ -6,7 +6,6 @@ import dev.masa.masuitecore.core.utils.PlayerFinder;
 import dev.masa.masuiteteleports.bungee.MaSuiteTeleports;
 import dev.masa.masuiteteleports.bungee.commands.SpawnCommand;
 import dev.masa.masuiteteleports.bungee.commands.TeleportForceCommand;
-import dev.masa.masuiteteleports.core.handlers.TeleportHandler;
 import dev.masa.masuiteteleports.core.objects.TeleportRequest;
 import dev.masa.masuiteteleports.core.objects.TeleportRequestType;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -126,7 +125,7 @@ public class TeleportMessageListener implements Listener {
                     break;
                 }
                 if (c.equals("Disable")) {
-                    if (TeleportHandler.lock.containsKey(sender.getUniqueId())) {
+                    if (plugin.teleportRequestService.locks.containsKey(sender.getUniqueId())) {
                         plugin.teleportRequestService.removeTeleportationLock(sender.getUniqueId());
                         plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("tpalock.disabled"));
                     } else {
@@ -136,11 +135,11 @@ public class TeleportMessageListener implements Listener {
                 }
                 break;
             case "TeleportToggle":
-                if (TeleportHandler.toggles.contains(sender.getUniqueId())) {
-                    TeleportHandler.toggles.remove(sender.getUniqueId());
+                if (plugin.playerTeleportService.toggles.contains(sender.getUniqueId())) {
+                    plugin.playerTeleportService.removeToggle(sender.getUniqueId());
                     plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("tptoggle.off"));
                 } else {
-                    TeleportHandler.toggles.add(sender.getUniqueId());
+                    plugin.playerTeleportService.addToggle(sender.getUniqueId());
                     plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("tptoggle.on"));
                 }
                 break;
