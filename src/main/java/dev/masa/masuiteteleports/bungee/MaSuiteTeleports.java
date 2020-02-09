@@ -68,7 +68,7 @@ public class MaSuiteTeleports extends Plugin implements Listener {
 
     public void applyWarmup(ProxiedPlayer player) {
         if (warmupEnabled) {
-            new BungeePluginChannel(this, player.getServer().getInfo(), "MaSuiteWarps", "ApplyWarmup", player.getUniqueId().toString()).send();
+            new BungeePluginChannel(this, player.getServer().getInfo(), "MaSuiteTeleports", "ApplyWarmup", player.getUniqueId().toString()).send();
         }
     }
 }
