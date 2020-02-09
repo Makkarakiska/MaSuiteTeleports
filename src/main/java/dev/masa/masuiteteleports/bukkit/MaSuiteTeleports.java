@@ -55,6 +55,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
         loadCommands();
         CommandManagerUtil.registerMaSuitePlayerCommandCompletion(manager);
         CommandManagerUtil.registerLocationContext(manager);
+        CommandManagerUtil.registerCooldownCondition(manager);
 
         new Updator(getDescription().getVersion(), getDescription().getName(), "60125").checkUpdates();
 
@@ -82,19 +83,15 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
             case ("bed"):
                 if (player.getBedSpawnLocation() != null) {
                     player.teleport(player.getBedSpawnLocation());
-                } else {
-                    new BukkitPluginChannel(this, player, "MaSuiteTeleports", "SpawnPlayer", player.getName()).send();
+                    break;
                 }
+                new BukkitPluginChannel(this, player, "MaSuiteTeleports", "SpawnPlayer", player.getName()).send();
                 break;
             case ("home"):
                 new BukkitPluginChannel(this, player, "MaSuiteTeleports", "HomeCommand", player.getName(), "home").send();
                 break;
             case ("spawn"):
-                if (player.hasPermission("masuiteteleports.spawn.teleport.first")) {
-                    new BukkitPluginChannel(this, player, "MaSuiteTeleports", "FirstSpawnPlayer", player.getName()).send();
-                } else {
-                    new BukkitPluginChannel(this, player, "MaSuiteTeleports", "SpawnPlayer", player.getName()).send();
-                }
+                new BukkitPluginChannel(this, player, "MaSuiteTeleports", "SpawnPlayer", player.getName()).send();
                 break;
         }
     }
