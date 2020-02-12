@@ -71,12 +71,12 @@ public class TeleportRequestService {
         // Send correct messages
         if (request.getType().equals(TeleportRequestType.REQUEST_TO)) {
             plugin.formator.sendMessage(request.getSenderAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-to-request-incoming"), request));
-            plugin.formator.sendMessage(request.getReceiverAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-to-request-incoming"), request));
+            plugin.formator.sendMessage(request.getReceiverAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("receiver.teleport-to-request-incoming"), request));
         }
 
         if (request.getType().equals(TeleportRequestType.REQUEST_HERE)) {
             plugin.formator.sendMessage(request.getSenderAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-here-request-incoming"), request));
-            plugin.formator.sendMessage(request.getReceiverAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-here-request-incoming"), request));
+            plugin.formator.sendMessage(request.getReceiverAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("receiver.teleport-here-request-incoming"), request));
         }
 
         // Send buttons
