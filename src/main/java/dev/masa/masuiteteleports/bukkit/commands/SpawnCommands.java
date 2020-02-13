@@ -22,7 +22,11 @@ public class SpawnCommands extends BaseCommand {
     @CommandCompletion("@masuite_players")
     @Conditions("cooldown:type=spawns,bypass:masuiteteleports.cooldown.override")
     public void teleportToSpawn(Player player, @Optional @CommandPermission("masuiteteleports.spawn.teleport.other") String target) {
-        new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "SpawnPlayer", target == null ? player.getName() : target).send();
+        plugin.api.getWarmupService().applyWarmup(player, "masuiteteleports.warmup.override", "teleports", success -> {
+            if (success) {
+                new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "SpawnPlayer", target == null ? player.getName() : target).send();
+            }
+        });
     }
 
     @CommandAlias("setspawn|spawnset|createspawn")
@@ -31,7 +35,9 @@ public class SpawnCommands extends BaseCommand {
     @CommandCompletion("default|first")
     public void setSpawn(Player player, String spawnType) {
         Location loc = player.getLocation();
-        new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "SetSpawn",
+        new BukkitPluginChannel(plugin, player,
+                "MaSuiteTeleports",
+                "SetSpawn",
                 player.getName(),
                 BukkitAdapter.adapt(loc).serialize(),
                 spawnType.toLowerCase()).send();

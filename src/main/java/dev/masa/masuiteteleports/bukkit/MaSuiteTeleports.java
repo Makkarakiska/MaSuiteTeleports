@@ -63,7 +63,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
         api.getCooldownService().addCooldownLength("spawns", config.load("teleports", "config.yml").getInt("cooldown"));
         api.getCooldownService().addCooldownLength("back", config.load("teleports", "config.yml").getInt("cooldown"));
 
-        api.getWarmupService().addWarmupTime("warps", config.load("teleports", "config.yml").getInt("warmup"));
+        api.getWarmupService().addWarmupTime("teleports", config.load("teleports", "config.yml").getInt("warmup"));
     }
 
     private void loadCommands() {
