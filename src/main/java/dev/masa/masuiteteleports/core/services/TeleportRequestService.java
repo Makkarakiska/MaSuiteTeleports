@@ -1,5 +1,6 @@
 package dev.masa.masuiteteleports.core.services;
 
+import dev.masa.masuitecore.core.channels.BungeePluginChannel;
 import dev.masa.masuiteteleports.bungee.Button;
 import dev.masa.masuiteteleports.bungee.MaSuiteTeleports;
 import dev.masa.masuiteteleports.core.objects.TeleportRequest;
@@ -34,6 +35,16 @@ public class TeleportRequestService {
      */
     public TeleportRequest getRequest(UUID uuid) {
         return this.requests.get(uuid);
+    }
+
+    /**
+     * Get sender's teleportation request
+     *
+     * @param uuid uuid of the sender
+     * @return
+     */
+    public TeleportRequest getSenderRequest(UUID uuid) {
+        return this.requests.values().stream().filter(request -> request.getSender().equals(uuid)).findFirst().orElse(null);
     }
 
     /**
@@ -100,9 +111,10 @@ public class TeleportRequestService {
      * @param request request to accept
      */
     public void acceptRequest(TeleportRequest request) {
-        plugin.formator.sendMessage(request.getSenderAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.receiver.teleport-request-accepted"), request));
-        plugin.formator.sendMessage(request.getReceiverAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("receiver.receiver.teleport-request-accepted"), request));
-        this.teleport(request);
+        plugin.formator.sendMessage(request.getSenderAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-request-accepted"), request));
+        plugin.formator.sendMessage(request.getReceiverAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("receiver.teleport-request-accepted"), request));
+
+        new BungeePluginChannel(plugin, request.getSenderAsPlayer().getServer().getInfo(), "MaSuiteTeleports", "ApplyWarmup", request.getReceiver().toString()).send();
     }
 
     /**
@@ -183,7 +195,7 @@ public class TeleportRequestService {
      *
      * @param request request to use
      */
-    private void teleport(TeleportRequest request) {
+    public void teleport(TeleportRequest request) {
         if (request.getType().equals(TeleportRequestType.REQUEST_TO)) {
             plugin.playerTeleportService.teleportPlayerToPlayer(request.getSenderAsPlayer(), request.getReceiverAsPlayer());
         } else {

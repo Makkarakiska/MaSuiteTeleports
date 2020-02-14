@@ -23,6 +23,7 @@ public class TeleportRequest {
 
     /**
      * Get the sender as player
+     *
      * @return returns sender as player or null
      */
     public ProxiedPlayer getSenderAsPlayer() {
@@ -31,6 +32,7 @@ public class TeleportRequest {
 
     /**
      * Get the receiver as player
+     *
      * @return returns receiver as player or null
      */
     public ProxiedPlayer getReceiverAsPlayer() {

@@ -93,17 +93,13 @@ public class TeleportListener implements PluginMessageListener {
             }
 
             if (method.equals("ApplyWarmup")) {
-                Player p = Bukkit.getPlayer(in.readUTF());
-                if (p == null) {
-                    return;
-                }
-
-                plugin.api.getWarmupService().applyWarmup(player, "masuiteteleports.warmup.bypass", "warps", success -> {
+                String receiverUUID = in.readUTF();
+                plugin.api.getWarmupService().applyWarmup(player, "masuiteteleports.warmup.bypass", "teleports", success -> {
                     if (success) {
-                        new BukkitPluginChannel(plugin, player, "MaSuiteWarps", "TeleportRequest", true, p.getUniqueId().toString());
+                        new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "TeleportRequest", player.getName(), true, receiverUUID).send();
                         return;
                     }
-                    new BukkitPluginChannel(plugin, player, "MaSuiteWarps", "TeleportRequest", false, p.getUniqueId().toString());
+                    new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "TeleportRequest", player.getName(), false, receiverUUID).send();
                 });
             }
         } catch (IOException e) {

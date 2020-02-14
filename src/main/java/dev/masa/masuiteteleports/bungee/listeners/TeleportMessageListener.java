@@ -16,6 +16,7 @@ import net.md_5.bungee.event.EventHandler;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class TeleportMessageListener implements Listener {
@@ -49,8 +50,15 @@ public class TeleportMessageListener implements Listener {
         }
 
         if (childchannel.equals("TeleportRequest")) {
-            String channel = in.readUTF();
             boolean status = in.readBoolean();
+            UUID receiverUUID = UUID.fromString(in.readUTF());
+            TeleportRequest request = plugin.teleportRequestService.getRequest(receiverUUID);
+            if (request == null) return;
+            if (status) {
+                plugin.teleportRequestService.teleport(request);
+            } else {
+                plugin.teleportRequestService.cancelRequest(request);
+            }
 
         }
 
