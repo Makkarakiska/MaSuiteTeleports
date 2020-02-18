@@ -56,10 +56,8 @@ public class TeleportMessageListener implements Listener {
             if (request == null) return;
             if (status) {
                 plugin.teleportRequestService.teleport(request);
-            } else {
-                plugin.teleportRequestService.cancelRequest(request);
             }
-
+            plugin.teleportRequestService.cancelRequest(request);
         }
 
         // Spawn
