@@ -4,7 +4,6 @@ import dev.masa.masuitecore.bungee.Utils;
 import dev.masa.masuitecore.bungee.chat.Formator;
 import dev.masa.masuitecore.core.Updator;
 import dev.masa.masuitecore.core.api.MaSuiteCoreAPI;
-import dev.masa.masuitecore.core.channels.BungeePluginChannel;
 import dev.masa.masuitecore.core.configuration.BungeeConfiguration;
 import dev.masa.masuiteteleports.bungee.listeners.PlayerJoinEvent;
 import dev.masa.masuiteteleports.bungee.listeners.PlayerQuitEvent;
@@ -13,7 +12,6 @@ import dev.masa.masuiteteleports.core.services.PlayerPositionService;
 import dev.masa.masuiteteleports.core.services.PlayerTeleportService;
 import dev.masa.masuiteteleports.core.services.SpawnService;
 import dev.masa.masuiteteleports.core.services.TeleportRequestService;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -29,8 +27,6 @@ public class MaSuiteTeleports extends Plugin implements Listener {
     public SpawnService spawnService;
 
     public MaSuiteCoreAPI api = new MaSuiteCoreAPI();
-
-    public boolean warmupEnabled = false;
 
     @Override
     public void onEnable() {
@@ -63,12 +59,5 @@ public class MaSuiteTeleports extends Plugin implements Listener {
         config.addDefault("teleports/messages.yml", "tptoggle.on", "&cYou are now denying force teleportations!");
         config.addDefault("teleports/messages.yml", "tptoggle.off", "&aYou are now allowing force teleportations!");
         config.addDefault("teleports/messages.yml", "tptoggle.disabled", "&c%player has disabled force teleportations!");
-        config.addDefault("teleports/settings.yml", "teleport-delay", 750);
-    }
-
-    public void applyWarmup(ProxiedPlayer player) {
-        if (warmupEnabled) {
-            new BungeePluginChannel(this, player.getServer().getInfo(), "MaSuiteTeleports", "ApplyWarmup", player.getUniqueId().toString()).send();
-        }
     }
 }
