@@ -138,7 +138,7 @@ public class MaSuiteTeleports extends JavaPlugin implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         // Prevent save back location across servers on the destination server
         ignoreTeleport.add(e.getPlayer());
-        getServer().getScheduler().runTaskLaterAsynchronously(this, () -> ignoreTeleport.remove(e.getPlayer()), 20);
+        getServer().getScheduler().runTaskLaterAsynchronously(this, () -> ignoreTeleport.remove(e.getPlayer()), 20 * 5);
 
         if (getConfig().getBoolean("spawn.first")) {
             if (!e.getPlayer().hasPlayedBefore()) {
