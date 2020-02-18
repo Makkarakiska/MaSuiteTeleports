@@ -38,16 +38,6 @@ public class TeleportRequestService {
     }
 
     /**
-     * Get sender's teleportation request
-     *
-     * @param uuid uuid of the sender
-     * @return
-     */
-    public TeleportRequest getSenderRequest(UUID uuid) {
-        return this.requests.values().stream().filter(request -> request.getSender().equals(uuid)).findFirst().orElse(null);
-    }
-
-    /**
      * Create a new teleportation request
      *
      * @param sender   sender of the request
