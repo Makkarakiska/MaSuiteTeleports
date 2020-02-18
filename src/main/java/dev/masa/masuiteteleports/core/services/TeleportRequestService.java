@@ -55,11 +55,18 @@ public class TeleportRequestService {
      * @param type     type ({@link TeleportRequestType}) of the request
      */
     public void createRequest(UUID sender, UUID receiver, TeleportRequestType type) {
-        // Check if receiver has pending request
-        TeleportRequest pendingRequest = this.getRequest(receiver);
-        if (pendingRequest != null) {
+        // Check if receiver or sender has a pending request
+        TeleportRequest pendingSenderRequest = this.getRequest(sender);
+        if (pendingSenderRequest != null) {
             plugin.formator.sendMessage(plugin.getProxy().getPlayer(sender),
-                    formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-request-pending." + type), pendingRequest));
+                    formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-request-pending.sender"), pendingSenderRequest));
+            return;
+        }
+
+        TeleportRequest pendingReceiverRequest = this.getRequest(receiver);
+        if (pendingReceiverRequest != null) {
+            plugin.formator.sendMessage(plugin.getProxy().getPlayer(sender),
+                    formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-request-pending.receiver"), pendingReceiverRequest));
             return;
         }
 
