@@ -1,6 +1,7 @@
 package dev.masa.masuiteteleports.bungee.listeners;
 
 import dev.masa.masuitecore.bungee.Utils;
+import dev.masa.masuitecore.bungee.events.MaSuitePlayerCreationEvent;
 import dev.masa.masuitecore.core.configuration.BungeeConfiguration;
 import dev.masa.masuiteteleports.bungee.MaSuiteTeleports;
 import dev.masa.masuiteteleports.core.objects.SpawnType;
@@ -16,29 +17,30 @@ public class PlayerJoinEvent implements Listener {
     private BungeeConfiguration config = new BungeeConfiguration();
     private Utils utils = new Utils();
 
+    private boolean firstSpawnEnabled;
+    private int teleportationDelay;
+
     public PlayerJoinEvent(MaSuiteTeleports plugin) {
         this.plugin = plugin;
+        this.firstSpawnEnabled = config.load("teleports", "settings.yml").getBoolean("enable-first-spawn");
+        this.teleportationDelay = plugin.config.load(null, "config.yml").getInt("teleportation-delay");
     }
 
     @EventHandler
     public void onJoin(PostLoginEvent e) {
-        if (config.load("teleports", "settings.yml").getBoolean("enable-first-spawn") && plugin.api.getPlayerService().getPlayer(e.getPlayer().getUniqueId()) == null) {
-            plugin.getProxy().getScheduler().schedule(plugin, () -> {
-                if (utils.isOnline(e.getPlayer())) {
-                    plugin.spawnService.teleportToSpawn(e.getPlayer(), SpawnType.FIRST);
-                }
-            }, plugin.config.load(null, "config.yml").getInt("teleport-delay"), TimeUnit.MILLISECONDS);
-            return;
-        }
-
         if (config.load("teleports", "settings.yml").getBoolean("spawn-on-join")) {
             plugin.getProxy().getScheduler().schedule(plugin, () -> {
                 if (utils.isOnline(e.getPlayer())) {
                     plugin.spawnService.teleportToSpawn(e.getPlayer(), SpawnType.DEFAULT);
                 }
-            }, plugin.config.load(null, "config.yml").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
+            }, teleportationDelay, TimeUnit.MILLISECONDS);
         }
     }
 
-
+    @EventHandler
+    public void onPlayerCreation(MaSuitePlayerCreationEvent event) {
+        if (firstSpawnEnabled) {
+            plugin.getProxy().getScheduler().schedule(plugin, () -> plugin.spawnService.teleportToSpawn(plugin.getProxy().getPlayer(event.getPlayer().getUniqueId()), SpawnType.FIRST), teleportationDelay, TimeUnit.MILLISECONDS);
+        }
+    }
 }
