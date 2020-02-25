@@ -111,7 +111,7 @@ public class TeleportRequestService {
         plugin.formator.sendMessage(request.getSenderAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-request-accepted"), request));
         plugin.formator.sendMessage(request.getReceiverAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("receiver.teleport-request-accepted"), request));
 
-        new BungeePluginChannel(plugin, request.getSenderAsPlayer().getServer().getInfo(), "MaSuiteTeleports", "ApplyWarmup", request.getReceiver().toString()).send();
+        new BungeePluginChannel(plugin, request.getSenderAsPlayer().getServer().getInfo(), "MaSuiteTeleports", "ApplyWarmup", request.getSender().toString(), request.getReceiver().toString()).send();
     }
 
     /**

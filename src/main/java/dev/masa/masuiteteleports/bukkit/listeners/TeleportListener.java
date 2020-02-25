@@ -94,19 +94,21 @@ public class TeleportListener implements PluginMessageListener {
             }
 
             if (method.equals("ApplyWarmup")) {
+                String senderUUID = in.readUTF();
                 String receiverUUID = in.readUTF();
+                Player sender = plugin.getServer().getPlayer(UUID.fromString(senderUUID));
                 Player receiver = plugin.getServer().getPlayer(UUID.fromString(receiverUUID));
-                plugin.api.getWarmupService().applyWarmup(player, "masuiteteleports.warmup.bypass", "teleports", success -> {
-                    if (receiver == null) {
-                        System.out.println("[MaSuiteTeleports] THIS IS A BUG! Player is null (might be offline), cannot accept teleportation request UUID: " + receiverUUID);
+                plugin.api.getWarmupService().applyWarmup(sender, "masuiteteleports.warmup.bypass", "teleports", success -> {
+                    if (sender == null) {
+                        System.out.println("[MaSuiteTeleports] THIS IS A BUG! Player is null (might be offline), cannot accept teleportation request Sender UUID: " + receiverUUID);
                         return;
                     }
                     if (success) {
-                        new BukkitPluginChannel(plugin, receiver, "MaSuiteTeleports", "GetLocation", receiver.getName(), BukkitAdapter.adapt(receiver.getLocation()).serialize()).send();
-                        new BukkitPluginChannel(plugin, receiver, "MaSuiteTeleports", "TeleportRequest", player.getName(), true, receiverUUID).send();
+                        new BukkitPluginChannel(plugin, sender, "MaSuiteTeleports", "GetLocation", sender.getName(), BukkitAdapter.adapt(sender.getLocation()).serialize()).send();
+                        new BukkitPluginChannel(plugin, sender, "MaSuiteTeleports", "TeleportRequest", sender.getName(), true, receiverUUID).send();
                         return;
                     }
-                    new BukkitPluginChannel(plugin, receiver, "MaSuiteTeleports", "TeleportRequest", receiver.getName(), false, receiverUUID).send();
+                    new BukkitPluginChannel(plugin, receiver, "MaSuiteTeleports", "TeleportRequest", sender.getName(), false, receiverUUID).send();
                 });
             }
         } catch (IOException e) {
