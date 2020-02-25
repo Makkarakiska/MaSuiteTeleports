@@ -49,6 +49,15 @@ public class TeleportMessageListener implements Listener {
             }
         }
 
+        if (childchannel.equals("GetLocationWithServer")) {
+            if (sender != null) {
+                Location loc = new Location().deserialize(in.readUTF());
+                loc.setServer(plugin.getProxy().getServerInfo(in.readUTF()).getName());
+                plugin.playerPositionService.locationReceived(sender, loc);
+                return;
+            }
+        }
+
         if (childchannel.equals("TeleportRequest")) {
             boolean status = in.readBoolean();
             UUID receiverUUID = UUID.fromString(in.readUTF());
