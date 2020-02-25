@@ -11,6 +11,7 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.UUID;
 
 public class TeleportListener implements PluginMessageListener {
     private MaSuiteTeleports plugin;
@@ -94,10 +95,10 @@ public class TeleportListener implements PluginMessageListener {
 
             if (method.equals("ApplyWarmup")) {
                 String receiverUUID = in.readUTF();
+                Player receiver = plugin.getServer().getPlayer(UUID.fromString(receiverUUID));
                 plugin.api.getWarmupService().applyWarmup(player, "masuiteteleports.warmup.bypass", "teleports", success -> {
-                    Player receiver = plugin.getServer().getPlayer(receiverUUID);
                     if (receiver == null) {
-                        System.out.println("Player is null, cannot accept teleportation request");
+                        System.out.println("[MaSuiteTeleports] THIS IS A BUG! Player is null (might be offline), cannot accept teleportation request UUID: " + receiverUUID);
                         return;
                     }
                     if (success) {
