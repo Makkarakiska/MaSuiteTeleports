@@ -40,6 +40,14 @@ public class TeleportForceCommand {
         ProxiedPlayer target1 = new PlayerFinder().get(t1);
         ProxiedPlayer target2 = new PlayerFinder().get(t2);
         if (plugin.utils.isOnline(target1, sender) && plugin.utils.isOnline(target2, sender)) {
+            if (teleportService.toggles.contains(target1.getUniqueId())) {
+                plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("tptoggle.disabled").replace("%player", target1.getName()));
+                return;
+            }
+            if (teleportService.toggles.contains(target2.getUniqueId())) {
+                plugin.formator.sendMessage(sender, plugin.config.load("teleports", "messages.yml").getString("tptoggle.disabled").replace("%player", target2.getName()));
+                return;
+            }
             plugin.playerPositionService.requestPosition(target1);
             teleportService.teleportPlayerToPlayer(target1, target2);
             plugin.formator.sendMessage(target1, plugin.config.load("teleports", "messages.yml")
