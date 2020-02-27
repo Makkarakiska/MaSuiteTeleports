@@ -41,6 +41,7 @@ public class PlayerPositionService {
      * @param loc    location of the {@link ProxiedPlayer}
      */
     public void locationReceived(ProxiedPlayer player, Location loc) {
+        System.out.println("Received location from player " + player.getName() + "! Location: " + loc.serialize());
         if (positionRunnables.containsKey(player.getUniqueId())) {
             positionRunnables.remove(player.getUniqueId()).run();
             return;
