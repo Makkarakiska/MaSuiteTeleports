@@ -8,6 +8,7 @@ import fi.matiaspaavilainen.masuiteteleports.bungee.commands.SpawnCommand;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.event.EventHandler;
 
 import java.util.concurrent.TimeUnit;
@@ -24,20 +25,22 @@ public class PlayerJoinEvent implements Listener {
 
     @EventHandler
     public void onJoin(PostLoginEvent e) {
-        if (config.load("teleports", "settings.yml").getBoolean("enable-first-spawn") && new MaSuitePlayer().find(e.getPlayer().getUniqueId()).getUniqueId() == null) {
-            ProxyServer.getInstance().getScheduler().schedule(plugin, () -> {
-                if (utils.isOnline(e.getPlayer())) {
-                    new SpawnCommand(plugin).spawn(e.getPlayer(), 1);
-                }
-            }, 500, TimeUnit.MILLISECONDS);
-        } else if (config.load("teleports", "settings.yml").getBoolean("spawn-on-join")) {
-            ProxyServer.getInstance().getScheduler().schedule(plugin, () -> {
-                if (utils.isOnline(e.getPlayer())) {
-                    new SpawnCommand(plugin).spawn(e.getPlayer(), 0);
-                }
-            }, 500, TimeUnit.MILLISECONDS);
-        }
+        Configuration tpConfig = config.load("teleports", "settings.yml");
+
+        ProxyServer.getInstance().getScheduler().runAsync(plugin, () -> {
+            if (tpConfig.getBoolean("enable-first-spawn") && new MaSuitePlayer().find(e.getPlayer().getUniqueId()).getUniqueId() == null) {
+                ProxyServer.getInstance().getScheduler().schedule(plugin, () -> {
+                    if (utils.isOnline(e.getPlayer())) {
+                        new SpawnCommand(plugin).spawn(e.getPlayer(), 1);
+                    }
+                }, 500, TimeUnit.MILLISECONDS);
+            } else if (tpConfig.getBoolean("spawn-on-join")) {
+                ProxyServer.getInstance().getScheduler().schedule(plugin, () -> {
+                    if (utils.isOnline(e.getPlayer())) {
+                        new SpawnCommand(plugin).spawn(e.getPlayer(), 0);
+                    }
+                }, 500, TimeUnit.MILLISECONDS);
+            }
+        });
     }
-
-
 }
