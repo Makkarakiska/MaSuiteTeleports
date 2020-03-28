@@ -190,8 +190,8 @@ public class TeleportMessageListener implements Listener {
 
         // Back
         if (childchannel.equals("Back")) {
-            if (plugin.playerPositionService.positions.containsKey(sender.getUniqueId())) {
-                Location loc = plugin.playerPositionService.positions.get(sender.getUniqueId());
+            Location loc = plugin.api.getPlayerService().getPlayer(sender.getUniqueId()).getLocation();
+            if (loc != null) {
                 plugin.playerPositionService.requestPosition(sender);
                 if (!loc.getServer().equals(sender.getServer().getInfo().getName())) {
                     sender.connect(plugin.getProxy().getServerInfo(loc.getServer()));
