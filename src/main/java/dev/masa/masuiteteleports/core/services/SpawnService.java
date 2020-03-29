@@ -30,6 +30,9 @@ public class SpawnService {
     }
 
     public boolean teleportToSpawn(ProxiedPlayer player, SpawnType spawnType) {
+        if(player == null) {
+            return false;
+        }
         Spawn spawn = this.getSpawn(player.getServer().getInfo(), spawnType);
         if (spawn == null) {
             if (spawnType == SpawnType.DEFAULT) {
