@@ -13,6 +13,7 @@ import dev.masa.masuiteteleports.bukkit.commands.TeleportForceCommands;
 import dev.masa.masuiteteleports.bukkit.commands.TeleportRequestCommands;
 import dev.masa.masuiteteleports.bukkit.commands.force.TpCommand;
 import dev.masa.masuiteteleports.bukkit.listeners.TeleportListener;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,7 +33,8 @@ import java.util.UUID;
 public class MaSuiteTeleports extends JavaPlugin implements Listener {
 
     public BukkitConfiguration config = new BukkitConfiguration();
-    public MaSuiteCoreBukkitAPI api = new MaSuiteCoreBukkitAPI();
+    @Getter
+    private MaSuiteCoreBukkitAPI api = new MaSuiteCoreBukkitAPI();
 
     public List<UUID> tpQue = new ArrayList<>();
     public static List<Player> ignoreTeleport = new ArrayList<>();

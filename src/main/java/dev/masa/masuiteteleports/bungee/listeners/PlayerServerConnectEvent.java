@@ -15,6 +15,6 @@ public class PlayerServerConnectEvent implements Listener {
 
     @EventHandler
     public void onPlayerConnect(ServerConnectEvent event) {
-        plugin.playerPositionService.requestPosition(event.getPlayer());
+        plugin.getPlayerPositionService().requestPosition(event.getPlayer());
     }
 }

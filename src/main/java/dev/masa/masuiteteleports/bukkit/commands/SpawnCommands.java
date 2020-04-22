@@ -22,7 +22,7 @@ public class SpawnCommands extends BaseCommand {
     @CommandCompletion("@masuite_players")
     @Conditions("cooldown:type=spawns,bypass:masuiteteleports.cooldown.override")
     public void teleportToSpawn(Player player, @Optional @CommandPermission("masuiteteleports.spawn.teleport.other") String target) {
-        plugin.api.getWarmupService().applyWarmup(player, "masuiteteleports.warmup.override", "teleports", success -> {
+        plugin.getApi().getWarmupService().applyWarmup(player, "masuiteteleports.warmup.override", "teleports", success -> {
             if (success) {
                 new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "SpawnPlayer", target == null ? player.getName() : target).send();
             }

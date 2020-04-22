@@ -31,7 +31,7 @@ public class PlayerJoinEvent implements Listener {
         if (config.load("teleports", "settings.yml").getBoolean("spawn-on-join")) {
             plugin.getProxy().getScheduler().schedule(plugin, () -> {
                 if (utils.isOnline(e.getPlayer())) {
-                    plugin.spawnService.teleportToSpawn(e.getPlayer(), SpawnType.DEFAULT);
+                    plugin.getSpawnService().teleportToSpawn(e.getPlayer(), SpawnType.DEFAULT);
                 }
             }, teleportationDelay, TimeUnit.MILLISECONDS);
         }
@@ -40,7 +40,7 @@ public class PlayerJoinEvent implements Listener {
     @EventHandler
     public void onPlayerCreation(MaSuitePlayerCreationEvent event) {
         if (firstSpawnEnabled) {
-            plugin.getProxy().getScheduler().schedule(plugin, () -> plugin.spawnService.teleportToSpawn(plugin.getProxy().getPlayer(event.getPlayer().getUniqueId()), SpawnType.FIRST), teleportationDelay, TimeUnit.MILLISECONDS);
+            plugin.getProxy().getScheduler().schedule(plugin, () -> plugin.getSpawnService().teleportToSpawn(plugin.getProxy().getPlayer(event.getPlayer().getUniqueId()), SpawnType.FIRST), teleportationDelay, TimeUnit.MILLISECONDS);
         }
     }
 }

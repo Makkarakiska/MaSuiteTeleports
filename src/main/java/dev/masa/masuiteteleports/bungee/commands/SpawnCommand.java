@@ -26,7 +26,7 @@ public class SpawnCommand {
         if (player == null) {
             return;
         }
-        if (plugin.spawnService.teleportToSpawn(player, SpawnType.getType(type))) {
+        if (plugin.getSpawnService().teleportToSpawn(player, SpawnType.getType(type))) {
             if (SpawnType.getType(type) == SpawnType.DEFAULT) {
                 plugin.formator.sendMessage(player, plugin.config.load("teleports", "messages.yml").getString("spawn.teleported"));
             }
@@ -48,13 +48,13 @@ public class SpawnCommand {
         Spawn spawn = new Spawn(loc, SpawnType.getType(type));
 
         // Check if spawn exists in specific server with specific type
-        plugin.spawnService.spawns.computeIfAbsent(player.getServer().getInfo().getName(), k -> new ArrayList<>());
-        Spawn cachedSpawn = plugin.spawnService.spawns.get(player.getServer().getInfo().getName()).stream().filter(filteredSpawn -> filteredSpawn.getType() == spawn.getType()).findFirst().orElse(null);
+        plugin.getSpawnService().getSpawns().computeIfAbsent(player.getServer().getInfo().getName(), k -> new ArrayList<>());
+        Spawn cachedSpawn = plugin.getSpawnService().getSpawns().get(player.getServer().getInfo().getName()).stream().filter(filteredSpawn -> filteredSpawn.getType() == spawn.getType()).findFirst().orElse(null);
         if (cachedSpawn != null) {
             cachedSpawn.setLocation(spawn.getLocation());
-            plugin.spawnService.updateSpawn(cachedSpawn);
+            plugin.getSpawnService().updateSpawn(cachedSpawn);
         } else {
-            plugin.spawnService.createSpawn(spawn);
+            plugin.getSpawnService().createSpawn(spawn);
         }
 
         plugin.formator.sendMessage(player, plugin.config.load("teleports", "messages.yml").getString("spawn.set"));
@@ -70,9 +70,9 @@ public class SpawnCommand {
         if (player == null) {
             return;
         }
-        Spawn spawn = plugin.spawnService.getSpawn(player.getServer().getInfo().getName(), SpawnType.getType(type));
+        Spawn spawn = plugin.getSpawnService().getSpawn(player.getServer().getInfo().getName(), SpawnType.getType(type));
         if (spawn != null) {
-            plugin.spawnService.removeSpawn(spawn);
+            plugin.getSpawnService().removeSpawn(spawn);
             plugin.formator.sendMessage(player, plugin.config.load("teleports", "messages.yml").getString("spawn.deleted"));
 
         } else {

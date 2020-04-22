@@ -22,7 +22,7 @@ public class BackCommand extends BaseCommand {
     @CommandPermission("masuiteteleports.teleport.back")
     @Conditions("cooldown:type=back,bypass:masuiteteleports.cooldown.override")
     public void teleportBack(Player player) {
-        plugin.api.getWarmupService().applyWarmup(player, "masuiteteleports.warmup.override", "teleports", success -> {
+        plugin.getApi().getWarmupService().applyWarmup(player, "masuiteteleports.warmup.override", "teleports", success -> {
             if (success) {
                 new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "Back", player.getName()).send();
             }

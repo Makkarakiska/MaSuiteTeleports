@@ -12,6 +12,7 @@ import dev.masa.masuiteteleports.core.services.PlayerPositionService;
 import dev.masa.masuiteteleports.core.services.PlayerTeleportService;
 import dev.masa.masuiteteleports.core.services.SpawnService;
 import dev.masa.masuiteteleports.core.services.TeleportRequestService;
+import lombok.Getter;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -21,12 +22,17 @@ public class MaSuiteTeleports extends Plugin implements Listener {
     public Formator formator = new Formator();
     public Utils utils = new Utils();
 
-    public PlayerPositionService playerPositionService;
-    public PlayerTeleportService playerTeleportService;
-    public TeleportRequestService teleportRequestService;
-    public SpawnService spawnService;
+    @Getter
+    private PlayerPositionService playerPositionService;
+    @Getter
+    private PlayerTeleportService playerTeleportService;
+    @Getter
+    private TeleportRequestService teleportRequestService;
+    @Getter
+    private SpawnService spawnService;
 
-    public MaSuiteCoreAPI api = new MaSuiteCoreAPI();
+    @Getter
+    private MaSuiteCoreAPI api = new MaSuiteCoreAPI();
 
     @Override
     public void onEnable() {

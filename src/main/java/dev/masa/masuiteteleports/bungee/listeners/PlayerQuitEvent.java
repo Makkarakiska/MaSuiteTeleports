@@ -16,12 +16,12 @@ public class PlayerQuitEvent implements Listener {
 
     @EventHandler
     public void onQuit(PlayerDisconnectEvent event) {
-        TeleportRequest request = plugin.teleportRequestService.getRequest(event.getPlayer().getUniqueId());
+        TeleportRequest request = plugin.getTeleportRequestService().getRequest(event.getPlayer().getUniqueId());
         if (request != null) {
-            plugin.teleportRequestService.cancelRequest(request);
+            plugin.getTeleportRequestService().cancelRequest(request);
         }
 
-        plugin.playerTeleportService.removeToggle(event.getPlayer().getUniqueId());
-        plugin.teleportRequestService.locks.remove(event.getPlayer().getUniqueId());
+        plugin.getPlayerTeleportService().removeToggle(event.getPlayer().getUniqueId());
+        plugin.getTeleportRequestService().locks.remove(event.getPlayer().getUniqueId());
     }
 }

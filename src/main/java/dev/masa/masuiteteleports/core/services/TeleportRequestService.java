@@ -194,9 +194,9 @@ public class TeleportRequestService {
      */
     public void teleport(TeleportRequest request) {
         if (request.getType().equals(TeleportRequestType.REQUEST_TO)) {
-            plugin.playerTeleportService.teleportPlayerToPlayer(request.getSenderAsPlayer(), request.getReceiverAsPlayer());
+            plugin.getPlayerTeleportService().teleportPlayerToPlayer(request.getSenderAsPlayer(), request.getReceiverAsPlayer());
         } else {
-            plugin.playerTeleportService.teleportPlayerToPlayer(request.getReceiverAsPlayer(), request.getSenderAsPlayer());
+            plugin.getPlayerTeleportService().teleportPlayerToPlayer(request.getReceiverAsPlayer(), request.getSenderAsPlayer());
         }
     }
 }

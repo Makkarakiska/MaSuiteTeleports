@@ -98,7 +98,7 @@ public class TeleportListener implements PluginMessageListener {
                 String receiverUUID = in.readUTF();
                 Player sender = plugin.getServer().getPlayer(UUID.fromString(senderUUID));
                 Player receiver = plugin.getServer().getPlayer(UUID.fromString(receiverUUID));
-                plugin.api.getWarmupService().applyWarmup(sender, "masuiteteleports.warmup.bypass", "teleports", success -> {
+                plugin.getApi().getWarmupService().applyWarmup(sender, "masuiteteleports.warmup.bypass", "teleports", success -> {
                     if (sender == null) {
                         System.out.println("[MaSuiteTeleports] THIS IS A BUG! Player is null (might be offline), cannot accept teleportation request Sender UUID: " + receiverUUID);
                         return;

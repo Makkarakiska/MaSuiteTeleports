@@ -36,7 +36,7 @@ public class PlayerPositionService {
      * @param loc    location of the {@link ProxiedPlayer}
      */
     public void locationReceived(ProxiedPlayer player, Location loc) {
-        MaSuitePlayer msp = plugin.api.getPlayerService().getPlayer(player.getUniqueId());
-        plugin.api.getPlayerService().updatePlayerLocation(msp, loc);
+        MaSuitePlayer msp = plugin.getApi().getPlayerService().getPlayer(player.getUniqueId());
+        plugin.getApi().getPlayerService().updatePlayerLocation(msp, loc);
     }
 }

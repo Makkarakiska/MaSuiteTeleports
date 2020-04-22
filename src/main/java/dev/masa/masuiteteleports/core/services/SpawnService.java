@@ -1,16 +1,18 @@
 package dev.masa.masuiteteleports.core.services;
 
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.table.TableUtils;
 import dev.masa.masuitecore.core.channels.BungeePluginChannel;
 import dev.masa.masuitecore.core.objects.Location;
-import dev.masa.masuitecore.core.utils.HibernateUtil;
 import dev.masa.masuiteteleports.bungee.MaSuiteTeleports;
 import dev.masa.masuiteteleports.core.models.Spawn;
 import dev.masa.masuiteteleports.core.objects.SpawnType;
+import lombok.Getter;
+import lombok.SneakyThrows;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,13 +22,16 @@ import java.util.stream.Collectors;
 
 public class SpawnService {
 
-    private EntityManager entityManager = HibernateUtil.addClasses(Spawn.class).getEntityManager();
-    public HashMap<String, List<Spawn>> spawns = new HashMap<>();
-
+    @Getter
+    private HashMap<String, List<Spawn>> spawns = new HashMap<>();
+    private Dao<Spawn, Integer> spawnDao;
     private MaSuiteTeleports plugin;
 
+    @SneakyThrows
     public SpawnService(MaSuiteTeleports plugin) {
         this.plugin = plugin;
+        spawnDao = DaoManager.createDao(plugin.getApi().getDatabaseService().getConnection(), Spawn.class);
+        TableUtils.createTableIfNotExists(plugin.getApi().getDatabaseService().getConnection(), Spawn.class);
     }
 
     public boolean teleportToSpawn(ProxiedPlayer player, SpawnType spawnType) {
@@ -43,7 +48,7 @@ public class SpawnService {
         }
 
         if (spawnType == SpawnType.DEFAULT) {
-            plugin.playerPositionService.requestPosition(player);
+            plugin.getPlayerPositionService().requestPosition(player);
         }
 
         Location loc = spawn.getLocation();
@@ -92,10 +97,9 @@ public class SpawnService {
      *
      * @param spawn spawn to create
      */
+    @SneakyThrows
     public Spawn createSpawn(Spawn spawn) {
-        entityManager.getTransaction().begin();
-        entityManager.persist(spawn);
-        entityManager.getTransaction().commit();
+        spawnDao.create(spawn);
 
         if (!spawns.containsKey(spawn.getLocation().getServer())) {
             spawns.put(spawn.getLocation().getServer(), new ArrayList<>());
@@ -109,10 +113,9 @@ public class SpawnService {
     /**
      * Update specific {@link Spawn}
      */
+    @SneakyThrows
     public Spawn updateSpawn(Spawn spawn) {
-        entityManager.getTransaction().begin();
-        entityManager.merge(spawn);
-        entityManager.getTransaction().commit();
+        spawnDao.update(spawn);
 
         // Remove spawn from list and add new back
         List<Spawn> spawnList = spawns.get(spawn.getLocation().getServer()).stream().filter(cachedSpawn -> cachedSpawn.getType() != spawn.getType()).collect(Collectors.toList());
@@ -126,10 +129,9 @@ public class SpawnService {
      *
      * @param spawn spawn to remove
      */
+    @SneakyThrows
     public void removeSpawn(Spawn spawn) {
-        entityManager.getTransaction().begin();
-        entityManager.remove(spawn);
-        entityManager.getTransaction().commit();
+        spawnDao.delete(spawn);
 
         // Update cache
         spawns.put(spawn.getLocation().getServer(), spawns.get(spawn.getLocation().getServer()).stream().filter(cachedSpawn -> cachedSpawn.getType() != spawn.getType()).collect(Collectors.toList()));
@@ -138,8 +140,9 @@ public class SpawnService {
     /**
      * Initialize spawns for use
      */
+    @SneakyThrows
     public void initializeSpawns() {
-        List<Spawn> spawnList = entityManager.createQuery("SELECT s FROM Spawn s", Spawn.class).getResultList();
+        List<Spawn> spawnList = spawnDao.queryForAll();
         spawnList.forEach(spawn -> spawns.put(spawn.getLocation().getServer(),
                 spawnList.stream().filter(listedSpawn -> listedSpawn.getLocation().getServer().equalsIgnoreCase(spawn.getLocation().getServer())).collect(Collectors.toList())));
     }
@@ -151,6 +154,7 @@ public class SpawnService {
      * @param type   type of the spawn
      * @return returns {@link Spawn} or null
      */
+    @SneakyThrows
     private Spawn loadSpawn(String server, SpawnType type) {
         /// Try to load from cache
         if (spawns.containsKey(server)) {
@@ -162,17 +166,13 @@ public class SpawnService {
 
         // Get spawn type from config
         String spawnType = plugin.config.load("teleports", "settings.yml").getString("spawn-type");
-        String query = spawnType.equalsIgnoreCase("server") ? "findSpawnByTypeAndServer" : "findSpawnByType";
 
-        TypedQuery<Spawn> namedQuery = entityManager.createNamedQuery(query, Spawn.class).setParameter("type", type);
-
-        // Add server if spawn type is server
-        if (query.equals("findSpawnByTypeAndServer")) {
-            namedQuery.setParameter("server", server);
+        Spawn spawn = null;
+        if(spawnType.equalsIgnoreCase("server")) {
+            spawn = spawnDao.queryForEq("type", type).stream().findFirst().orElse(null);
+        }else {
+            spawn = spawnDao.queryBuilder().where().in("server", server).and().in("type", type).query().stream().findFirst().orElse(null);
         }
-
-        // Execute query
-        Spawn spawn = namedQuery.getResultList().stream().findFirst().orElse(null);
 
         // If not null, try to add cache
         if (spawn != null) {
