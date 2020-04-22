@@ -1,5 +1,6 @@
 package dev.masa.masuiteteleports.core.models;
 
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import dev.masa.masuitecore.core.objects.Location;
 import dev.masa.masuiteteleports.core.objects.SpawnType;
@@ -41,7 +42,7 @@ public class Spawn {
     private Float pitch = 0.0F;
 
     @NonNull
-    @DatabaseField(columnDefinition = "smallint")
+    @DatabaseField(columnDefinition = "smallint", dataType = DataType.ENUM_INTEGER)
     private SpawnType type;
 
     public Spawn (Location location, SpawnType type) {
