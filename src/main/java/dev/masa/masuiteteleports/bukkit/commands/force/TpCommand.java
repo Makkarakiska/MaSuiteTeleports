@@ -19,35 +19,34 @@ public class TpCommand extends BaseCommand {
         plugin = p;
     }
 
-    // TODO: Add console commands
-    @Default
+    @CommandAlias("tp")
     @CommandPermission("masuiteteleports.teleport.force.player")
     @CommandCompletion("@masuite_players")
     public void teleportSenderToPlayer(Player player, String target) {
         new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "TeleportForceTo", player.getName(), "TeleportSenderToTarget", target, player.hasPermission("masuiteteleports.teleport.toggle.bypass")).send();
     }
 
-    @Default
+    @CommandAlias("tp")
     @CommandPermission("masuiteteleports.teleport.force.player")
     @CommandCompletion("@masuite_players")
     public void teleportPlayerToPlayer(Player player, String fromPlayer, String toPlayer) {
         new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "TeleportForceTo", player.getName(), "TeleportTargetToTarget", fromPlayer, toPlayer).send();
     }
 
-    @Default
+    @CommandAlias("tp")
     @CommandPermission("masuiteteleports.teleport.force.coordinates")
     public void teleportSenderToXYZ(Player player, double x, double y, double z) {
         new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "TeleportForceTo", player.getName(), "TeleportToXYZ", player.getName(), x, y, z).send();
     }
 
-    @Default
+    @CommandAlias("tp")
     @CommandPermission("masuiteteleports.teleport.force.coordinates")
     @CommandCompletion("@worlds")
     public void teleportSenderToCoordinates(Player player, String world, double x, double y, double z) {
         new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "TeleportForceTo", player.getName(), "TeleportToCoordinates", player.getName(), world, x, y, z).send();
     }
 
-    @Default
+    @CommandAlias("tp")
     @CommandPermission("masuiteteleports.teleport.force.coordinates")
     @CommandCompletion("@masuite_players @worlds")
     public void teleportPlayerToCoordinates(Player player, String targetPlayer, String world, double x, double y, double z) {
