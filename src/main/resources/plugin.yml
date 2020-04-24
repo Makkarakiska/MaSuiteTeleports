@@ -5,3 +5,4 @@ author: Masagameplay
 depends: [MaSuiteCore]
 softdepend: [Multiverse, MultiWorld]
 loadbefore: [Essentials]
+api-version: 1.15
