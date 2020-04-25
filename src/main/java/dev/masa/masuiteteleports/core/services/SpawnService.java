@@ -169,9 +169,9 @@ public class SpawnService {
 
         Spawn spawn = null;
         if(spawnType.equalsIgnoreCase("server")) {
-            spawn = spawnDao.queryForEq("type", type).stream().findFirst().orElse(null);
-        }else {
             spawn = spawnDao.queryBuilder().where().in("server", server).and().in("type", type).query().stream().findFirst().orElse(null);
+        }else {
+            spawn = spawnDao.queryForEq("type", type).stream().findFirst().orElse(null);
         }
 
         // If not null, try to add cache
