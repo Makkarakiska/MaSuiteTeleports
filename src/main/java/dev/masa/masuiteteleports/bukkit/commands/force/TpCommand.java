@@ -4,6 +4,7 @@ import dev.masa.masuitecore.acf.BaseCommand;
 import dev.masa.masuitecore.acf.annotation.*;
 import dev.masa.masuitecore.core.channels.BukkitPluginChannel;
 import dev.masa.masuiteteleports.bukkit.MaSuiteTeleports;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class TpCommand extends BaseCommand {
@@ -26,7 +27,8 @@ public class TpCommand extends BaseCommand {
     @CommandPermission("masuiteteleports.teleport.force.player")
     @CommandCompletion("@masuite_players")
     @Description("Teleport a player to an other player")
-    public void teleportPlayerToPlayer(Player player, String fromPlayer, String toPlayer) {
+    public void teleportPlayerToPlayer(CommandSender sender, String fromPlayer, String toPlayer) {
+        Player player = this.getPlayerFromSender(sender);
         new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "TeleportForceTo", player.getName(), "TeleportTargetToTarget", fromPlayer, toPlayer).send();
     }
 
@@ -47,7 +49,24 @@ public class TpCommand extends BaseCommand {
     @CommandAlias("tp")
     @CommandPermission("masuiteteleports.teleport.force.coordinates")
     @CommandCompletion("@masuite_players @worlds")
-    public void teleportPlayerToCoordinates(Player player, String targetPlayer, String world, double x, double y, double z) {
+    public void teleportPlayerToCoordinates(CommandSender sender, String targetPlayer, String world, double x, double y, double z) {
+        Player player = this.getPlayerFromSender(sender);
         new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "TeleportForceTo", player.getName(), "TeleportToCoordinates", targetPlayer, world, x, y, z).send();
+    }
+
+    /**
+     * Get the player from command sender or a random player if the sender is console
+     * @param sender sender of the command
+     * @return returns player
+     */
+    private Player getPlayerFromSender(CommandSender sender) {
+        Player player;
+        if(sender instanceof Player) {
+            player = (Player) sender;
+        } else {
+            player = plugin.getServer().getOnlinePlayers().stream().findFirst().orElse(null);
+        }
+
+        return player;
     }
 }
