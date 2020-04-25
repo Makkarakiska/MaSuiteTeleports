@@ -1,3 +1,5 @@
 respawn-type: none #Available types none (to disable respawning), bed, home, spawn
+cooldown: 3
+warmup: 3
 spawn:
   first: true
