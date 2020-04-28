@@ -111,12 +111,14 @@ public class TeleportRequestService {
         plugin.formator.sendMessage(request.getSenderAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("sender.teleport-request-accepted"), request));
         plugin.formator.sendMessage(request.getReceiverAsPlayer(), formatMessage(plugin.config.load("teleports", "messages.yml").getString("receiver.teleport-request-accepted"), request));
 
-        if(request.getType().equals(TeleportRequestType.REQUEST_TO)) {
+        if (request.getType().equals(TeleportRequestType.REQUEST_TO)) {
+            System.out.println("Send warmup here");
             new BungeePluginChannel(plugin, request.getSenderAsPlayer().getServer().getInfo(), "MaSuiteTeleports", "ApplyWarmup", request.getSender().toString(), request.getReceiver().toString()).send();
         }
 
-        if(request.getType().equals(TeleportRequestType.REQUEST_HERE)) {
-            new BungeePluginChannel(plugin, request.getReceiverAsPlayer().getServer().getInfo(), "MaSuiteTeleports", "ApplyWarmup", request.getReceiver().toString(), request.getSender().toString()).send();
+        if (request.getType().equals(TeleportRequestType.REQUEST_HERE)) {
+            System.out.println("Send warmup here");
+            new BungeePluginChannel(plugin, request.getReceiverAsPlayer().getServer().getInfo(), "MaSuiteTeleports", "ApplyWarmup", request.getReceiver().toString(), request.getReceiver().toString()).send();
         }
 
     }
