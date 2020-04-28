@@ -25,7 +25,7 @@ public class TpCommand extends BaseCommand {
 
     @CommandAlias("tp")
     @CommandPermission("masuiteteleports.teleport.force.player")
-    @CommandCompletion("@masuite_players")
+    @CommandCompletion("@masuite_players|@worlds")
     @Description("Teleport a player to an other player")
     public void teleportPlayerToPlayer(CommandSender sender, String fromPlayer, String toPlayer) {
         Player player = this.getPlayerFromSender(sender);
@@ -48,7 +48,7 @@ public class TpCommand extends BaseCommand {
 
     @CommandAlias("tp")
     @CommandPermission("masuiteteleports.teleport.force.coordinates")
-    @CommandCompletion("@masuite_players @worlds")
+    @CommandCompletion("@masuite_players @masuite_players|@worlds")
     public void teleportPlayerToCoordinates(CommandSender sender, String targetPlayer, String world, double x, double y, double z) {
         Player player = this.getPlayerFromSender(sender);
         new BukkitPluginChannel(plugin, player, "MaSuiteTeleports", "TeleportForceTo", player.getName(), "TeleportToCoordinates", targetPlayer, world, x, y, z).send();
