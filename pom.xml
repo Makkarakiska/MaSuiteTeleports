@@ -71,7 +71,7 @@
         <dependency>
             <groupId>dev.masa</groupId>
             <artifactId>MaSuiteCore</artifactId>
-            <version>2.0.0-20200422.122558-20</version>
+            <version>2.0.0-20200501.110525-24</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
