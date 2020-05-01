@@ -1,5 +1,4 @@
 keep-request-alive: 20 #In seconds
 spawn-type: server #You can use server, global and none
-cooldown: 3 #In seconds, change to 0 to disable
 enable-first-spawn: false #Set true to enable first spawn
 spawn-on-join: false #Set true to spawn player on join
