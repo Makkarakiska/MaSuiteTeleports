@@ -154,10 +154,15 @@ public class TeleportRequestService {
         ProxiedPlayer sender = request.getSenderAsPlayer();
         ProxiedPlayer receiver = request.getReceiverAsPlayer();
 
-        return message
+        message = message
                 .replace("%sender%", sender.getName())
-                .replace("%receiver%", receiver.getName())
-                .replace("%server%", receiver.getServer().getInfo().getName());
+                .replace("%receiver%", receiver.getName());
+
+        if (receiver.isConnected()) {
+            message = message.replace("%server%", receiver.getServer().getInfo().getName());
+        }
+        return message;
+
     }
 
 
