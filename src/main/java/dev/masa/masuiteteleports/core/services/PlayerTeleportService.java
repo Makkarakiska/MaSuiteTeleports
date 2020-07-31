@@ -32,8 +32,11 @@ public class PlayerTeleportService {
                 target.getName()
         );
         if (!player.getServer().getInfo().getName().equals(target.getServer().getInfo().getName())) {
-            player.connect(plugin.getProxy().getServerInfo(target.getServer().getInfo().getName()));
-            plugin.getProxy().getScheduler().schedule(plugin, bpc::send, plugin.config.load(null, "config.yml").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
+            plugin.getProxy().getScheduler().runAsync(plugin, () -> player.connect(plugin.getProxy().getServerInfo(target.getServer().getInfo().getName()), (connected, throwable) -> {
+                if (connected) {
+                    plugin.getProxy().getScheduler().schedule(plugin, bpc::send, plugin.config.load(null, "config.yml").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
+                }
+            }));
         } else {
             bpc.send();
         }
