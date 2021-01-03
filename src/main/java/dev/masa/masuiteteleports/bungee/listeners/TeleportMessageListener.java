@@ -194,8 +194,11 @@ public class TeleportMessageListener implements Listener {
             if (loc != null) {
                 plugin.getPlayerPositionService().requestPosition(sender);
                 if (!loc.getServer().equals(sender.getServer().getInfo().getName())) {
+                    String server = sender.getServer().getInfo().getName();
                     sender.connect(plugin.getProxy().getServerInfo(loc.getServer()));
-                    plugin.getProxy().getScheduler().schedule(plugin, () -> tpforce.tp(sender, sender.getName(), loc), plugin.config.load(null, "config.yml").getInt("teleportation-delay"), TimeUnit.MILLISECONDS);
+                    loc.setServer(server);
+                    plugin.getApi().getPlayerService().getPlayer(sender.getUniqueId()).setLocation(loc);
+
                 } else {
                     tpforce.tp(sender, sender.getName(), loc);
                 }
