@@ -27,6 +27,9 @@ public class PlayerJoinEvent implements Listener {
     @EventHandler
     public void onJoin(PostLoginEvent e) {
         if (plugin.config.load("teleports", "settings.yml").getBoolean("spawn-on-join")) {
+            if (e.getPlayer().hasPermission("masuiteteleports.spawn-on-join.bypass")) {
+                return;
+            }
             plugin.getProxy().getScheduler().schedule(plugin, () -> {
                 if (utils.isOnline(e.getPlayer())) {
                     plugin.getSpawnService().teleportToSpawn(e.getPlayer(), SpawnType.DEFAULT);
